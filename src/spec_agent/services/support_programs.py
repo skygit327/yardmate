@@ -292,6 +292,38 @@ def _province(region: str) -> str | None:
     )
 
 
+def facets(program: dict) -> dict:
+    """Support fields and regions of a notice, for search and filters.
+
+    Fields: the API's own field names when the notice came from Bizinfo, otherwise words in the
+    title, purpose and support text. Regions: the notice's location conditions and the
+    [region] prefix of its title; no region at all means "*" (anywhere).
+    """
+    notice = program["notice"]
+    categories = LEX["categories"]
+    given = set(program.get("categories") or [])
+    text = " ".join([notice["title"], notice.get("purpose", ""), *notice.get("support", [])])
+    found = [
+        key
+        for key, item in categories.items()
+        if not key.startswith("_")
+        and key != "other"
+        and (item["ko"] in given or any(word in text for word in item["words"]))
+    ]
+    regions = set()
+    for condition in notice["conditions"]:
+        if condition["field"] == "region":
+            regions.update(condition["rule"].get("any", []))
+        elif condition["field"] == "area":
+            regions.update(
+                LEX["area_provinces"].get(name, "") for name in condition["rule"].get("any", [])
+            )
+    for tag in re.findall(r"\[([^\]]+)\]", notice["title"]):
+        regions.update(p for word, p in LEX["feed"]["region_tags"].items() if word in tag)
+    regions.discard("")
+    return {"categories": found or ["other"], "regions": sorted(regions) or ["*"]}
+
+
 def judge(notice: dict, profile: CompanyProfile, today: date | None = None) -> dict:
     """Each condition gets pass / fail / unknown with what the profile says."""
     today = today or date.today()
@@ -423,7 +455,16 @@ class SupportPrograms:
     def profile(self) -> dict:
         with self.workflow.lock:
             saved = self.store.company_profile()
-        choices = {"company_types": list(TYPES.values()), "certificates": list(CERTIFICATES)}
+        choices = {
+            "company_types": list(TYPES.values()),
+            "certificates": list(CERTIFICATES),
+            "categories": {
+                key: {lang: item[lang] for lang in LANGUAGES}
+                for key, item in LEX["categories"].items()
+                if not key.startswith("_")
+            },
+            "regions": LEX["province_order"],
+        }
         if saved is None:
             return {**DEMO_PROFILE.model_dump(), "demo": True, "choices": choices}
         return {**saved, "demo": False, "choices": choices}
@@ -441,7 +482,9 @@ class SupportPrograms:
         with self.workflow.lock:
             programs = self.store.support_programs()
         profile = self._profile_model()
-        result = [{**p, "match": judge(p["notice"], profile)} for p in programs]
+        result = [
+            {**p, "match": judge(p["notice"], profile), "facets": facets(p)} for p in programs
+        ]
         order = {"ELIGIBLE": 0, "CHECK": 1, "INELIGIBLE": 2, "CLOSED": 3}
         return sorted(
             result, key=lambda p: (order[p["match"]["overall"]], p["notice"]["deadline"] or "9999")
@@ -450,7 +493,11 @@ class SupportPrograms:
     def get(self, program_id: str) -> dict:
         with self.workflow.lock:
             program = self.store.support_program(program_id)
-        return {**program, "match": judge(program["notice"], self._profile_model())}
+        return {
+            **program,
+            "match": judge(program["notice"], self._profile_model()),
+            "facets": facets(program),
+        }
 
     def add(
         self, text: str, filename: str = "", source: str = "manual", extra: dict | None = None

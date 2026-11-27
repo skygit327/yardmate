@@ -62,3 +62,18 @@ def test_bad_response_is_reported():
 def test_feed_needs_a_session(client):
     client.cookies.clear()
     assert client.post("/api/programs/feed").status_code in {401, 403}
+
+
+def test_notices_carry_fields_and_regions_for_search(client, monkeypatch):
+    monkeypatch.delenv("SPEC_AGENT_BIZINFO_API_KEY", raising=False)
+    client.post("/api/programs/samples")
+    client.post("/api/programs/feed")
+    programs = {p["notice"]["title"]: p["facets"] for p in client.get("/api/programs").json()}
+    crisis = next(f for title, f in programs.items() if "스마트야드" in title)
+    assert "technology" in crisis["categories"] and crisis["regions"] == ["경남", "울산"]
+    busan = next(f for title, f in programs.items() if "부산항" in title)
+    assert busan["regions"] == ["부산"]
+    nationwide = next(f for title, f in programs.items() if "뿌리산업" in title)
+    assert nationwide["regions"] == ["*"]
+    choices = client.get("/api/company-profile").json()["choices"]
+    assert choices["categories"]["export"]["ko"] == "수출" and choices["regions"][0] == "부산"

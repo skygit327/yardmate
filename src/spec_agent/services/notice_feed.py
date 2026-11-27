@@ -119,6 +119,14 @@ def _reason(kind: str, **values) -> dict:
     return {lang: FEED["reasons"][kind][lang].format(**values) for lang in LANGUAGES}
 
 
+def _categories(item: dict) -> list[str]:
+    """The API's own support-field names, e.g. "management@startup" style values."""
+    names = re.split(r"[@,]", str(item.get("pldirSportRealmLclasCodeNm") or ""))
+    known = {entry["ko"] for key, entry in LEX["categories"].items() if not key.startswith("_")}
+    names += [tag for tag in _tags(item) if tag in known]
+    return sorted({name.strip() for name in names if name.strip()})
+
+
 def notice_text(item: dict, province: str | None) -> str:
     """Bizinfo fields written out as a notice, so the normal reader can judge it."""
     heads = FEED["headings"]
@@ -201,7 +209,11 @@ class NoticeFeed:
                     notice_text(item, province),
                     filename,
                     "bizinfo",
-                    extra={"url": item.get("pblancUrl"), "fit": fit},
+                    extra={
+                        "url": item.get("pblancUrl"),
+                        "fit": fit,
+                        "categories": _categories(item),
+                    },
                 )
                 existing.add(filename)
                 added.append(program["id"])

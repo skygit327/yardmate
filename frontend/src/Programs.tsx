@@ -18,11 +18,11 @@ interface Match {
 }
 interface Notice {
   title: string; agency: string; opens: string | null; deadline: string | null;
-  amount: { text: string; manwon: number } | null; support: string[]; documents: string[]; synthetic: boolean;
+  amount: { text: string; manwon: number } | null; support: string[]; documents: string[]; synthetic: boolean; purpose?: string;
 }
 export interface Program {
   id: string; created_at: string; filename: string; source: string; notice: Notice; match: Match;
-  url?: string | null; fit?: { score: number; reasons: Texts[] };
+  url?: string | null; fit?: { score: number; reasons: Texts[] }; facets?: { categories: string[]; regions: string[] };
   tasks: { id: string; title: Texts; due: string }[];
 }
 interface Profile {
@@ -30,7 +30,7 @@ interface Profile {
   employees: number | null; revenue_eok: number | null; founded: number | null; export_usd: number | null;
   certifications: string[]; main_customers: string[]; received: string[];
   tax_arrears: boolean; closed: boolean; demo: boolean;
-  choices: { company_types: string[]; certificates: string[] };
+  choices: { company_types: string[]; certificates: string[]; categories?: Record<string, Texts>; regions?: string[] };
 }
 
 const overallLabel: Record<Overall, string> = {
@@ -76,6 +76,13 @@ export default function Programs({ busy, perform, initialProgram, onProgramUsed,
   const [file, setFile] = useState<File | null>(null);
   const [saved, setSaved] = useState('');
   const [feed, setFeed] = useState<FeedStatus | null>(null);
+  const [query, setQuery] = useState('');
+  const [fields, setFields] = useState<Set<string>>(new Set());
+  const [region, setRegion] = useState('');
+  const [due, setDue] = useState<'all' | '7' | '30'>('all');
+  const [origin, setOrigin] = useState<'all' | 'bizinfo' | 'manual' | 'sample'>('all');
+  const [sort, setSort] = useState<'deadline' | 'newest' | 'met'>('deadline');
+  const [detailed, setDetailed] = useState(false);
 
   async function load() {
     const [list, company, status] = await Promise.all([api<Program[]>('/programs'), api<Profile>('/company-profile'), api<FeedStatus>('/programs/feed').catch(() => null)]);
@@ -92,8 +99,29 @@ export default function Programs({ busy, perform, initialProgram, onProgramUsed,
   }, [initialProgram]);
 
   const pick = (texts: Texts) => texts[language] || texts.en;
-  const counts = (kind: Overall | 'ALL') => kind === 'ALL' ? programs.length : programs.filter(p => p.match.overall === kind).length;
-  const visible = programs.filter(p => filter === 'ALL' || p.match.overall === filter);
+  const words = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const searched = programs.filter(p => {
+    const haystack = [p.notice.title, p.notice.agency, p.notice.purpose ?? '', ...(p.notice.support ?? [])].join(' ').toLowerCase();
+    if (!words.every(word => haystack.includes(word))) return false;
+    if (fields.size && !p.facets?.categories.some(key => fields.has(key))) return false;
+    if (region && !(p.facets?.regions.includes(region) || p.facets?.regions.includes('*'))) return false;
+    if (due !== 'all' && (p.match.days_left === null || p.match.days_left < 0 || p.match.days_left > Number(due))) return false;
+    if (origin !== 'all' && (origin === 'manual' ? ['bizinfo', 'sample'].includes(p.source) : p.source !== origin)) return false;
+    return true;
+  });
+  const counts = (kind: Overall | 'ALL') => kind === 'ALL' ? searched.length : searched.filter(p => p.match.overall === kind).length;
+  const ordered = [...searched].sort((a, b) => sort === 'newest' ? b.created_at.localeCompare(a.created_at)
+    : sort === 'met' ? (b.match.met / Math.max(b.match.required, 1)) - (a.match.met / Math.max(a.match.required, 1))
+      : programs.indexOf(a) - programs.indexOf(b));
+  const visible = ordered.filter(p => filter === 'ALL' || p.match.overall === filter);
+  const filtering = words.length > 0 || fields.size > 0 || region !== '' || due !== 'all' || origin !== 'all';
+  const categories = Object.entries(profile?.choices.categories ?? {});
+  const toggleField = (key: string) => setFields(current => {
+    const next = new Set(current);
+    if (next.has(key)) next.delete(key); else next.add(key);
+    return next;
+  });
+  const resetFilters = () => { setQuery(''); setFields(new Set()); setRegion(''); setDue('all'); setOrigin('all'); };
   const fmtDate = (value: string | null) => value ? new Date(value + 'T00:00:00').toLocaleDateString(locale, { month: 'short', day: 'numeric', weekday: 'short' }) : '-';
 
   async function collect() {
@@ -284,6 +312,40 @@ export default function Programs({ busy, perform, initialProgram, onProgramUsed,
       </span>
       <button disabled={busy} onClick={() => perform(collect)}><Icon name="download" size={16} />{t("Collect now")}</button>
     </div>
+    <div className="program-search" role="search">
+      <div className="search-line">
+        <label className="search-box"><Icon name="search" size={16} /><span className="sr-only">{t("Search notices")}</span>
+          <input type="search" value={query} maxLength={100} placeholder={t("Search title, agency or content")} onChange={event => setQuery(event.target.value)} /></label>
+        <button type="button" className={detailed ? 'selected' : ''} aria-expanded={detailed} onClick={() => setDetailed(value => !value)}><Icon name="filter" size={16} />{t("Detailed search")}</button>
+        <select aria-label={t("Sort")} value={sort} onChange={event => setSort(event.target.value as typeof sort)}>
+          <option value="deadline">{t("Closing soonest")}</option>
+          <option value="newest">{t("Newest first")}</option>
+          <option value="met">{t("Most conditions met")}</option>
+        </select>
+      </div>
+      <div className="field-chips" role="group" aria-label={t("Support field")}>
+        {categories.map(([key, label]) => <button type="button" key={key} aria-pressed={fields.has(key)} className={`chip-button ${fields.has(key) ? 'selected' : ''}`} onClick={() => toggleField(key)}>{pick(label)}</button>)}
+      </div>
+      {detailed && <div className="detail-filters">
+        <label>{t("Region")}<select value={region} onChange={event => setRegion(event.target.value)}>
+          <option value="">{t("All regions")}</option>
+          {(profile?.choices.regions ?? []).map(name => <option key={name} value={name}>{name}</option>)}
+        </select><small>{t("Nationwide notices are included")}</small></label>
+        <label>{t("Deadline")}<select value={due} onChange={event => setDue(event.target.value as typeof due)}>
+          <option value="all">{t("Any time")}</option>
+          <option value="7">{t("Within 7 days")}</option>
+          <option value="30">{t("Within 30 days")}</option>
+        </select></label>
+        <label>{t("Notice source")}<select value={origin} onChange={event => setOrigin(event.target.value as typeof origin)}>
+          <option value="all">{t("All sources")}</option>
+          <option value="bizinfo">{t("Bizinfo")}</option>
+          <option value="manual">{t("Added by us")}</option>
+          <option value="sample">{t("Synthetic samples")}</option>
+        </select></label>
+      </div>}
+      {filtering && <p className="search-result">{t("{count} notices match").replace('{count}', String(searched.length))}
+        <button type="button" className="ghost small" onClick={resetFilters}><Icon name="x" size={14} />{t("Clear filters")}</button></p>}
+    </div>
     <div className="filter-tiles four" role="group" aria-label={t("Filter programmes")}>
       {(['ELIGIBLE', 'CHECK', 'INELIGIBLE', 'ALL'] as const).map(kind => <button key={kind} aria-pressed={filter === kind}
         className={`${filter === kind ? 'selected' : ''} ${kind === 'INELIGIBLE' && counts(kind) ? 'bad' : ''}`} onClick={() => setFilter(kind)}>
@@ -293,9 +355,12 @@ export default function Programs({ busy, perform, initialProgram, onProgramUsed,
       {programs.length === 0
         ? <div className="empty"><p>{t("No notices yet. Add one, drop a file into the support-notice work folder, or load the samples.")}</p>
           <button className="primary big" disabled={busy} onClick={() => perform(addSamples)}><Icon name="file" />{t("Load sample notices")}</button></div>
-        : visible.length === 0 ? <p className="muted center">{t("No notices in this group.")}</p>
+        : visible.length === 0 ? <div className="empty"><p className="muted center">{filtering ? t("No notices match these filters.") : t("No notices in this group.")}</p>
+          {filtering && <button type="button" onClick={resetFilters}>{t("Clear filters")}</button>}</div>
           : <div className="inspection-list">{visible.map(program => <button key={program.id} className="inspection-row program-row" disabled={busy} onClick={() => setSelected(program)}>
             <div><strong>{program.notice.title}</strong>
+              {program.facets && <span className="row-tags">{program.facets.categories.map(key => <span key={key} className="tag">{pick(profile?.choices.categories?.[key] ?? { en: key, ko: key, zh: key })}</span>)}
+                {program.facets.regions.map(name => <span key={name} className="tag region">{name === '*' ? t("Nationwide") : name}</span>)}</span>}
               <small>{program.source === 'bizinfo' && <span className="source-mark">{t("Bizinfo")} · </span>}{program.notice.agency || '-'} · {t("Deadline")} {fmtDate(program.notice.deadline)}
                 {program.notice.amount && <> · {program.notice.amount.text}</>} · {t("Conditions met")} {program.match.met}/{program.match.required}
                 {program.tasks.length > 0 && <> · {t("Tasks registered")}</>}</small></div>
