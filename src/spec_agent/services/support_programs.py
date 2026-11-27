@@ -452,8 +452,11 @@ class SupportPrograms:
             program = self.store.support_program(program_id)
         return {**program, "match": judge(program["notice"], self._profile_model())}
 
-    def add(self, text: str, filename: str = "", source: str = "manual") -> dict:
+    def add(
+        self, text: str, filename: str = "", source: str = "manual", extra: dict | None = None
+    ) -> dict:
         program = {
+            **(extra or {}),
             "id": str(uuid4()),
             "created_at": timestamp(),
             "filename": filename,

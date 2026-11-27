@@ -426,5 +426,77 @@
     "부산 영도구",
     "영도"
   ],
-  "district_suffixes": "시군구"
+  "district_suffixes": "시군구",
+  "feed": {
+    "_comment": "Words for turning a Bizinfo (기업마당) API item into notice text, and for picking notices that fit the company.",
+    "headings": {
+      "agency": "주관기관",
+      "purpose": "1. 사업목적",
+      "eligibility": "2. 신청자격",
+      "period": "3. 접수기간",
+      "link": "공고 원문"
+    },
+    "region_line": "{region} 소재 기업",
+    "target_line": "{target}",
+    "region_tags": {
+      "부산": "부산",
+      "울산": "울산",
+      "경남": "경남",
+      "경상남도": "경남",
+      "창원": "경남",
+      "거제": "경남",
+      "통영": "경남",
+      "김해": "경남"
+    },
+    "nationwide_tags": [
+      "전국"
+    ],
+    "other_region_tags": [
+      "서울",
+      "경기",
+      "인천",
+      "대구",
+      "대전",
+      "광주",
+      "전남광주",
+      "세종",
+      "강원",
+      "충북",
+      "충남",
+      "전북",
+      "전남",
+      "경북",
+      "제주"
+    ],
+    "industry_words": [
+      "조선",
+      "선박",
+      "해양",
+      "기자재",
+      "용접",
+      "도장",
+      "항만",
+      "해운",
+      "뿌리",
+      "제조"
+    ],
+    "reasons": {
+      "region": {
+        "en": "Notice for {region}",
+        "ko": "{region} 공고",
+        "zh": "{region}公告"
+      },
+      "nationwide": {
+        "en": "Nationwide notice",
+        "ko": "전국 공고",
+        "zh": "全国公告"
+      },
+      "industry": {
+        "en": "Mentions {words}",
+        "ko": "{words} 관련",
+        "zh": "涉及{words}"
+      }
+    },
+    "detail_line": "세부 신청자격은 공고 원문 확인 필요"
+  }
 }

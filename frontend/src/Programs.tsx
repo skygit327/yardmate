@@ -22,6 +22,7 @@ interface Notice {
 }
 export interface Program {
   id: string; created_at: string; filename: string; source: string; notice: Notice; match: Match;
+  url?: string | null; fit?: { score: number; reasons: Texts[] };
   tasks: { id: string; title: Texts; due: string }[];
 }
 interface Profile {
@@ -57,6 +58,9 @@ function dday(days: number | null) {
 const listToText = (items: string[]) => items.join(', ');
 const textToList = (text: string) => text.split(/[,\n]/).map(item => item.trim()).filter(Boolean);
 
+interface FeedRun { mode: 'live' | 'sample'; fetched?: number; matched?: number; added?: number; error?: string; at: string }
+interface FeedStatus { mode: 'live' | 'sample'; last: FeedRun | null }
+
 export default function Programs({ busy, perform, initialProgram, onProgramUsed, onOpenTasks, initialView }: {
   busy: boolean; perform: (task: () => Promise<void>) => Promise<void>;
   initialProgram: string | null; onProgramUsed: () => void; onOpenTasks: () => void; initialView?: 'list' | 'profile';
@@ -71,9 +75,11 @@ export default function Programs({ busy, perform, initialProgram, onProgramUsed,
   const [text, setText] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [saved, setSaved] = useState('');
+  const [feed, setFeed] = useState<FeedStatus | null>(null);
 
   async function load() {
-    const [list, company] = await Promise.all([api<Program[]>('/programs'), api<Profile>('/company-profile')]);
+    const [list, company, status] = await Promise.all([api<Program[]>('/programs'), api<Profile>('/company-profile'), api<FeedStatus>('/programs/feed').catch(() => null)]);
+    setFeed(status);
     setPrograms(list);
     setProfile(company);
     setDraft(company);
@@ -89,6 +95,12 @@ export default function Programs({ busy, perform, initialProgram, onProgramUsed,
   const counts = (kind: Overall | 'ALL') => kind === 'ALL' ? programs.length : programs.filter(p => p.match.overall === kind).length;
   const visible = programs.filter(p => filter === 'ALL' || p.match.overall === filter);
   const fmtDate = (value: string | null) => value ? new Date(value + 'T00:00:00').toLocaleDateString(locale, { month: 'short', day: 'numeric', weekday: 'short' }) : '-';
+
+  async function collect() {
+    const last = await api<FeedRun>('/programs/feed', {});
+    await load();
+    setFeed({ mode: last.mode, last });
+  }
 
   async function addSamples() {
     await api<Program[]>('/programs/samples', {});
@@ -147,8 +159,11 @@ export default function Programs({ busy, perform, initialProgram, onProgramUsed,
         <button className="ghost" onClick={() => setSelected(null)}><Icon name="back" />{t("Back")}</button>
         <span className={`badge ${overallTone[match.overall]}`}>{t(overallLabel[match.overall])}</span>
         {notice.synthetic && <span className="chip">{t("Synthetic sample notice")}</span>}
+        {selected.source === 'bizinfo' && <span className="chip source-chip">{t("Collected from Bizinfo")}</span>}
       </div>
       <h1 className="program-title">{notice.title}</h1>
+      {selected.fit && <p className="fit-line">{selected.fit.reasons.map(pick).join(' · ')}
+        {selected.url && <> · <a href={selected.url} target="_blank" rel="noopener noreferrer">{t("Open the original notice")}</a></>}</p>}
       <div className="program-meta">
         <span><Icon name="building" size={15} />{notice.agency || t("Agency not stated")}</span>
         <span><Icon name="calendar" size={15} />{notice.opens ? `${fmtDate(notice.opens)} ~ ` : ''}{fmtDate(notice.deadline)}
@@ -259,6 +274,16 @@ export default function Programs({ busy, perform, initialProgram, onProgramUsed,
         <button className="primary" disabled={busy} onClick={() => setView('add')}><Icon name="plus" size={16} />{t("Add a notice")}</button>
       </div></header>
     {profileLine}
+    <div className="feed-bar">
+      <span className="feed-text"><Icon name="refresh" size={16} />
+        <strong>{t("Automatic collection from Bizinfo")}</strong>
+        <span className="muted">{feed?.mode === 'live' ? t("Every 12 hours with your API key") : t("No API key: a synthetic sample response is used")}</span>
+        {feed?.last && (feed.last.error
+          ? <span className="feed-error">{t("Collection failed")}: {feed.last.error}</span>
+          : <span>{t("Last run")} {new Date(feed.last.at).toLocaleString(locale, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })} · {t("{matched} of {fetched} fit your company, {added} new").replace('{matched}', String(feed.last.matched ?? 0)).replace('{fetched}', String(feed.last.fetched ?? 0)).replace('{added}', String(feed.last.added ?? 0))}</span>)}
+      </span>
+      <button disabled={busy} onClick={() => perform(collect)}><Icon name="download" size={16} />{t("Collect now")}</button>
+    </div>
     <div className="filter-tiles four" role="group" aria-label={t("Filter programmes")}>
       {(['ELIGIBLE', 'CHECK', 'INELIGIBLE', 'ALL'] as const).map(kind => <button key={kind} aria-pressed={filter === kind}
         className={`${filter === kind ? 'selected' : ''} ${kind === 'INELIGIBLE' && counts(kind) ? 'bad' : ''}`} onClick={() => setFilter(kind)}>
@@ -271,7 +296,7 @@ export default function Programs({ busy, perform, initialProgram, onProgramUsed,
         : visible.length === 0 ? <p className="muted center">{t("No notices in this group.")}</p>
           : <div className="inspection-list">{visible.map(program => <button key={program.id} className="inspection-row program-row" disabled={busy} onClick={() => setSelected(program)}>
             <div><strong>{program.notice.title}</strong>
-              <small>{program.notice.agency || '-'} · {t("Deadline")} {fmtDate(program.notice.deadline)}
+              <small>{program.source === 'bizinfo' && <span className="source-mark">{t("Bizinfo")} · </span>}{program.notice.agency || '-'} · {t("Deadline")} {fmtDate(program.notice.deadline)}
                 {program.notice.amount && <> · {program.notice.amount.text}</>} · {t("Conditions met")} {program.match.met}/{program.match.required}
                 {program.tasks.length > 0 && <> · {t("Tasks registered")}</>}</small></div>
             {program.match.days_left !== null && program.match.overall !== 'CLOSED'

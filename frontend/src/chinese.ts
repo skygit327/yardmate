@@ -1,5 +1,15 @@
 // Simplified Chinese UI catalogue. Keys are the English source strings.
 export const chinese: Record<string, string> = {
+  "Collected from Bizinfo": "从企业广场收集",
+  "Open the original notice": "查看公告原文",
+  "Automatic collection from Bizinfo": "企业广场公告自动收集",
+  "Every 12 hours with your API key": "使用 API 密钥每 12 小时收集一次",
+  "No API key: a synthetic sample response is used": "未设置 API 密钥：使用演示用虚拟示例",
+  "Collection failed": "收集失败",
+  "Last run": "上次收集",
+  "{matched} of {fetched} fit your company, {added} new": "{fetched} 条中 {matched} 条适合本公司，新增 {added} 条",
+  "Collect now": "立即收集",
+  "Bizinfo": "企业广场",
   "Add a notice": "添加公告",
   "Add a support programme notice": "添加支持项目公告",
   "Agency not stated": "未注明主管机构",

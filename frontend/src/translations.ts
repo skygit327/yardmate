@@ -9,6 +9,16 @@ export const languages: { code: Language; label: string; short: string; switchLa
 export { chinese };
 
 export const korean: Record<string, string> = {
+  "Collected from Bizinfo": "기업마당에서 수집",
+  "Open the original notice": "공고 원문 보기",
+  "Automatic collection from Bizinfo": "기업마당 공고 자동 수집",
+  "Every 12 hours with your API key": "API 키로 12시간마다 가져옵니다",
+  "No API key: a synthetic sample response is used": "API 키가 없어 시연용 가상 샘플을 사용합니다",
+  "Collection failed": "수집 실패",
+  "Last run": "마지막 수집",
+  "{matched} of {fetched} fit your company, {added} new": "{fetched}건 중 {matched}건이 우리 회사에 맞음, 새 공고 {added}건",
+  "Collect now": "지금 가져오기",
+  "Bizinfo": "기업마당",
   "Inspections & reports": "검사·성적서",
   "Local support": "지역 지원",
   "Read a spec form": "검사기준 양식 읽기",

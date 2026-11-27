@@ -38,6 +38,7 @@ from spec_agent.services.automation import Automation, TaskInput, TaskUpdate
 from spec_agent.services.customer_desk import CustomerDesk
 from spec_agent.services.documents import MAX_REQUEST_BYTES
 from spec_agent.services.form_intake import MAX_FORM_BYTES, FormIntake
+from spec_agent.services.notice_feed import NoticeFeed
 from spec_agent.services.revision_agent import LLMClient, LLMError
 from spec_agent.services.support_programs import (
     MAX_NOTICE_BYTES,
@@ -96,6 +97,7 @@ def create_app(settings: Settings | None = None, llm_client=None) -> FastAPI:
         app.state.intake = FormIntake(app.state.workflow, llm_client)
         app.state.traceback = TracebackDesk(app.state.workflow)
         app.state.programs = SupportPrograms(app.state.workflow)
+        app.state.feed = NoticeFeed(app.state.programs)
         app.state.automation = Automation(
             app.state.workflow,
             app.state.desk,
@@ -119,10 +121,12 @@ def create_app(settings: Settings | None = None, llm_client=None) -> FastAPI:
             app.state.auth = AuthStore(settings)
             bootstrap_hosted_demo(app)
             app.state.automation.start()
+            app.state.feed.start()
             try:
                 yield
             finally:
                 app.state.automation.stop()
+                app.state.feed.stop()
                 app.state.auth.close()
         finally:
             app.state.workflow.close()
@@ -364,6 +368,14 @@ def create_app(settings: Settings | None = None, llm_client=None) -> FastAPI:
         from spec_agent.reports.i18n import resource
 
         return resource()["glossary"]
+
+    @app.get("/api/programs/feed")
+    def notice_feed_status():
+        return app.state.feed.status()
+
+    @app.post("/api/programs/feed")
+    def notice_feed_refresh():
+        return app.state.feed.refresh()
 
     @app.post("/api/demo/shipyard")
     def load_shipyard_demo(request: Request):

@@ -1,0 +1,89 @@
+{
+  "_comment": "Synthetic sample in the shape of the Bizinfo 지원사업정보 API response, used when no API key is set. Every notice is invented and marked 가상.",
+  "jsonArray": [
+    {
+      "pblancId": "SAMPLE_0001",
+      "pblancNm": "[경남] (가상) 2026년 조선업 위기지역 협력사 용접 자동화 장비 도입 지원",
+      "jrsdInsttNm": "(가상) 경상남도",
+      "excInsttNm": "(가상) 경남조선해양진흥원",
+      "bsnsSumryCn": "<p>거제·통영·고성 등 조선업 위기지역 조선기자재 중소기업의 용접 자동화 장비 도입 비용을 지원합니다. 기업당 최대 5천만원.</p>",
+      "trgetNm": "중소기업",
+      "hashTags": "2026,기술,경남,경상남도",
+      "reqstBeginEndDe": "20261201 ~ 20261222",
+      "pblancUrl": "https://www.bizinfo.go.kr/",
+      "creatPnttm": "2026-11-20 10:00:00"
+    },
+    {
+      "pblancId": "SAMPLE_0002",
+      "pblancNm": "[전국] (가상) 2026년 뿌리산업(용접·도장) 공정 디지털화 지원사업",
+      "jrsdInsttNm": "(가상) 중앙부처",
+      "excInsttNm": "(가상) 뿌리산업진흥센터",
+      "bsnsSumryCn": "<p>용접·도장 등 뿌리기술 기업의 공정 데이터 수집과 품질 검사 디지털화를 지원합니다.</p>",
+      "trgetNm": "중소기업",
+      "hashTags": "2026,기술,전국",
+      "reqstBeginEndDe": "2026-12-03 ~ 2027-01-08",
+      "pblancUrl": "https://www.bizinfo.go.kr/",
+      "creatPnttm": "2026-11-18 09:00:00"
+    },
+    {
+      "pblancId": "SAMPLE_0003",
+      "pblancNm": "[경남] (가상) 2026년 경남 제조기업 해외규격 인증 획득 지원",
+      "jrsdInsttNm": "(가상) 경상남도",
+      "excInsttNm": "(가상) 경남테크노파크",
+      "bsnsSumryCn": "<p>수출을 준비하는 도내 제조 중소기업의 해외규격 인증 시험·심사 비용을 지원합니다.</p>",
+      "trgetNm": "중소기업",
+      "hashTags": "2026,수출,경남",
+      "reqstBeginEndDe": "20261207 ~ 20261231",
+      "pblancUrl": "https://www.bizinfo.go.kr/",
+      "creatPnttm": "2026-11-22 14:00:00"
+    },
+    {
+      "pblancId": "SAMPLE_0004",
+      "pblancNm": "[부산] (가상) 2026년 부산 해양·조선 기자재 수출 바우처",
+      "jrsdInsttNm": "(가상) 부산광역시",
+      "excInsttNm": "(가상) 부산경제진흥원",
+      "bsnsSumryCn": "<p>부산 소재 해양·조선 기자재 기업의 해외 마케팅을 지원합니다.</p>",
+      "trgetNm": "중소기업",
+      "hashTags": "2026,수출,부산",
+      "reqstBeginEndDe": "20261201 ~ 20261215",
+      "pblancUrl": "https://www.bizinfo.go.kr/",
+      "creatPnttm": "2026-11-19 11:00:00"
+    },
+    {
+      "pblancId": "SAMPLE_0005",
+      "pblancNm": "[서울] (가상) 2026년 소상공인 온라인 판로 지원",
+      "jrsdInsttNm": "(가상) 서울특별시",
+      "excInsttNm": "(가상) 서울경제진흥원",
+      "bsnsSumryCn": "<p>서울 소재 소상공인의 온라인 쇼핑몰 입점을 지원합니다.</p>",
+      "trgetNm": "소상공인",
+      "hashTags": "2026,내수,서울",
+      "reqstBeginEndDe": "20261201 ~ 20261220",
+      "pblancUrl": "https://www.bizinfo.go.kr/",
+      "creatPnttm": "2026-11-21 09:00:00"
+    },
+    {
+      "pblancId": "SAMPLE_0006",
+      "pblancNm": "[전국] (가상) 2026년 청년 창업사관학교 입교생 모집",
+      "jrsdInsttNm": "(가상) 중앙부처",
+      "excInsttNm": "(가상) 창업진흥기관",
+      "bsnsSumryCn": "<p>만 39세 이하 예비창업자의 사업화를 지원합니다.</p>",
+      "trgetNm": "청년",
+      "hashTags": "2026,창업,전국",
+      "reqstBeginEndDe": "20261125 ~ 20261210",
+      "pblancUrl": "https://www.bizinfo.go.kr/",
+      "creatPnttm": "2026-11-15 09:00:00"
+    },
+    {
+      "pblancId": "SAMPLE_0007",
+      "pblancNm": "[경남] (가상) 2026년 경남 조선기자재 품질개선 바우처 (마감)",
+      "jrsdInsttNm": "(가상) 경상남도",
+      "excInsttNm": "(가상) 경남테크노파크",
+      "bsnsSumryCn": "<p>조선기자재 기업의 품질개선을 지원합니다.</p>",
+      "trgetNm": "중소기업",
+      "hashTags": "2026,기술,경남",
+      "reqstBeginEndDe": "20261001 ~ 20261031",
+      "pblancUrl": "https://www.bizinfo.go.kr/",
+      "creatPnttm": "2026-09-25 09:00:00"
+    }
+  ]
+}
