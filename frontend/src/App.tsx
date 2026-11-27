@@ -311,15 +311,16 @@ export default function App({ user, onLogout, loggingOut }: {
   ];
 
   return <div className="app-shell">
-    <aside className="sidebar">
+    <header className="topbar">
       <a className="brand" href="/" aria-label={t("YardMate home")}><span className="brand-mark" aria-hidden="true"><svg viewBox="0 0 40 40" width="40" height="40"><path d="M6 22h28l-4 9H10z" fill="#c4532f" /><path d="M6 22h28" stroke="#fff" strokeWidth="2" /><path d="M12 22V12h9v10M23 22v-6h6v6" fill="none" stroke="#dbe7ef" strokeWidth="2.4" strokeLinejoin="round" /></svg></span><div>YardMate<small>{t("Shipyard supplier workspace")}</small></div></a>
       <nav aria-label={t("Main")}>
         {navItems.map((item, index) => <Fragment key={item.tab}>
           {index === 1 || index === 4 ? <span className="nav-divider" aria-hidden="true" /> : null}
-          <button className={tab === item.tab ? 'active' : ''} aria-current={tab === item.tab ? 'page' : undefined} onClick={() => go(item.tab)} title={item.hint ? t(item.hint) : undefined}>
+          <button className={tab === item.tab ? 'active' : ''} aria-current={tab === item.tab ? 'page' : undefined} aria-label={t(item.label)} onClick={() => go(item.tab)} title={item.hint ? t(item.hint) : undefined}>
             <Icon name={item.icon} /><span>{t(item.label)}</span></button></Fragment>)}</nav>
-      <button className="sidebar-cta primary" disabled={busy} onClick={startInspection}><Icon name="plus" />{t("New inspection")}</button>
-      <button className={`sidebar-note ${tab === 'ai' ? 'active' : ''}`} onClick={() => setTab('ai')} title={llm && llm.provider !== 'none' && llm.external && !llm.allow_internal ? t("Internal standards and customer requests use the rule-based analysis.") : undefined}>
+      <div className="top-actions">
+  <button className="sidebar-cta primary" disabled={busy} onClick={startInspection}><Icon name="plus" />{t("New inspection")}</button>
+        <button className={`sidebar-note ${tab === 'ai' ? 'active' : ''}`} onClick={() => setTab('ai')} title={llm && llm.provider !== 'none' && llm.external && !llm.allow_internal ? t("Internal standards and customer requests use the rule-based analysis.") : undefined}>
         <span className={`live-dot ${llm && llm.provider !== 'none' ? 'ai' : ''}`} />
         {llm && llm.provider !== 'none'
           ? `${t("AI connected")}: ${providerName[llm.provider] ?? llm.provider}${llm.external ? '' : ` (${t("local")})`}`
@@ -327,15 +328,16 @@ export default function App({ user, onLogout, loggingOut }: {
         {llm && llm.provider !== 'none' && llm.external && !llm.allow_internal && <small>{t("Internal data stays rule-based")}</small>}
         <small className="settings-link"><Icon name="gear" size={12} /> {t("AI settings")}</small>
       </button>
-    </aside>
+        <span className="chip demo-chip">{t("Demo data")}</span><LanguageToggle /><span className="user-name">{user.display_name}</span>
+        <button className="icon-button" aria-label={t("Sign out")} title={t("Sign out")} disabled={busy || loggingOut} onClick={() => void onLogout()}><Icon name="logout" /></button>
+      </div>
+    </header>
     <main>
-      <div className="account-bar"><span className="mobile-brand" aria-hidden="true">YardMate</span><span className="chip demo-chip">{t("Demo data")}</span><LanguageToggle /><span className="user-name">{user.display_name}</span>
-        <button className="icon-button" aria-label={t("Sign out")} title={t("Sign out")} disabled={busy || loggingOut} onClick={() => void onLogout()}><Icon name="logout" /></button></div>
       {error && <div role="alert" className="error-banner">{t(error)}<button onClick={() => setError('')} aria-label={t("Dismiss error")}><Icon name="x" /></button></div>}
       {busy && <div className="busy" role="status"><span className="spinner" />{t("Processing...")}</div>}
 
       {tab === 'inspections' && !creating && !selected && <>
-        <header className="page-header"><h1>{t("Inspections")}</h1>
+        <header className="page-header inspections-head"><h1>{t("Inspections")}</h1>
           <button className="primary big" disabled={busy} onClick={startInspection}><Icon name="plus" />{t("New inspection")}</button></header>
         <div className="list-toolbar">
           <div className="status-tabs" role="group" aria-label={t("Filter inspections")}>
@@ -348,7 +350,7 @@ export default function App({ user, onLogout, loggingOut }: {
           {inspections.length === 0 ? <div className="empty"><button className="primary big" disabled={busy} onClick={startInspection}><Icon name="plus" />{t("Start your first inspection")}</button></div>
             : visible.length === 0 ? <p className="muted center">{t("No matching inspections.")}</p>
               : <div className="inspection-list">{visible.map(item => <button className="inspection-row" key={item.inspection_id} disabled={busy} onClick={() => perform(() => open(item.inspection_id))}>
-                <div><strong>{item.inputs.lot}</strong><small>{item.standard.customer} · {new Date(item.created_at).toLocaleDateString(locale, { month: 'numeric', day: 'numeric' })}</small></div>
+                <div><strong className="plate">{item.inputs.lot}</strong><small>{item.standard.customer} · {new Date(item.created_at).toLocaleDateString(locale, { month: 'numeric', day: 'numeric' })}</small></div>
                 <Badge value={item.overall_result} /><Badge value={item.status} /><Icon name="next" size={16} />
               </button>)}</div>}
         </section>
@@ -373,7 +375,7 @@ export default function App({ user, onLogout, loggingOut }: {
 
       {tab === 'inspections' && !creating && selected && <section className="panel">
         <div className="panel-top"><button className="ghost" onClick={() => setSelected(null)}><Icon name="back" />{t("Back")}</button>
-          <div className="title-block"><h1>{selected.inputs.lot}</h1><small>{selected.standard.customer} · {selected.standard.part_number} · {t('Rev')} {selected.standard.revision} · {selected.inputs.inspector}</small></div>
+          <div className="title-block"><h1 className="plate-title">{selected.inputs.lot}</h1><small>{selected.standard.customer} · {selected.standard.part_number} · {t('Rev')} {selected.standard.revision} · {selected.inputs.inspector}</small></div>
           <div className={`verdict ${selected.overall_result.toLowerCase()}`}>{t(labels[selected.overall_result] ?? selected.overall_result)}</div></div>
         <Stepper status={selected.status} />
         {selected.status === 'CANCELLED' && <p className="warning-text center">{t("Cancelled")}</p>}
