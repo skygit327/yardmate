@@ -23,7 +23,12 @@ interface Notice {
 export interface Program {
   id: string; created_at: string; filename: string; source: string; notice: Notice; match: Match;
   url?: string | null; fit?: { score: number; reasons: Texts[] }; facets?: { categories: string[]; regions: string[] };
-  ai?: { model: string; at: string; conditions: Record<string, { status: 'pass' | 'fail' | 'unknown'; reason: Texts }> };
+  ai?: {
+    model: string; at: string; used_original?: boolean; original_error?: string | null; summary?: Texts;
+    conditions: Record<string, { status: 'pass' | 'fail' | 'unknown'; reason: Texts; evidence?: string }>;
+    extra?: { condition: Texts; status: 'pass' | 'fail' | 'unknown'; reason: Texts; evidence?: string }[];
+  };
+  original?: { source: string; chars: number; at: string; files: { name: string; chars: number }[]; skipped: string[] };
   tasks: { id: string; title: Texts; due: string }[];
 }
 interface Profile {
@@ -91,6 +96,9 @@ export default function Programs({ busy, perform, initialProgram, onProgramUsed,
   const [sort, setSort] = useState<'deadline' | 'newest' | 'met'>('deadline');
   const [detailed, setDetailed] = useState(Boolean(initialRegion));
   const [showWording, setShowWording] = useState(false);
+  const [originalText, setOriginalText] = useState<string | null>(null);
+  const [asking, setAsking] = useState(false);
+  useEffect(() => { setOriginalText(null); }, [selected?.id]);
 
   async function load() {
     const [list, company, status] = await Promise.all([api<Program[]>('/programs'), api<Profile>('/company-profile'), api<FeedStatus>('/programs/feed').catch(() => null)]);
@@ -162,6 +170,29 @@ export default function Programs({ busy, perform, initialProgram, onProgramUsed,
     await load();
   }
 
+  async function fetchOriginal(program: Program) {
+    setOriginalText(null);
+    setSelected(await api<Program>(`/programs/${program.id}/original`, {}));
+  }
+
+  async function uploadOriginal(program: Program, file: File) {
+    const form = new FormData();
+    form.append('file', file);
+    setOriginalText(null);
+    setSelected(await api<Program>(`/programs/${program.id}/original/file`, form));
+  }
+
+  async function toggleOriginal(program: Program) {
+    if (originalText !== null) { setOriginalText(null); return; }
+    setOriginalText((await api<{ text: string }>(`/programs/${program.id}/original`)).text);
+  }
+
+  async function askAi(program: Program) {
+    setAsking(true);
+    try { setSelected(await api<Program>(`/programs/${program.id}/ai-check`, {})); }
+    finally { setAsking(false); }
+  }
+
   async function remove(program: Program) {
     await api(`/programs/${program.id}`, undefined, 'DELETE');
     setSelected(null);
@@ -207,13 +238,53 @@ export default function Programs({ busy, perform, initialProgram, onProgramUsed,
       <div className={`program-verdict ${overallTone[match.overall]}`}>
         <div><strong>{match.met}/{match.required}</strong><span>{t("required conditions met")}</span></div>
         {match.preferred > 0 && <div><strong>{match.bonus}/{match.preferred}</strong><span>{t("preferred conditions met")}</span></div>}
-        {match.conditions.some(c => c.status === 'unknown') && <button type="button" className="small ai-check" disabled={busy || !aiReady}
-          title={aiReady ? t("Ask the AI about the conditions the rules could not decide") : t("Connect an AI model in AI settings to use this")}
-          onClick={() => perform(async () => { setSelected(await api<Program>(`/programs/${selected.id}/ai-check`, {})); })}>
-          <Icon name="spark" size={14} />{selected.ai ? t("Ask AI again") : t("Check with AI")}</button>}
+        <button type="button" className="small ai-check" disabled={busy || asking || !aiReady}
+          title={aiReady ? t("AI reads the original notice and checks the conditions") : t("Connect an AI model in AI settings to use this")}
+          onClick={() => perform(() => askAi(selected))}>
+          <Icon name="spark" size={14} />{asking ? t("Reading the notice…") : selected.ai ? t("Ask AI again") : t("Ask AI")}</button>
         <button type="button" className="ghost small wording-toggle" aria-pressed={showWording} onClick={() => setShowWording(value => !value)}>
           <Icon name="file" size={14} />{t(showWording ? "Hide notice wording" : "Show notice wording")}</button>
       </div>
+
+      <div className="original-strip">
+        <Icon name="file" size={16} />
+        <div className="original-state">
+          <strong>{t("Original notice")}</strong>
+          {selected.original
+            ? <span>{selected.original.chars.toLocaleString()} {t("chars")}{selected.original.files.length > 0 && <> · <span className="file-names">{selected.original.files.map(f => f.name).join(', ')}</span></>}
+                {selected.original.skipped.length > 0 && <> · <span className="muted" title={selected.original.skipped.join(', ')}>{t("Could not read")} {selected.original.skipped.length}</span></>}</span>
+            : <span className="muted">{t("Not saved yet")}</span>}
+        </div>
+        <div className="original-actions">
+          {selected.original && <button type="button" className="ghost small" aria-expanded={originalText !== null} disabled={busy} onClick={() => perform(() => toggleOriginal(selected))}>
+            {t(originalText !== null ? "Hide full text" : "Read full text")}</button>}
+          {selected.url && <button type="button" className="ghost small" disabled={busy || asking} onClick={() => perform(() => fetchOriginal(selected))}>
+            <Icon name="download" size={14} />{t(selected.original ? "Fetch again" : "Fetch original")}</button>}
+          <label className={`button ghost small file-button ${busy ? 'disabled' : ''}`}>
+            <Icon name="plus" size={14} />{t("Upload file")}
+            <input type="file" accept=".pdf,.hwp,.hwpx,.docx,.txt" disabled={busy} onChange={event => {
+              const file = event.target.files?.[0]; event.target.value = '';
+              if (file) perform(() => uploadOriginal(selected, file));
+            }} /></label>
+        </div>
+        {!selected.original && <p className="original-hint">{t("Without the original, the AI reads only the summary. Fetch it or upload the HWP/PDF.")}</p>}
+        {originalText !== null && <pre className="original-box">{originalText}</pre>}
+      </div>
+
+      {selected.ai && <div className="ai-panel">
+        <div className="ai-panel-head"><Icon name="spark" size={15} /><strong>{t("AI opinion")}</strong>
+          <span className="muted">{selected.ai.used_original ? t("Read the original notice") : t("Judged from the summary only")}
+            {selected.ai.original_error && <> · <span title={selected.ai.original_error}>{t("Could not read")}</span></>}</span></div>
+        {selected.ai.summary && pick(selected.ai.summary) && <p className="ai-summary">{pick(selected.ai.summary)}</p>}
+        {selected.ai.extra && selected.ai.extra.length > 0 && <>
+          <h3>{t("More conditions found in the original")}</h3>
+          <ul className="ai-extra">{selected.ai.extra.map((item, index) => <li key={index}>
+            <span className={`badge ${statusTone[item.status]}`}>{t(statusLabel[item.status])}</span>
+            <div><strong>{pick(item.condition)}</strong><small>{pick(item.reason)}</small>
+              {item.evidence && <q>{item.evidence}</q>}</div>
+          </li>)}</ul></>}
+        <p className="ai-foot">{t("The rule verdict stays official. AI opinions are for reference.")}</p>
+      </div>}
 
       {groups.map(group => {
         const rows = match.conditions.filter(c => c.group === group);
@@ -228,7 +299,8 @@ export default function Programs({ busy, perform, initialProgram, onProgramUsed,
               <td>{pick(row.actual)}</td>
               <td><span className={`badge ${statusTone[row.status]}`}>{t(statusLabel[row.status])}</span>
                 {row.status === 'unknown' && selected.ai?.conditions[row.id] && <span className={`ai-opinion ${selected.ai.conditions[row.id].status}`} title={pick(selected.ai.conditions[row.id].reason)}>
-                  <Icon name="spark" size={12} />AI: {t(statusLabel[selected.ai.conditions[row.id].status])}<small>{pick(selected.ai.conditions[row.id].reason)}</small></span>}</td>
+                  <Icon name="spark" size={12} />AI: {t(statusLabel[selected.ai.conditions[row.id].status])}<small>{pick(selected.ai.conditions[row.id].reason)}</small>
+                  {selected.ai.conditions[row.id].evidence && <q>{selected.ai.conditions[row.id].evidence}</q>}</span>}</td>
             </tr>)}</tbody>
           </table></div>
         </div>;

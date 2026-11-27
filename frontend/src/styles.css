@@ -957,3 +957,33 @@ button.assistant-card:hover { background: #e9eef2; border-color: var(--line); }
 @media (min-width: 761px) { .ai-opinion { min-width: 190px; } }
 .ai-opinion.pass { color: var(--good); }
 .ai-opinion.fail { color: var(--bad); }
+
+/* Original notice + AI opinion on the programme detail */
+.original-strip { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 6px 10px; margin: 14px 0 4px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); }
+.original-strip > svg { color: var(--muted); }
+.original-state { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; font-size: 13.5px; font-variant-numeric: tabular-nums; }
+.original-actions { display: flex; flex-wrap: wrap; gap: 4px; justify-content: flex-end; }
+.file-button { position: relative; overflow: hidden; }
+.file-button input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.file-button.disabled { opacity: .5; pointer-events: none; }
+.original-hint { grid-column: 2 / -1; margin: 0; font-size: 12.5px; color: var(--muted); text-wrap: pretty; }
+.original-box { grid-column: 1 / -1; margin: 6px 0 0; max-height: 360px; overflow: auto; padding: 12px; border-radius: 8px; background: var(--bg); font: 12.5px/1.6 inherit; font-family: inherit; white-space: pre-wrap; word-break: break-word; }
+.ai-panel { margin: 12px 0 4px; padding: 12px 14px; border: 1px solid #ddd2f5; border-radius: 12px; background: #faf8ff; }
+.ai-panel-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; color: #4b3a86; font-size: 14px; }
+.ai-panel-head .muted { font-size: 12.5px; }
+.ai-summary { margin: 8px 0 0; font-size: 14.5px; line-height: 1.55; text-wrap: pretty; }
+.ai-panel h3 { margin: 14px 0 6px; font-size: 13px; color: #5d5478; }
+.ai-extra { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.ai-extra li { display: grid; grid-template-columns: 74px 1fr; gap: 10px; align-items: start; }
+.ai-extra li .badge { justify-self: start; }
+.ai-extra strong { display: block; font-size: 13.5px; }
+.ai-extra small { display: block; color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+.ai-panel q, .ai-opinion q { display: block; margin-top: 3px; font-size: 11.5px; color: #6a6283; font-style: normal; border-left: 2px solid #d5c8f2; padding-left: 6px; quotes: none; }
+.ai-opinion q { grid-column: 1 / -1; }
+.ai-foot { margin: 12px 0 0; font-size: 11.5px; color: var(--muted); }
+@media (max-width: 760px) {
+  .original-strip { grid-template-columns: auto 1fr; }
+  .original-actions { grid-column: 1 / -1; justify-content: flex-start; }
+  .original-hint { grid-column: 1 / -1; }
+}
+.file-names { color: var(--muted); max-width: 46ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; vertical-align: bottom; }

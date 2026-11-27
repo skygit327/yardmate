@@ -144,7 +144,7 @@ class FakeModel:
 
     def complete(self, system, user, json_mode=True):
         self.prompts.append(user)
-        ids = [c["id"] for c in json.loads(user)["conditions"]]
+        ids = [c["id"] for c in json.loads(user)["open_conditions"]]
         return json.dumps(
             {
                 "conditions": [
@@ -158,7 +158,21 @@ class FakeModel:
                         },
                     },
                     {"id": "made-up", "status": "pass", "reason": {}},
-                ]
+                ],
+                "extra": [
+                    {
+                        "condition": {"en": "No unpaid wages", "ko": "임금 체불 없음"},
+                        "status": "unknown",
+                        "evidence": "임금 체불 사업장 제외",
+                        "reason": {"en": "Not in the profile."},
+                    },
+                    "not a dict",
+                ],
+                "summary": {
+                    "en": "Likely eligible.",
+                    "ko": "신청 가능해 보임.",
+                    "zh": "看起来可以申请。",
+                },
             }
         )
 
@@ -210,3 +224,99 @@ def test_ai_check_needs_a_model(client):
     program = client.get("/api/programs").json()[0]
     response = client.post(f"/api/programs/{program['id']}/ai-check")
     assert response.status_code == 409
+
+
+@pytest.fixture
+def ai_client(tmp_path):
+    from conftest import sign_in
+    from fastapi.testclient import TestClient
+
+    from spec_agent.config import LLMSettings, Settings
+    from spec_agent.main import create_app
+
+    llm = LLMSettings(provider="openai", model="m", base_url="http://127.0.0.1:9/v1", api_key="k")
+    model = FakeModel()
+    with TestClient(create_app(Settings(tmp_path, llm=llm), model)) as client:
+        client.app.state.auth.create_user("tester", "Tester", "testing-password-1234")
+        sign_in(client)
+        client.model = model
+        yield client
+
+
+def test_ai_check_reads_the_original_notice_first(ai_client):
+    """The AI button fetches the full notice once, keeps it, and sends it to the model."""
+    client, model = ai_client, ai_client.model
+    calls = []
+
+    def fake_fetch(url):
+        calls.append(url)
+        return {
+            "text": "[공고문.hwp]\n신청자격: KR 형식승인 보유 기업\n임금 체불 사업장 제외",
+            "source": url,
+            "files": [{"name": "공고문.hwp", "chars": 30}],
+            "skipped": [],
+        }
+
+    client.app.state.fetch_original = fake_fetch
+    client.post("/api/programs/samples")
+    target = next(p for p in client.get("/api/programs").json() if p["filename"].startswith("03"))
+    store = client.app.state.programs
+    raw = store._raw(target["id"])
+    raw["url"] = "https://www.bizinfo.go.kr/notice?id=1"
+    store._save_raw(raw)
+
+    checked = client.post(f"/api/programs/{target['id']}/ai-check").json()
+    assert calls == ["https://www.bizinfo.go.kr/notice?id=1"]
+    assert "임금 체불" in json.loads(model.prompts[0])["original_text"]
+    assert checked["ai"]["used_original"] is True
+    assert checked["ai"]["extra"][0]["condition"]["zh"] == "No unpaid wages"  # falls back to en
+    assert checked["ai"]["summary"]["ko"] == "신청 가능해 보임."
+    assert "text" not in checked["original"] and checked["original"]["files"][0]["chars"] == 30
+
+    client.post(f"/api/programs/{target['id']}/ai-check")
+    assert len(calls) == 1  # the saved original is reused
+    client.post(f"/api/programs/{target['id']}/tasks")
+    full = client.get(f"/api/programs/{target['id']}/original").json()
+    assert "KR 형식승인" in full["text"]  # registering tasks keeps the original
+    listed = next(p for p in client.get("/api/programs").json() if p["id"] == target["id"])
+    assert "text" not in listed["original"]
+
+
+def test_ai_check_still_runs_when_the_original_cannot_be_fetched(ai_client):
+    from spec_agent.services.notice_original import OriginalError
+
+    client = ai_client
+
+    def failing(url):
+        raise OriginalError("The page could not be opened: timed out")
+
+    client.app.state.fetch_original = failing
+    client.post("/api/programs/samples")
+    target = next(p for p in client.get("/api/programs").json() if p["filename"].startswith("03"))
+    store = client.app.state.programs
+    raw = store._raw(target["id"])
+    raw["url"] = "https://www.bizinfo.go.kr/notice?id=2"
+    store._save_raw(raw)
+    checked = client.post(f"/api/programs/{target['id']}/ai-check").json()
+    assert checked["ai"]["used_original"] is False
+    assert "timed out" in checked["ai"]["original_error"]
+    assert client.post(f"/api/programs/{target['id']}/original", json={}).status_code == 502
+
+
+def test_original_notice_can_be_uploaded(client):
+    client.post("/api/programs/samples")
+    target = client.get("/api/programs").json()[0]
+    assert client.get(f"/api/programs/{target['id']}/original").status_code == 404
+    assert client.post(f"/api/programs/{target['id']}/original", json={}).status_code == 400
+    text = "신청자격: 경남 소재 조선기자재 중소기업\n지원한도: 4천만원".encode()
+    saved = client.post(
+        f"/api/programs/{target['id']}/original/file",
+        files={"file": ("공고문.txt", text, "text/plain")},
+    ).json()
+    assert saved["original"]["source"] == "공고문.txt"
+    assert "조선기자재" in client.get(f"/api/programs/{target['id']}/original").json()["text"]
+    bad = client.post(
+        f"/api/programs/{target['id']}/original/file",
+        files={"file": ("photo.png", b"\x89PNG....", "image/png")},
+    )
+    assert bad.status_code == 400

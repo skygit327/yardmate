@@ -9,6 +9,7 @@ from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
+from pydantic import Field
 
 from spec_agent.auth import (
     COOKIE_NAME,
@@ -39,6 +40,7 @@ from spec_agent.services.customer_desk import CustomerDesk
 from spec_agent.services.documents import MAX_REQUEST_BYTES
 from spec_agent.services.form_intake import MAX_FORM_BYTES, FormIntake
 from spec_agent.services.notice_feed import NoticeFeed
+from spec_agent.services.notice_original import OriginalError, fetch_original, read_file
 from spec_agent.services.revision_agent import LLMClient, LLMError
 from spec_agent.services.support_programs import (
     MAX_NOTICE_BYTES,
@@ -55,6 +57,11 @@ from spec_agent.services.traceback_desk import (
     TracebackInput,
 )
 from spec_agent.services.workflow import Conflict, Workflow
+
+
+class OriginalFetch(StrictModel):
+    url: str | None = Field(default=None, max_length=2000)
+
 
 Language = Literal["en", "ko", "zh"]
 
@@ -97,6 +104,7 @@ def create_app(settings: Settings | None = None, llm_client=None) -> FastAPI:
         app.state.intake = FormIntake(app.state.workflow, llm_client)
         app.state.traceback = TracebackDesk(app.state.workflow)
         app.state.programs = SupportPrograms(app.state.workflow)
+        app.state.fetch_original = fetch_original
         app.state.feed = NoticeFeed(app.state.programs)
         app.state.automation = Automation(
             app.state.workflow,
@@ -370,6 +378,12 @@ def create_app(settings: Settings | None = None, llm_client=None) -> FastAPI:
 
         return resource()["glossary"]
 
+    def save_fetched_original(program_id: str, url: str) -> dict:
+        found = app.state.fetch_original(url)
+        return app.state.programs.save_original(
+            program_id, found["text"], found["source"], found["files"], found["skipped"]
+        )
+
     @app.post("/api/programs/{program_id}/ai-check")
     def program_ai_check(program_id: str):
         settings = app.state.workflow.settings.llm
@@ -379,11 +393,53 @@ def create_app(settings: Settings | None = None, llm_client=None) -> FastAPI:
             raise HTTPException(
                 409, "Company data is kept from external AI. Allow it in AI settings first."
             )
+        program = app.state.programs.get(program_id)
+        original_error = None
+        if not program.get("original") and program.get("url"):
+            # Read the full notice first: the feed summary rarely holds every condition.
+            try:
+                save_fetched_original(program_id, program["url"])
+            except OriginalError as error:
+                original_error = str(error)
         client = app.state.assistant.client or LLMClient(settings)
         try:
-            return app.state.programs.ai_check(program_id, client, client.label)
+            return app.state.programs.ai_check(
+                program_id, client, client.label, original_error=original_error
+            )
         except LLMError as error:
             raise HTTPException(502, f"The AI check failed: {error}") from None
+
+    @app.get("/api/programs/{program_id}/original")
+    def program_original(program_id: str):
+        try:
+            return app.state.programs.original(program_id)
+        except KeyError:
+            raise HTTPException(404, "No original notice is saved yet.") from None
+
+    @app.post("/api/programs/{program_id}/original")
+    def program_original_fetch(program_id: str, data: OriginalFetch):
+        url = (data.url or app.state.programs.get(program_id).get("url") or "").strip()
+        if not url:
+            raise HTTPException(400, "This notice has no link. Upload the notice file instead.")
+        try:
+            return save_fetched_original(program_id, url)
+        except OriginalError as error:
+            raise HTTPException(502, str(error)) from None
+
+    @app.post("/api/programs/{program_id}/original/file")
+    def program_original_file(program_id: str, file: Annotated[UploadFile, File()]):
+        app.state.programs.get(program_id)
+        content = file.file.read(MAX_NOTICE_BYTES + 1)
+        if len(content) > MAX_NOTICE_BYTES:
+            raise HTTPException(413, "The file is larger than 10 MB.")
+        name = file.filename or "notice"
+        try:
+            text = read_file(name, content)
+        except OriginalError as error:
+            raise HTTPException(400, str(error)) from None
+        return app.state.programs.save_original(
+            program_id, text, name, [{"name": name, "chars": len(text)}]
+        )
 
     @app.get("/api/programs/feed")
     def notice_feed_status():
