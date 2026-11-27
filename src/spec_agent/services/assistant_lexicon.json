@@ -1,5 +1,5 @@
 {
-  "_comment": "Words the chat assistant uses to understand a request without an AI model (Korean, English, Vietnamese). Add phrases here; no code change is needed.",
+  "_comment": "YardMate chat: words that pick an action (any language), dates, filler words, and replies in en/ko/zh.",
   "intents": {
     "add_task": [
       "할 일 추가",
@@ -7,14 +7,12 @@
       "일정 추가",
       "일정 등록",
       "할 일 등록",
-      "알려줘",
       "리마인드",
       "add task",
       "add a task",
       "remind me",
-      "schedule",
-      "thêm việc",
-      "nhắc tôi"
+      "添加任务",
+      "提醒我"
     ],
     "revise": [
       "개정",
@@ -23,80 +21,77 @@
       "바꿔",
       "변경해",
       "수정해",
-      "로 해",
-      "로 바꾸",
       "revise",
       "tighten",
       "loosen",
-      "change the",
-      "sửa tiêu chuẩn",
-      "thay đổi"
-    ],
-    "trace": [
-      "원인",
-      "역추적",
-      "추적",
-      "어느 공정",
-      "어떤 공정",
-      "root cause",
-      "trace",
-      "which process",
-      "nguyên nhân",
-      "truy vết"
-    ],
-    "ncr": [
-      "NCR",
-      "부적합"
-    ],
-    "request": [
-      "고객 요청",
-      "요청 등록",
-      "메일",
-      "문의",
-      "회신",
-      "클레임",
-      "request",
-      "complaint",
-      "email",
-      "reply",
-      "yêu cầu",
-      "khiếu nại"
+      "修订",
+      "改为"
     ],
     "form": [
-      "고객 양식",
       "양식",
+      "사양서 읽",
+      "기준서 읽",
       "검사서",
-      "한도 승인",
-      "한도승인",
+      "read a spec",
+      "spec form",
       "form",
-      "limit approval",
-      "biểu mẫu"
+      "表格",
+      "读取规范"
     ],
     "inspection": [
       "검사 시작",
       "검사 등록",
       "새 검사",
-      "검사하",
-      "측정값",
-      "판정",
       "start inspection",
       "new inspection",
-      "inspect",
-      "kiểm tra mới",
-      "bắt đầu kiểm tra"
+      "新检验",
+      "开始检验"
     ],
-    "customer": [
-      "고객사",
-      "customer page",
-      "khách hàng"
+    "programs": [
+      "지원사업",
+      "지원 사업",
+      "공고",
+      "보조금",
+      "지원금",
+      "grant",
+      "support",
+      "notice",
+      "subsidy",
+      "支持项目",
+      "公告",
+      "补贴",
+      "扶持"
+    ],
+    "collect": [
+      "가져와",
+      "수집",
+      "새 공고",
+      "업데이트",
+      "collect",
+      "fetch",
+      "收集",
+      "获取"
+    ],
+    "failed": [
+      "불합격",
+      "불량 로트",
+      "failed",
+      "fail",
+      "不合格"
+    ],
+    "lots": [
+      "로트",
+      "lot",
+      "批次"
     ],
     "standard": [
       "기준서",
+      "기준표",
       "기준 찾",
       "스펙",
       "standard",
       "spec",
-      "tiêu chuẩn"
+      "标准"
     ],
     "tasks": [
       "할 일",
@@ -111,31 +106,30 @@
       "today",
       "this week",
       "overdue",
-      "việc",
-      "lịch",
-      "hôm nay"
+      "任务",
+      "今天",
+      "本周",
+      "逾期"
     ],
     "calendar": [
       "캘린더",
       "달력",
       "calendar",
-      "lịch tháng"
+      "日历"
     ],
     "automation": [
       "작업 폴더",
       "자동 처리",
-      "처리 보고서",
-      "workspace",
       "automation",
-      "thư mục"
+      "work folder",
+      "自动处理"
     ],
     "settings": [
       "AI 설정",
-      "모델 바꿔",
       "API 키",
-      "api key",
       "ai settings",
-      "cài đặt ai"
+      "api key",
+      "AI 设置"
     ],
     "help": [
       "도움",
@@ -146,31 +140,32 @@
       "help",
       "what can you",
       "how do i",
-      "giúp",
-      "hướng dẫn"
+      "帮助",
+      "能做什么",
+      "怎么用"
     ]
   },
   "dates": {
     "today": [
       "오늘",
       "today",
-      "hôm nay"
+      "今天"
     ],
     "tomorrow": [
       "내일",
       "tomorrow",
-      "ngày mai"
+      "明天"
     ],
     "day_after": [
       "모레",
       "day after tomorrow",
-      "ngày kia"
+      "后天"
     ],
     "next_week": [
       "다음 주",
       "다음주",
       "next week",
-      "tuần sau"
+      "下周"
     ],
     "month_marker": "월",
     "day_marker": "일",
@@ -179,7 +174,7 @@
       "일 뒤",
       "days later",
       "in {n} days",
-      "ngày nữa"
+      "天后"
     ]
   },
   "strip": [
@@ -195,14 +190,15 @@
     "를",
     "로",
     "으로",
-    "vui lòng",
     "by",
     "until",
-    "for"
+    "for",
+    "请",
+    "一下"
   ],
   "replies": {
     "ko": {
-      "help": "이런 일을 말로 시킬 수 있어요: 오늘 할 일 보기, 할 일 추가(예: 내일까지 8D 보고서 작성), 기준서 찾기·개정(예: Top Cover Assy 버 높이 0.15로 강화), 불량 원인 찾기(예: 크랙 원인 공정), 고객 요청 등록(요청 내용을 붙여넣기), 새 검사 시작, 고객사 페이지 열기, 고객 양식 읽기.",
+      "help": "이런 걸 말로 시킬 수 있어요: 오늘 할 일 보기, 할 일 추가(예: 금요일까지 E21-B09 재검사), 로트 찾기(예: E21-B08 결과), 불합격 로트 보기, 기준서 찾기·개정, 새 검사 시작, 지원사업 찾기(예: 거제 신청 가능한 공고, 마감 임박 수출 지원), 기업마당 공고 가져오기. 공고 전문을 붙여넣으면 바로 판정해 드려요.",
       "tasks": "할 일 {open}개 중 기한 지남 {overdue}개, 오늘 {today}개, 이번 주 {week}개입니다.",
       "task_added": "할 일을 추가했어요: {title} ({due})",
       "task_missing": "추가할 할 일 내용을 함께 말씀해 주세요. 예: 내일까지 8D 보고서 작성",
@@ -218,15 +214,25 @@
       "inspection": "새 검사 화면을 엽니다{standard}.",
       "customer": "{customer} 고객사 페이지를 엽니다.",
       "customers_page": "고객사 목록을 엽니다.",
-      "form": "고객 양식 읽기 화면을 엽니다. PDF를 올리거나 작업 폴더 1_고객양식에 넣으면 자동으로 처리됩니다.",
+      "form": "기준서 읽기 화면을 엽니다. 조선소·선주 양식 PDF를 올리면 한국어·영어·중국어 모두 읽습니다.",
       "calendar": "캘린더를 엽니다.",
       "automation": "작업 폴더 자동 처리 현황을 엽니다.",
       "settings": "AI 설정 화면을 엽니다.",
       "unknown": "무엇을 원하시는지 정확히 몰라서 할 수 있는 일을 정리했어요. 아래에서 고르거나 다시 말씀해 주세요.",
-      "llm_blocked": "고객 자료 보호 설정 때문에 외부 AI 대신 규칙으로 이해했어요."
+      "llm_blocked": "고객 자료 보호 설정 때문에 외부 AI 대신 규칙으로 이해했어요.",
+      "programs_found": "공고 {count}건을 찾았어요{filters}.",
+      "programs_none": "조건에 맞는 공고가 없어요{filters}. 기업마당에서 새 공고를 가져와 볼까요?",
+      "collected": "기업마당 공고 {fetched}건을 확인해 우리 회사에 맞는 {matched}건 중 새 공고 {added}건을 추가했어요.",
+      "collected_sample": " (API 키가 없어 가상 샘플을 썼어요)",
+      "collect_failed": "공고를 가져오지 못했어요: {error}",
+      "notice_added": "공고를 읽고 판정했어요: {verdict} · 필수 조건 {met}/{required} 충족 · 마감 {deadline}",
+      "lots_found": "로트 {count}개를 찾았어요.",
+      "lot_none": "그런 로트를 찾지 못했어요. 로트 번호를 확인해 주세요.",
+      "failed_found": "확인이 필요한 불합격 로트가 {count}개 있어요.",
+      "failed_none": "확인이 필요한 불합격 로트가 없어요."
     },
     "en": {
-      "help": "You can ask me to: show today's tasks, add a task (e.g. write the 8D report by tomorrow), find or revise a standard (e.g. tighten burr height on Top Cover Assy to 0.15), find a defect's likely process (e.g. root cause of a crack), register a customer request (paste it), start an inspection, open a customer page, or read a customer form.",
+      "help": "You can ask me to: show today's tasks, add a task (e.g. reinspect E21-B09 by Friday), find a lot (e.g. E21-B08 result), list failed lots, find or revise a standard, start an inspection, find support notices (e.g. eligible notices in Geoje, export support closing soon), or collect new Bizinfo notices. Paste a whole notice and I judge it for your company.",
       "tasks": "{open} open tasks: {overdue} overdue, {today} due today, {week} due this week.",
       "task_added": "Task added: {title} ({due})",
       "task_missing": "Tell me what the task is, e.g. write the 8D report by tomorrow.",
@@ -242,15 +248,25 @@
       "inspection": "Opening a new inspection{standard}.",
       "customer": "Opening the {customer} customer page.",
       "customers_page": "Opening the customer list.",
-      "form": "Opening customer forms. Upload a PDF, or drop it into the 1_customer-forms work folder to process it automatically.",
+      "form": "Opening Read specs. Upload a shipyard or owner form PDF in Korean, English or Chinese.",
       "calendar": "Opening the calendar.",
       "automation": "Opening the work-folder automation status.",
       "settings": "Opening AI settings.",
       "unknown": "I'm not sure what you need, so here is what I can do. Pick one below or rephrase.",
-      "llm_blocked": "Customer data protection is on, so I understood this with rules instead of the external AI."
+      "llm_blocked": "Customer data protection is on, so I understood this with rules instead of the external AI.",
+      "programs_found": "Found {count} notices{filters}.",
+      "programs_none": "No notices match{filters}. Shall I collect new ones from Bizinfo?",
+      "collected": "Checked {fetched} Bizinfo notices: {matched} fit your company, {added} new.",
+      "collected_sample": " (no API key, so a synthetic sample was used)",
+      "collect_failed": "Could not collect notices: {error}",
+      "notice_added": "Notice read and judged: {verdict} · {met}/{required} required conditions met · deadline {deadline}",
+      "lots_found": "Found {count} lots.",
+      "lot_none": "No such lot. Check the lot number.",
+      "failed_found": "{count} failed lots need review.",
+      "failed_none": "No failed lots need review."
     },
     "zh": {
-      "help": "您可以让我：查看今天的任务、添加任务（例如明天前写好8D报告）、查找或修订标准、查找缺陷的可能工序、登记客户请求（直接粘贴）、开始检验、打开客户页面或读取客户表格。",
+      "help": "您可以让我：查看今天的任务、添加任务（例如周五前复检 E21-B09）、查找批次（例如 E21-B08 结果）、查看不合格批次、查找或修订标准、开始新检验、查找支持项目（例如巨济可申请的公告、即将截止的出口支持），或从企业广场收集新公告。粘贴整篇公告，我会按本公司条件判定。",
       "tasks": "未完成任务 {open} 项：逾期 {overdue} 项，今天到期 {today} 项，本周到期 {week} 项。",
       "task_added": "已添加任务：{title}（{due}）",
       "task_missing": "请告诉我任务内容，例如：明天前写好8D报告。",
@@ -266,12 +282,198 @@
       "inspection": "正在打开新的检验{standard}。",
       "customer": "正在打开 {customer} 客户页面。",
       "customers_page": "正在打开客户列表。",
-      "form": "正在打开检验标准导入。上传 PDF，或放入工作文件夹即可自动处理。",
+      "form": "正在打开读取标准。上传韩文、英文或中文的船厂或船东表格 PDF 即可。",
       "calendar": "正在打开日历。",
       "automation": "正在打开工作文件夹自动处理状态。",
       "settings": "正在打开 AI 设置。",
       "unknown": "我不太确定您需要什么，以下是我能做的。请选择或换个说法。",
-      "llm_blocked": "客户数据保护已开启，因此使用规则而非外部 AI 理解了您的请求。"
+      "llm_blocked": "客户数据保护已开启，因此使用规则而非外部 AI 理解了您的请求。",
+      "programs_found": "找到 {count} 条公告{filters}。",
+      "programs_none": "没有符合条件的公告{filters}。要从企业广场收集新公告吗？",
+      "collected": "已检查企业广场公告 {fetched} 条：{matched} 条适合本公司，新增 {added} 条。",
+      "collected_sample": "（未设置 API 密钥，使用了虚拟示例）",
+      "collect_failed": "无法收集公告：{error}",
+      "notice_added": "已读取并判定公告：{verdict} · 满足必要条件 {met}/{required} · 截止 {deadline}",
+      "lots_found": "找到 {count} 个批次。",
+      "lot_none": "未找到该批次，请确认批次号。",
+      "failed_found": "有 {count} 个不合格批次需要复核。",
+      "failed_none": "没有需要复核的不合格批次。"
+    }
+  },
+  "program_filters": {
+    "eligible": [
+      "신청 가능",
+      "신청가능",
+      "받을 수 있",
+      "eligible",
+      "can apply",
+      "可申请",
+      "能申请"
+    ],
+    "check": [
+      "확인 필요",
+      "check needed",
+      "需确认"
+    ],
+    "closing": [
+      "마감 임박",
+      "곧 마감",
+      "마감 가까",
+      "closing",
+      "deadline soon",
+      "due soon",
+      "即将截止",
+      "快截止"
+    ],
+    "regions": {
+      "부산": "부산",
+      "busan": "부산",
+      "釜山": "부산",
+      "울산": "울산",
+      "ulsan": "울산",
+      "蔚山": "울산",
+      "경남": "경남",
+      "경상남도": "경남",
+      "gyeongnam": "경남",
+      "庆南": "경남",
+      "거제": "경남",
+      "geoje": "경남",
+      "巨济": "경남",
+      "통영": "경남",
+      "tongyeong": "경남",
+      "统营": "경남",
+      "고성": "경남",
+      "창원": "경남",
+      "진해": "경남",
+      "昌原": "경남"
+    },
+    "categories": {
+      "finance": [
+        "금융",
+        "융자",
+        "보증",
+        "finance",
+        "loan",
+        "金融",
+        "贷款"
+      ],
+      "technology": [
+        "기술",
+        "자동화",
+        "디지털",
+        "스마트",
+        "technology",
+        "automation",
+        "技术",
+        "自动化"
+      ],
+      "workforce": [
+        "인력",
+        "채용",
+        "교육",
+        "workforce",
+        "hiring",
+        "人力",
+        "招聘"
+      ],
+      "export": [
+        "수출",
+        "해외",
+        "인증",
+        "선급",
+        "export",
+        "certification",
+        "出口",
+        "认证"
+      ],
+      "domestic": [
+        "내수",
+        "판로",
+        "domestic",
+        "内需"
+      ],
+      "startup": [
+        "창업",
+        "스타트업",
+        "startup",
+        "创业"
+      ],
+      "management": [
+        "경영",
+        "컨설팅",
+        "품질",
+        "management",
+        "consulting",
+        "经营",
+        "咨询"
+      ]
+    }
+  },
+  "filter_words": {
+    "en": {
+      "region": "in {v}",
+      "eligible": "you can apply for",
+      "check": "to check",
+      "closing": "closing within 7 days",
+      "category": "for {v}"
+    },
+    "ko": {
+      "region": "{v}",
+      "eligible": "신청 가능",
+      "check": "확인 필요",
+      "closing": "7일 내 마감",
+      "category": "{v} 분야"
+    },
+    "zh": {
+      "region": "{v}",
+      "eligible": "可申请",
+      "check": "需确认",
+      "closing": "7天内截止",
+      "category": "{v}领域"
+    }
+  },
+  "lot_words": {
+    "en": {
+      "PASS": "pass",
+      "FAIL": "fail",
+      "REVIEW": "review",
+      "N_A": "n/a",
+      "AWAITING_REVIEW": "awaiting review",
+      "AWAITING_REPORT_APPROVAL": "report to approve",
+      "APPROVED": "approved",
+      "NEEDS_INPUT": "input needed",
+      "CANCELLED": "cancelled",
+      "CREATED": "created",
+      "EVALUATED": "evaluated",
+      "ERROR": "error"
+    },
+    "ko": {
+      "PASS": "합격",
+      "FAIL": "불합격",
+      "REVIEW": "판정 대기",
+      "N_A": "해당 없음",
+      "AWAITING_REVIEW": "검사 확인 대기",
+      "AWAITING_REPORT_APPROVAL": "성적서 승인 대기",
+      "APPROVED": "승인 완료",
+      "NEEDS_INPUT": "입력 필요",
+      "CANCELLED": "취소",
+      "CREATED": "생성",
+      "EVALUATED": "판정 중",
+      "ERROR": "오류"
+    },
+    "zh": {
+      "PASS": "合格",
+      "FAIL": "不合格",
+      "REVIEW": "待判定",
+      "N_A": "不适用",
+      "AWAITING_REVIEW": "待确认检验",
+      "AWAITING_REPORT_APPROVAL": "待批准报告",
+      "APPROVED": "已批准",
+      "NEEDS_INPUT": "需要输入",
+      "CANCELLED": "已取消",
+      "CREATED": "已创建",
+      "EVALUATED": "判定中",
+      "ERROR": "错误"
     }
   }
 }

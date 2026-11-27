@@ -931,3 +931,20 @@ details.skipped ul { margin: 4px 0 0; padding-left: 18px; }
   .calendar-day .calendar-task.kind-programs { background: var(--primer); }
   .calendar-day .calendar-task.done { background: #c9d3da; }
 }
+
+/* YardMate assistant */
+.assistant-fab { background: var(--hull); box-shadow: 0 8px 24px rgba(15, 44, 66, .35), inset 0 -3px 0 var(--primer); }
+.assistant-panel header { background: var(--hull); align-items: center; }
+.assistant-card { width: 100%; display: grid; grid-template-columns: 10px minmax(0, 1fr) 14px; align-items: center; gap: 10px; min-height: 0; padding: 9px 10px; border: 1px solid transparent; text-align: left; font-weight: 500; }
+button.assistant-card:hover { background: #e9eef2; border-color: var(--line); }
+.card-text { display: grid; gap: 2px; min-width: 0; }
+.card-text small { font-variant-numeric: tabular-nums; }
+.card-dot { width: 8px; height: 8px; border-radius: 50%; background: #9fb0bc; }
+.card-dot.pass { background: var(--good); }
+.card-dot.warning { background: #d9a520; }
+.card-dot.fail { background: var(--bad); }
+@media (max-width: 760px) {
+  .assistant-fab { bottom: calc(76px + env(safe-area-inset-bottom)); right: 14px; min-height: 50px; padding: 0 14px; }
+  .assistant-fab span { display: none; }
+  .assistant-panel { inset: 8px 8px calc(74px + env(safe-area-inset-bottom)) 8px; width: auto; height: auto; }
+}

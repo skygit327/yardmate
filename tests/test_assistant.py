@@ -1,4 +1,4 @@
-"""Chat assistant: plain-language requests open the right page or do the work."""
+"""YardMate chat: plain-language requests open the right page or do the work."""
 
 import json
 from datetime import date, timedelta
@@ -38,12 +38,9 @@ def test_tasks_are_added_and_listed_from_chat(client):
 
 
 def test_navigation_requests(client):
-    assert ask(client, "고객 양식 읽고 싶어")["navigate"]["page"] == "forms"
+    assert ask(client, "기준서 양식 읽고 싶어")["navigate"]["page"] == "forms"
     assert ask(client, "캘린더 보여줘")["navigate"]["page"] == "calendar"
     assert ask(client, "AI 설정 바꾸고 싶어")["navigate"]["page"] == "ai"
-    assert ask(client, "원인 분석 하고 싶어")["navigate"]["page"] == "trace"
-    customer = ask(client, "DEMO CUSTOMER 고객사 페이지 열어줘")
-    assert customer["navigate"] == {"page": "customer", "params": {"name": "DEMO CUSTOMER"}}
     inspection = ask(client, "DEMO-COVER 새 검사 시작")
     assert inspection["navigate"] == {
         "page": "inspection_new",
@@ -53,33 +50,49 @@ def test_navigation_requests(client):
     assert unknown["cards"] == [{"kind": "help"}]
 
 
-def test_work_is_done_from_chat(client):
+def test_standards_are_found_and_revised_from_chat(client):
     found = ask(client, "DEMO-COVER 기준서 찾아줘")
     assert (
         found["cards"][0]["kind"] == "standard"
         and found["cards"][0]["link"]["id"] == "demo-cover-en-v1"
     )
-
     revise = ask(client, "DEMO-COVER 버 높이를 0.15로 강화해줘")
     assert revise["navigate"]["page"] == "standard"
     assert revise["navigate"]["params"]["instruction"] == "DEMO-COVER 버 높이를 0.15로 강화해줘"
 
-    trace = ask(client, "크랙이 나왔는데 어느 공정 원인이야?")
-    assert trace["cards"][0]["kind"] == "trace"
-    assert "1. " in trace["cards"][0]["detail"]
-    assert client.get(f"/api/traceback/{trace['cards'][0]['link']['id']}").status_code == 200
 
-    mail = (
-        "Dear supplier,\nPlease check the burr height on DEMO-COVER lot TEST-001 urgently.\n"
-        "We found burrs above the limit at incoming inspection.\nRegards, DEMO CUSTOMER"
-    )
-    request = ask(client, mail, "en")
-    assert request["cards"][0]["kind"] == "request"
-    saved = client.get(f"/api/customer-requests/{request['cards'][0]['link']['id']}").json()
-    assert saved["customer"] == "DEMO CUSTOMER" and saved["priority"] == "HIGH"
+def test_lots_and_failed_lots(client):
+    client.post("/api/demo/shipyard")
+    lot = ask(client, "E21-B08 결과 알려줘")
+    assert lot["cards"][0]["kind"] == "lot" and lot["cards"][0]["tone"] == "FAIL"
+    assert lot["cards"][0]["link"]["type"] == "inspection"
+    failed = ask(client, "不合格批次有哪些？", "zh")
+    assert [card["title"].split(" · ")[0] for card in failed["cards"]] == ["E21-B08"]
+    assert "1" in failed["reply"]
+    assert ask(client, "X9-Z99 로트 결과")["navigate"]["page"] == "inspections"
 
-    home = client.get("/api/home").json()
-    assert home["open_requests"] == 1 and home["active_standards"] == 1
+
+def test_support_notices_from_chat(client, monkeypatch):
+    monkeypatch.delenv("SPEC_AGENT_BIZINFO_API_KEY", raising=False)
+    client.post("/api/programs/samples")
+    found = ask(client, "거제에서 신청 가능한 지원사업 있어?")
+    assert found["navigate"] == {"page": "programs", "params": {"region": "경남"}}
+    assert [card["tone"] for card in found["cards"]] == ["ELIGIBLE"]
+    exports = ask(client, "export support notices", "en")
+    assert all(card["kind"] == "program" for card in exports["cards"]) and exports["cards"]
+    assert "(for Export)" in exports["reply"]
+
+    collected = ask(client, "기업마당 새 공고 가져와줘")
+    assert "3" in collected["reply"] and collected["navigate"]["page"] == "programs"
+
+    notice = (
+        Path(__file__).resolve().parents[1]
+        / "src/spec_agent/services/support_samples"
+        / "02_busan_port_logistics.txt"
+    ).read_text("utf-8")
+    judged = ask(client, notice.replace("[샘플 · 가상 공고]", "[가상]"), "zh")
+    assert judged["cards"][0]["kind"] == "program" and judged["cards"][0]["tone"] == "INELIGIBLE"
+    assert "不可申请" in judged["reply"]
 
 
 class Planner:
@@ -102,6 +115,7 @@ def test_ai_planner_and_data_protection(tmp_path, external):
             "actions": [
                 {"type": "navigate", "page": "forms"},
                 {"type": "add_task", "title": "Check DEMO-OEM form", "due": "2026-11-02"},
+                {"type": "navigate", "page": "trace"},
                 {"type": "delete_everything"},
             ],
         }

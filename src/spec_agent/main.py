@@ -112,6 +112,7 @@ def create_app(settings: Settings | None = None, llm_client=None) -> FastAPI:
             app.state.automation,
             llm_client,
         )
+        app.state.assistant.feed = app.state.feed
         app.state.ai_settings = AISettingsStore(settings.data_dir, settings.llm)
         if llm_client is None:
             effective, _ = app.state.ai_settings.effective()

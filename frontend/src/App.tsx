@@ -1,5 +1,7 @@
 import { Fragment, useEffect, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
+import Assistant from './Assistant';
+import type { Navigate } from './Assistant';
 import { api, requestId } from './api';
 import { DocLanguagePicker, reportLanguages } from './docLanguage';
 import { Icon } from './icons';
@@ -470,5 +472,7 @@ export default function App({ user, onLogout, loggingOut }: {
         </article>)}</div>
       </>}
     </main>
+    <Assistant open={assistantOpen} onOpenChange={setAssistantOpen} pending={assistantMessage} onPendingUsed={() => setAssistantMessage(null)}
+      onNavigate={(target: Navigate) => go(target.page, target.params)} onOpenLink={openLink} />
   </div>;
 }

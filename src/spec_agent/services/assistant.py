@@ -17,7 +17,6 @@ from pathlib import Path
 from pydantic import Field
 
 from spec_agent.schemas.standard import StrictModel
-from spec_agent.services import traceback
 from spec_agent.services.automation import TaskInput
 from spec_agent.services.revision_agent import LLMClient, LLMError, parse_json_object
 
@@ -33,11 +32,7 @@ PAGES = {
     "standards",
     "standard",
     "forms",
-    "trace",
-    "customers",
-    "customer",
-    "requests",
-    "request_new",
+    "programs",
     "ai",
 }
 ACTIONS = {
@@ -46,33 +41,70 @@ ACTIONS = {
     "add_task",
     "find_standards",
     "revise_standard",
-    "trace_defect",
-    "create_request",
     "start_inspection",
-    "open_customer",
+    "find_lots",
+    "find_programs",
+    "collect_notices",
+    "add_notice",
     "help",
 }
+FILTERS = LEXICON["program_filters"]
 
-PLANNER_PROMPT = """You are the assistant inside Spec Agent, a quality-inspection app. Read the user's
-request and plan actions. Answer ONLY with JSON:
+PLANNER_PROMPT = """You are the assistant inside YardMate, a workspace for shipyard suppliers in Busan,
+Ulsan and Gyeongnam: inspection standards from shipyards, class societies and ship owners,
+inspection lots and reports, support programmes, and tasks. Plan actions for the user's
+request. Answer ONLY with JSON:
 {"reply": "<one or two sentences in the user's language>", "actions": [ ... ]}
 Actions (use only these, at most 3):
-- {"type":"navigate","page":"home|tasks|calendar|automation|inspections|standards|forms|trace|customers|requests|request_new|ai"}
+- {"type":"navigate","page":"home|tasks|calendar|automation|inspections|standards|forms|programs|ai"}
 - {"type":"list_tasks"}
 - {"type":"add_task","title":"...","due":"YYYY-MM-DD"}
 - {"type":"find_standards","query":"customer, part number, product or document number"}
 - {"type":"revise_standard","query":"which standard","instruction":"the requested change in the user's words"}
-- {"type":"trace_defect","defect":"defect type","part_number":"optional"}
-- {"type":"create_request","text":"the customer's request text","customer":"optional"}
 - {"type":"start_inspection","query":"optional standard"}
-- {"type":"open_customer","name":"customer name"}
+- {"type":"find_lots","query":"lot numbers, or empty with failed=true for failed lots","failed":false}
+- {"type":"find_programs","query":"the user's words about region, field or status"}
+- {"type":"collect_notices"}
+- {"type":"add_notice","text":"the full support notice the user pasted"}
 - {"type":"help"}
-Never invent customers, parts or numbers; use the context lists. Today is {today}."""
+Never invent lots, standards or notices; use the context lists. Today is {today}."""
+
+
+def _looks_like_notice(text: str) -> bool:
+    """A pasted support notice: at least two of its usual section headings."""
+    from spec_agent.services.support_programs import LEX as SUPPORT
+
+    headings = [words for key, words in SUPPORT["sections"].items() if key != "_comment"]
+    return sum(any(word in text for word in group) for group in headings) >= 2
+
+
+def _verdict(overall: str, language: str) -> str:
+    from spec_agent.services.support_programs import LEX as SUPPORT
+
+    return SUPPORT["results"][overall][language]
+
+
+def _region_name(region: str, language: str) -> str:
+    names = {"en": {}, "zh": {}}
+    for word, province in FILTERS["regions"].items():
+        if province != region:
+            continue
+        if word.isascii():
+            names["en"].setdefault(province, word.title())
+        elif all("\u4e00" <= char <= "\u9fff" for char in word):
+            names["zh"].setdefault(province, word)
+    return names.get(language, {}).get(region, region)
+
+
+def _category_name(key: str, language: str) -> str:
+    from spec_agent.services.support_programs import LEX as SUPPORT
+
+    return SUPPORT["categories"][key][language]
 
 
 class AssistantInput(StrictModel):
     message: str = Field(min_length=1, max_length=8000)
-    language: str = Field(default="ko", pattern=r"^(en|ko|vi)$")
+    language: str = Field(default="ko", pattern=r"^(en|ko|zh)$")
     history: list[dict] = Field(default_factory=list, max_length=20)
 
 
@@ -91,6 +123,7 @@ class Assistant:
         self.traceback = traceback_desk
         self.automation = automation
         self.client = llm_client
+        self.feed = None  # set by the app: collects Bizinfo notices
 
     def set_llm(self, llm, client=None):
         self.client = client
@@ -217,6 +250,13 @@ class Assistant:
             return False
         return not settings.external or settings.allow_internal
 
+    def _lots(self) -> dict[str, dict]:
+        return {item["inputs"]["lot"]: item for item in self.workflow.list()}
+
+    def _mentioned_lots(self, text: str) -> list[dict]:
+        folded = text.casefold()
+        return [item for lot, item in self._lots().items() if lot.casefold() in folded]
+
     def plan_rules(self, message: str) -> list[dict]:
         text = message.strip()
         long_text = len(text) > 120 or text.count("\n") >= 2
@@ -225,21 +265,18 @@ class Assistant:
             due, rest = self._due(text)
             title = self._clean(rest, INTENTS["add_task"])
             return [{"type": "add_task", "title": title, "due": due}]
-        if long_text or (intent("request") and not intent("trace") and not intent("revise")):
-            if long_text or len(self._clean(text, INTENTS["request"])) > 30:
-                return [
-                    {"type": "create_request", "text": text, "customer": self._match_customer(text)}
-                ]
-            return [
-                {"type": "navigate", "page": "request_new", "customer": self._match_customer(text)}
-            ]
+        if long_text and _looks_like_notice(text):
+            return [{"type": "add_notice", "text": text}]
+        if intent("collect") and (intent("programs") or "bizinfo" in text.casefold()):
+            return [{"type": "collect_notices"}]
+        if intent("programs"):
+            return [{"type": "find_programs", "query": text}]
+        if self._mentioned_lots(text):
+            return [{"type": "find_lots", "query": text}]
+        if intent("failed"):
+            return [{"type": "find_lots", "failed": True}]
         if intent("revise") and (self._match_standards(text) or re.search(r"\d", text)):
             return [{"type": "revise_standard", "query": text, "instruction": text}]
-        if intent("trace") or intent("ncr"):
-            defect = traceback.match_defect(text)
-            if defect:
-                return [{"type": "trace_defect", "defect": text, "part_number": None}]
-            return [{"type": "navigate", "page": "trace"}]
         if intent("form"):
             return [{"type": "navigate", "page": "forms"}]
         if intent("inspection"):
@@ -250,18 +287,19 @@ class Assistant:
             return [{"type": "navigate", "page": "automation"}]
         if intent("settings"):
             return [{"type": "navigate", "page": "ai"}]
-        customer = self._match_customer(text)
-        if intent("customer") or (customer and not intent("standard")):
-            return [{"type": "open_customer", "name": customer or ""}]
         if intent("standard") or self._match_standards(text):
             return [{"type": "find_standards", "query": text}]
+        if intent("lots"):
+            return [{"type": "navigate", "page": "inspections"}]
         if intent("tasks"):
             return [{"type": "list_tasks"}]
         if intent("help"):
             return [{"type": "help"}]
-        if traceback.match_defect(text):
-            return [{"type": "trace_defect", "defect": text, "part_number": None}]
         return [{"type": "help", "unknown": True}]
+
+    def _programs(self) -> list[dict]:
+        programs = self.automation.programs
+        return programs.list() if programs else []
 
     def plan_llm(self, data: AssistantInput) -> tuple[str, list[dict]]:
         client = self.client or LLMClient(self.workflow.settings.llm)
@@ -277,6 +315,11 @@ class Assistant:
                 }
                 for s in self._standards()[:50]
             ],
+            "lots": [
+                {"lot": lot, "result": item["overall_result"], "status": item["status"]}
+                for lot, item in list(self._lots().items())[:50]
+            ],
+            "notices": [p["notice"]["title"] for p in self._programs()[:30]],
             "language": data.language,
         }
         history = "\n".join(
@@ -328,6 +371,115 @@ class Assistant:
             result["reply"] = " ".join(result["messages"]) or replies["help"]
         result.pop("messages")
         return result
+
+    def _program_card(self, program: dict, data: AssistantInput) -> dict:
+        match = program["match"]
+        days = match.get("days_left")
+        due = (
+            f"D-{days}"
+            if days is not None and days >= 0
+            else (program["notice"]["deadline"] or "-")
+        )
+        return {
+            "kind": "program",
+            "title": re.sub(r"^\s*\[[^\]]*\]\s*", "", program["notice"]["title"])[:140],
+            "detail": f"{_verdict(match['overall'], data.language)} · {due} · {match['met']}/{match['required']}",
+            "tone": match["overall"],
+            "link": {"type": "program", "id": program["id"]},
+        }
+
+    def _find_programs(self, query: str, data: AssistantInput, result: dict):
+        from spec_agent.services.support_programs import facets
+
+        folded = query.casefold()
+        region = next(
+            (p for word, p in FILTERS["regions"].items() if word.casefold() in folded), None
+        )
+        fields = [
+            key
+            for key, words in FILTERS["categories"].items()
+            if any(w.casefold() in folded for w in words)
+        ]
+        wanted = (
+            "ELIGIBLE"
+            if _has(query, FILTERS["eligible"])
+            else "CHECK"
+            if _has(query, FILTERS["check"])
+            else None
+        )
+        closing = bool(_has(query, FILTERS["closing"]))
+        found = []
+        for program in self._programs():
+            match = program["match"]
+            if match["overall"] == "CLOSED":
+                continue
+            tags = facets(program)
+            if region and region not in tags["regions"] and "*" not in tags["regions"]:
+                continue
+            if fields and not set(fields) & set(tags["categories"]):
+                continue
+            if wanted and match["overall"] != wanted:
+                continue
+            if closing and not (match["days_left"] is not None and 0 <= match["days_left"] <= 7):
+                continue
+            found.append(program)
+        found.sort(key=lambda p: (p["match"]["days_left"] is None, p["match"]["days_left"] or 0))
+        words = LEXICON["filter_words"][data.language]
+        parts = []
+        if region:
+            parts.append(words["region"].format(v=_region_name(region, data.language)))
+        for key in fields:
+            parts.append(words["category"].format(v=_category_name(key, data.language)))
+        if wanted:
+            parts.append(words["eligible" if wanted == "ELIGIBLE" else "check"])
+        if closing:
+            parts.append(words["closing"])
+        filters = f" ({', '.join(parts)})" if parts else ""
+        self._say(
+            result,
+            data,
+            "programs_found" if found else "programs_none",
+            count=len(found),
+            filters=filters,
+        )
+        for program in found[:6]:
+            result["cards"].append(self._program_card(program, data))
+        result["navigate"] = {"page": "programs", "params": {"region": region} if region else {}}
+
+    def _find_lots(self, action: dict, data: AssistantInput, result: dict):
+        lots = self._mentioned_lots(str(action.get("query") or data.message))
+        if not lots and action.get("failed"):
+            lots = [
+                item
+                for item in self.workflow.list()
+                if item["overall_result"] == "FAIL"
+                and item["status"] not in {"APPROVED", "CANCELLED"}
+            ]
+            self._say(result, data, "failed_found" if lots else "failed_none", count=len(lots))
+        elif lots:
+            self._say(result, data, "lots_found", count=len(lots))
+        else:
+            self._say(result, data, "lot_none")
+            result["navigate"] = {"page": "inspections", "params": {}}
+            return
+        words = LEXICON["lot_words"][data.language]
+        for item in lots[:6]:
+            standard = item["standard"]
+            result["cards"].append(
+                {
+                    "kind": "lot",
+                    "title": f"{item['inputs']['lot']} · {standard['customer']}",
+                    "detail": " · ".join(
+                        [
+                            words.get(item["overall_result"], item["overall_result"]),
+                            words.get(item["status"], item["status"]),
+                            standard["document_number"],
+                        ]
+                    ),
+                    "tone": item["overall_result"],
+                    "link": {"type": "inspection", "id": item["inspection_id"]},
+                }
+            )
 
     def _say(self, result, data, key, **params):
         template = LEXICON["replies"][data.language][key]
@@ -456,64 +608,6 @@ class Assistant:
                 "page": "standard",
                 "params": {"id": standard.lineage, "instruction": instruction},
             }
-        elif kind == "trace_defect":
-            defect_text = str(action.get("defect") or data.message)
-            if not traceback.match_defect(defect_text):
-                self._say(result, data, "trace_unknown")
-                result["navigate"] = {"page": "trace", "params": {}}
-                return
-            from spec_agent.services.traceback_desk import TracebackInput
-
-            case = self.traceback.from_defect(
-                TracebackInput(
-                    defect=defect_text[:300], part_number=(action.get("part_number") or None)
-                )
-            )
-            analysis = case["analysis"]
-            names = []
-            for candidate in analysis["candidates"][:3]:
-                step_names = candidate.get("names") or {}
-                names.append(
-                    f"{candidate['rank']}. {candidate.get('label') or step_names.get(language) or candidate['step']}"
-                )
-            defect_names = traceback.DEFECTS.get(analysis["defect"] or "", {}).get("names", {})
-            self._say(
-                result,
-                data,
-                "trace",
-                defect=defect_names.get(language, defect_text),
-                steps=", ".join(names) or "-",
-            )
-            result["cards"].append(
-                {
-                    "kind": "trace",
-                    "title": defect_names.get(language, defect_text),
-                    "detail": ", ".join(names),
-                    "link": {"type": "trace", "id": case["id"]},
-                }
-            )
-        elif kind == "create_request":
-            text = str(action.get("text") or data.message)
-            customer = action.get("customer") or self._match_customer(text) or ""
-            request = self.desk.create_request(
-                customer=customer, channel="OTHER", body=text, actor=actor
-            )
-            self._say(
-                result,
-                data,
-                "request_created",
-                summary=(request.analysis or {}).get("summary", request.subject)[:200],
-                category=request.category,
-                priority=request.priority,
-            )
-            result["cards"].append(
-                {
-                    "kind": "request",
-                    "title": request.subject[:120],
-                    "detail": f"{request.customer or '-'} · {request.category} · {request.priority}",
-                    "link": {"type": "request", "id": request.id},
-                }
-            )
         elif kind == "start_inspection":
             found = [
                 s
@@ -524,12 +618,41 @@ class Assistant:
             label = f" ({found[0].document_number})" if len(found) == 1 else ""
             self._say(result, data, "inspection", standard=label)
             result["navigate"] = {"page": "inspection_new", "params": params}
-        elif kind == "open_customer":
-            name = str(action.get("name") or "").strip()
-            known = self._match_customer(name) if name else None
-            if known:
-                self._say(result, data, "customer", customer=known)
-                result["navigate"] = {"page": "customer", "params": {"name": known}}
-            else:
-                self._say(result, data, "customers_page")
-                result["navigate"] = {"page": "customers", "params": {}}
+        elif kind == "find_lots":
+            self._find_lots(action, data, result)
+        elif kind == "find_programs":
+            self._find_programs(str(action.get("query") or data.message), data, result)
+        elif kind == "collect_notices":
+            if not self.feed:
+                raise ValueError("Notice collection is not available.")
+            run = self.feed.refresh()
+            if run.get("error"):
+                self._say(result, data, "collect_failed", error=run["error"])
+                return
+            self._say(
+                result,
+                data,
+                "collected",
+                **{k: run.get(k, 0) for k in ("fetched", "matched", "added")},
+            )
+            if run["mode"] == "sample":
+                result["messages"][-1] += LEXICON["replies"][data.language]["collected_sample"]
+            for program_id in run.get("added_ids", [])[:6]:
+                result["cards"].append(
+                    self._program_card(self.automation.programs.get(program_id), data)
+                )
+            result["navigate"] = {"page": "programs", "params": {}}
+        elif kind == "add_notice":
+            text = str(action.get("text") or data.message)[:20000]
+            program = self.automation.programs.add(text, "", "chat")
+            match, notice = program["match"], program["notice"]
+            self._say(
+                result,
+                data,
+                "notice_added",
+                verdict=_verdict(match["overall"], data.language),
+                met=match["met"],
+                required=match["required"],
+                deadline=notice["deadline"] or "-",
+            )
+            result["cards"].append(self._program_card(program, data))

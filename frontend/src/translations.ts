@@ -9,6 +9,14 @@ export const languages: { code: Language; label: string; short: string; switchLa
 export { chinese };
 
 export const korean: Record<string, string> = {
+  "Ask YardMate": "도우미에게 묻기",
+  "Which lots failed?": "불합격 로트 보여줘",
+  "Eligible support notices in Geoje": "거제에서 신청 가능한 지원사업",
+  "Collect new notices from Bizinfo": "기업마당에서 새 공고 가져와",
+  "Add a task: reinspect E21-B09 by Friday": "금요일까지 E21-B09 재검사 할 일 추가",
+  "Find the HC-QC-07 standard": "HC-QC-07 기준서 찾아줘",
+  "YardMate assistant": "YardMate 도우미",
+  "Ask, or paste a support notice…": "물어보거나 지원사업 공고를 붙여넣으세요…",
   "Open standard": "열기",
   "Show notice wording": "원문 보기",
   "Hide notice wording": "원문 숨기기",
