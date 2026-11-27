@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { api } from './api';
 import { Icon } from './icons';
 import LiveMap from './LiveMap';
+import { CountUp, MaskReveal, Marquee } from './motion';
 import { useLanguage } from './language';
 import type { InspectionSummary, Standard } from './types';
 
@@ -32,7 +33,7 @@ function MapLegend({ note }: { note: string }) {
     <span><i className="map-key home" />{t("Our plant")}</span>
     <span><i className="map-key yard" />{t("Customer shipyard")}</span>
     <span><i className="map-key crisis" />{t("Shipbuilding crisis area")}</span>
-    <span className="muted">{t(note)}</span>
+    {note && <span className="muted">{t(note)}</span>}
   </figcaption>;
 }
 
@@ -43,7 +44,7 @@ function CoastMap() {
       <defs>
         <pattern id="sea-lines" width="800" height="14" patternUnits="userSpaceOnUse"><path d="M0 7H800" stroke="#b9d0de" strokeWidth="1" /></pattern>
       </defs>
-      <rect width="800" height="560" fill="#d6e5ee" />
+      <rect width="800" height="560" className="map-sea-fill" />
       <rect width="800" height="560" fill="url(#sea-lines)" opacity=".7" />
       <path d={land} className="map-land" />
       <path d={island} className="map-land" />
@@ -62,25 +63,37 @@ function CoastMap() {
         {place.note && <text x={place.side === 'left' ? -28 : 28} y="25" textAnchor={place.side === 'left' ? 'end' : 'start'} className="map-note">{t(place.note)}</text>}
       </g>)}
     </svg>
-    <MapLegend note="Synthetic companies" />
+    <MapLegend note="" />
   </figure>;
+}
+
+interface UpcomingTask { id: string; title: Record<string, string>; due: string; status: 'TODO' | 'DONE'; customer?: string }
+
+function daysUntil(due: string) {
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  return Math.round((new Date(`${due}T00:00:00`).getTime() - today.getTime()) / 86400000);
 }
 
 export default function Home({ userName, onGo, busy, perform, onLoaded }: {
   userName: string; onGo: (page: string, params?: Record<string, string>) => void; onAsk?: (message: string) => void;
   busy: boolean; perform: (task: () => Promise<void>) => Promise<void>; onLoaded: () => void;
 }) {
-  const { t, locale } = useLanguage();
+  const { t, locale, language } = useLanguage();
   const [summary, setSummary] = useState<Summary | null>(null);
   const [standards, setStandards] = useState<Standard[]>([]);
   const [inspections, setInspections] = useState<InspectionSummary[]>([]);
   const [version, setVersion] = useState(0);
   const [mapFailed, setMapFailed] = useState(false);
+  const [upcoming, setUpcoming] = useState<UpcomingTask[]>([]);
 
   useEffect(() => {
     api<Summary>('/home').then(setSummary).catch(() => setSummary(null));
     api<Standard[]>('/standards').then(setStandards).catch(() => setStandards([]));
     api<InspectionSummary[]>('/inspections').then(setInspections).catch(() => setInspections([]));
+    api<UpcomingTask[]>('/tasks').then(tasks => setUpcoming(tasks
+      .filter(task => task.status === 'TODO')
+      .sort((a, b) => a.due.localeCompare(b.due))
+      .slice(0, 12))).catch(() => setUpcoming([]));
   }, [version]);
 
   const yardStandards = standards.filter(standard => standard.status === 'ACTIVE' && !standard.id.startsWith('demo-cover'));
@@ -103,21 +116,31 @@ export default function Home({ userName, onGo, busy, perform, onLoaded }: {
   }
 
   return <div className="home">
-    <header className="home-hero">
+    <header className="home-hero" data-parallax="0.12">
       <div><small>{new Date().toLocaleDateString(locale, { month: 'long', day: 'numeric', weekday: 'long' })}</small>
-        <h1>{t("Hello")}, {userName}</h1></div>
+        <h1><MaskReveal>{t("Hello")}, {userName}</MaskReveal></h1></div>
     </header>
+
+    {upcoming.length > 0 && <Marquee label={t("Upcoming tasks")} seconds={Math.max(28, upcoming.length * 6)}>
+      {upcoming.map(task => {
+        const days = daysUntil(task.due);
+        return <button type="button" key={task.id} className="marquee-item" onClick={() => onGo('tasks')}>
+          <b className={days < 0 ? 'late' : days <= 3 ? 'soon' : ''}>{days < 0 ? `D+${-days}` : days === 0 ? 'D-day' : `D-${days}`}</b>
+          {task.title[language] || task.title.en}
+        </button>;
+      })}
+    </Marquee>}
 
     {summary && yardStandards.length === 0 && <div className="demo-banner">
       <strong>{t("No shipyard specs yet")}</strong>
       <button className="primary" disabled={busy} onClick={() => void loadDemo()}><Icon name="upload" />{t("Load the shipyard demo")}</button>
     </div>}
 
-    <section className="home-board">
+    <section className="home-board reveal">
       {!mapFailed
         ? <figure className="coast-map live">
           <LiveMap onRegion={region => onGo('programs', { region })} onFail={() => setMapFailed(true)} />
-          <MapLegend note="Synthetic companies" />
+          <MapLegend note="" />
         </figure>
         : <CoastMap />}
       <div className="home-flow">
@@ -125,21 +148,21 @@ export default function Home({ userName, onGo, busy, perform, onLoaded }: {
           <button className="yard-step" onClick={() => onGo(step.page)}>
             <span className="flow-index" aria-hidden="true">{index + 1}</span>
             <span className="flow-text"><strong>{t(step.title)}</strong>{step.chips && <span className="flow-chips">{step.chips.map(chip => <span key={chip}>{chip}</span>)}</span>}</span>
-            <span className={`flow-stat ${step.tone}`}><b>{step.value}</b><small>{t(step.unit)}</small></span>
+            <span className={`flow-stat ${step.tone}`}><b><CountUp value={step.value} /></b><small>{t(step.unit)}</small></span>
           </button></li>)}</ol>
-        <button className="support-card" onClick={() => onGo('programs')}>
+        <button className="support-card" data-magnetic onClick={() => onGo('programs')}>
           <span className="support-head"><Icon name="grant" size={20} /><strong>{t("Support for shipbuilding crisis areas")}</strong><Icon name="next" size={16} /></span>
           {programs && <span className="support-stats">
-            <span className="good"><b>{programs.eligible}</b>{t("can apply")}</span>
-            <span className="warn"><b>{programs.check}</b>{t("to check")}</span>
-            <span><b>{programs.closing}</b>{t("closing in 7 days")}</span>
+            <span className="good"><b><CountUp value={programs.eligible} /></b>{t("can apply")}</span>
+            <span className="warn"><b><CountUp value={programs.check} /></b>{t("to check")}</span>
+            <span><b><CountUp value={programs.closing} /></b>{t("closing in 7 days")}</span>
           </span>}
         </button>
         {summary && <button className="tasks-line" onClick={() => onGo('tasks')}>
           <Icon name="calendar" size={18} />
-          <span>{t("Open tasks")}: <b>{summary.tasks.open}</b></span>
-          <span className={summary.tasks.overdue ? 'bad' : ''}>{t("Overdue")}: <b>{summary.tasks.overdue}</b></span>
-          <span>{t("Due this week")}: <b>{summary.tasks.today + summary.tasks.week}</b></span>
+          <span>{t("Open tasks")} <b><CountUp value={summary.tasks.open} /></b></span>
+          <span className={summary.tasks.overdue ? 'bad' : ''}>{t("Overdue")} <b><CountUp value={summary.tasks.overdue} /></b></span>
+          <span>{t("Due this week")} <b><CountUp value={summary.tasks.today + summary.tasks.week} /></b></span>
           <Icon name="next" size={16} />
         </button>}
       </div>

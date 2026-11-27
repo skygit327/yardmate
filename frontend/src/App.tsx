@@ -7,6 +7,8 @@ import { DocLanguagePicker, reportLanguages } from './docLanguage';
 import { Icon } from './icons';
 import { displayInspection, displayStandard, setGlossary } from './legacyDisplay';
 import { LanguageToggle, useLanguage } from './language';
+import { useMotion } from './motion';
+import { ThemeToggle } from './theme';
 import AISettings from './AISettings';
 import CustomersView from './Customers';
 import FormIntake from './FormIntake';
@@ -301,6 +303,8 @@ export default function App({ user, onLogout, loggingOut }: {
         : { name: 'approve', label: 'Approve report', icon: 'check' }
     : null;
 
+  useMotion([]);
+
   const navItems: { tab: string; icon: string; label: string; hint?: string }[] = [
     { tab: 'home', icon: 'home', label: 'Home' },
     { tab: 'forms', icon: 'scan', label: 'Read specs', hint: 'Shipyard, coating and owner forms in Korean, English or Chinese → one standard' },
@@ -319,7 +323,7 @@ export default function App({ user, onLogout, loggingOut }: {
           <button className={tab === item.tab ? 'active' : ''} aria-current={tab === item.tab ? 'page' : undefined} aria-label={t(item.label)} onClick={() => go(item.tab)} title={item.hint ? t(item.hint) : undefined}>
             <Icon name={item.icon} /><span>{t(item.label)}</span></button></Fragment>)}</nav>
       <div className="top-actions">
-  <button className="sidebar-cta primary" disabled={busy} onClick={startInspection}><Icon name="plus" />{t("New inspection")}</button>
+  <button className="sidebar-cta primary" data-magnetic disabled={busy} onClick={startInspection}><Icon name="plus" />{t("New inspection")}</button>
         <button className={`sidebar-note ${tab === 'ai' ? 'active' : ''}`} onClick={() => setTab('ai')} title={llm && llm.provider !== 'none' && llm.external && !llm.allow_internal ? t("Internal standards and customer requests use the rule-based analysis.") : undefined}>
         <span className={`live-dot ${llm && llm.provider !== 'none' ? 'ai' : ''}`} />
         {llm && llm.provider !== 'none'
@@ -328,11 +332,11 @@ export default function App({ user, onLogout, loggingOut }: {
         {llm && llm.provider !== 'none' && llm.external && !llm.allow_internal && <small>{t("Internal data stays rule-based")}</small>}
         <small className="settings-link"><Icon name="gear" size={12} /> {t("AI settings")}</small>
       </button>
-        <span className="chip demo-chip">{t("Demo data")}</span><LanguageToggle /><span className="user-name">{user.display_name}</span>
+        <ThemeToggle /><LanguageToggle /><span className="user-name">{user.display_name}</span>
         <button className="icon-button" aria-label={t("Sign out")} title={t("Sign out")} disabled={busy || loggingOut} onClick={() => void onLogout()}><Icon name="logout" /></button>
       </div>
     </header>
-    <main>
+    <main key={tab} className="page-enter">
       {error && <div role="alert" className="error-banner">{t(error)}<button onClick={() => setError('')} aria-label={t("Dismiss error")}><Icon name="x" /></button></div>}
       {busy && <div className="busy" role="status"><span className="spinner" />{t("Processing...")}</div>}
 

@@ -9,6 +9,9 @@ export const languages: { code: Language; label: string; short: string; switchLa
 export { chinese };
 
 export const korean: Record<string, string> = {
+  "Upcoming tasks": "다가오는 할 일",
+  "Dark mode": "다크 모드",
+  "Light mode": "라이트 모드",
   "Original notice": "공고 원문",
   "chars": "자",
   "Not saved yet": "아직 저장 안 됨",

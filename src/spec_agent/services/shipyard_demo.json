@@ -6,12 +6,12 @@
       "lots": [
         {
           "lot": "E21-B07",
-          "inspector": "(가상) 김도윤 · 거제 2공장",
+          "inspector": "김도윤 · 거제 2공장",
           "stage": "approved"
         },
         {
           "lot": "E21-B08",
-          "inspector": "(가상) 김도윤 · 거제 2공장",
+          "inspector": "김도윤 · 거제 2공장",
           "stage": "review",
           "values": {
             "언더컷|맞대기": "0.62"
@@ -24,7 +24,7 @@
       "lots": [
         {
           "lot": "VL-P12",
-          "inspector": "(가상) 박서연 · 울산 도장장",
+          "inspector": "박서연 · 울산 도장장",
           "stage": "report"
         }
       ]
@@ -34,7 +34,7 @@
       "lots": [
         {
           "lot": "HC-S03",
-          "inspector": "(가상) 이준호 · 통영 배관공장",
+          "inspector": "이준호 · 통영 배관공장",
           "stage": "approved"
         }
       ]
@@ -48,7 +48,7 @@
         "ko": "E21-B08 맞대기 용접부 언더컷 재용접·재검사",
         "zh": "E21-B08：对接焊缝咬边返修焊接并复检"
       },
-      "customer": "(가상) 한바다조선",
+      "customer": "한바다조선",
       "link": {
         "lot": "E21-B08"
       }
@@ -60,7 +60,7 @@
         "ko": "HC-S03 중국어 성적서 선주 감독관에게 발송",
         "zh": "HC-S03：向船东验船师发送中文报告"
       },
-      "customer": "(虚拟) 海川船务",
+      "customer": "海川船务",
       "link": {
         "lot": "HC-S03"
       }
@@ -72,7 +72,7 @@
         "ko": "VL-P12 도장 성적서 승인",
         "zh": "VL-P12：批准涂装报告"
       },
-      "customer": "(Synthetic) Donghae Heavy Industries",
+      "customer": "Donghae Heavy Industries",
       "link": {
         "lot": "VL-P12"
       }
@@ -93,7 +93,7 @@
         "ko": "HB-WLD-201 개정 C 변경점 용접사 교육",
         "zh": "向焊工讲解 HB-WLD-201 C 版变更"
       },
-      "customer": "(가상) 한바다조선",
+      "customer": "한바다조선",
       "link": {
         "document": "HB-WLD-201"
       }
@@ -105,7 +105,7 @@
         "ko": "E21-B09 블록 용접 외관검사",
         "zh": "E21-B09 分段：焊缝外观检验"
       },
-      "customer": "(가상) 한바다조선"
+      "customer": "한바다조선"
     },
     {
       "days": 5,
@@ -114,7 +114,7 @@
         "ko": "선급 검사관 배관 용접 입회 검사 일정 확인",
         "zh": "确认船级社验船师参加管系焊接见证检验的日程"
       },
-      "customer": "(虚拟) 海川船务",
+      "customer": "海川船务",
       "link": {
         "document": "HC-QC-07"
       }
@@ -135,7 +135,7 @@
         "ko": "선주 배관 사양서 차기 개정판 검토",
         "zh": "审阅船东下一版管系规范"
       },
-      "customer": "(虚拟) 海川船务",
+      "customer": "海川船务",
       "link": {
         "document": "HC-QC-07"
       }
@@ -148,7 +148,7 @@
         "ko": "E21-B07 성적서 조선소 제출",
         "zh": "E21-B07：向船厂提交报告"
       },
-      "customer": "(가상) 한바다조선",
+      "customer": "한바다조선",
       "link": {
         "lot": "E21-B07"
       }
@@ -161,7 +161,7 @@
         "ko": "VL-P12 DFT 측정값 입력",
         "zh": "VL-P12：录入 DFT 测量值"
       },
-      "customer": "(Synthetic) Donghae Heavy Industries",
+      "customer": "Donghae Heavy Industries",
       "link": {
         "lot": "VL-P12"
       }

@@ -4,6 +4,7 @@ import App from './App';
 import { api, setCsrfToken } from './api';
 import type { Session } from './types';
 import { LanguageToggle, useLanguage } from './language';
+import { ThemeToggle } from './theme';
 
 export default function AuthGate() {
   const { t } = useLanguage();
@@ -104,12 +105,12 @@ export default function AuthGate() {
     } finally { authBusy.current = false; setBusy(false); }
   }
 
-  if (checking) return <main className="login-shell"><div className="login-language"><LanguageToggle /></div><p role="status">{t("Checking your session...")}</p></main>;
+  if (checking) return <main className="login-shell"><div className="login-language"><ThemeToggle /><LanguageToggle /></div><p role="status">{t("Checking your session...")}</p></main>;
   if (session) return <>
     {error && <div role="alert" className="error-banner">{t(error)}</div>}
     <App key={session.csrf_token} user={session.user} onLogout={logout} loggingOut={busy} />
   </>;
-  return <main className="login-shell"><div className="login-language"><LanguageToggle /></div><section className="panel login-panel">
+  return <main className="login-shell"><div className="login-language"><ThemeToggle /><LanguageToggle /></div><section className="panel login-panel">
     <div className="login-brand"><span className="brand-mark" aria-hidden="true"><svg viewBox="0 0 40 40" width="40" height="40"><path d="M6 22h28l-4 9H10z" fill="#c4532f" /><path d="M6 22h28" stroke="#fff" strokeWidth="2" /><path d="M12 22V12h9v10M23 22v-6h6v6" fill="none" stroke="#dbe7ef" strokeWidth="2.4" strokeLinejoin="round" /></svg></span><h1>YardMate</h1></div>
     {error && <div role="alert" className="error-banner">{t(error)}</div>}
     <form onSubmit={login}><fieldset disabled={busy}>

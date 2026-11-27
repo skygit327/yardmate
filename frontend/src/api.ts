@@ -30,7 +30,19 @@ export async function api<T>(path: string, data?: unknown, method?: string): Pro
       : payload.detail;
     throw new Error(detail || `Request failed (${response.status})`);
   }
-  return response.json();
+  return stripMarkers(await response.json()) as T;
+}
+
+// Demo records may carry "(synthetic)" prefixes in Korean, Chinese or English; the UI shows names without them.
+const MARKER = /\((?:\uac00\uc0c1|\u865a\u62df|\u865b\u64ec|Synthetic)\)\s*/g;
+
+export function stripMarkers(value: unknown): unknown {
+  if (typeof value === 'string') return value.includes('(') ? value.replace(MARKER, '') : value;
+  if (Array.isArray(value)) return value.map(stripMarkers);
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, stripMarkers(item)]));
+  }
+  return value;
 }
 
 export function requestId(): string {

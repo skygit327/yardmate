@@ -70,7 +70,7 @@ const regionNames: Record<string, Texts> = {
 
 // "[Sample · synthetic notice] 2026 ..." -> "2026 ..."; the synthetic chip says it instead.
 function plainTitle(title: string) {
-  return title.replace(/^\s*\[[^\]]*\]\s*/, '');
+  return title.replace(/^(\s*\[[^\]]*\]\s*)+/, '');
 }
 
 export default function Programs({ busy, perform, initialProgram, onProgramUsed, onOpenTasks, initialView, initialRegion, aiReady = false }: {

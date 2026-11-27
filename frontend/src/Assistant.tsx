@@ -3,6 +3,7 @@ import { api } from './api';
 import { Icon } from './icons';
 import { useLanguage } from './language';
 import type { TaskLink } from './Tasks';
+import { Typewriter } from './motion';
 
 export interface Navigate { page: string; params: Record<string, string> }
 interface Card { kind: 'task' | 'standard' | 'lot' | 'program' | 'help'; title?: string; detail?: string; late?: boolean; tone?: string; link?: TaskLink | null }
@@ -60,7 +61,7 @@ export default function Assistant({ open, onOpenChange, pending, onPendingUsed, 
   }
 
   return <>
-    {!open && <button className="assistant-fab" aria-label={t("Ask the assistant")} onClick={() => onOpenChange(true)}>
+    {!open && <button className="assistant-fab" data-magnetic aria-label={t("Ask the assistant")} onClick={() => onOpenChange(true)}>
       <Icon name="chat" size={26} /><span>{t("Ask YardMate")}</span></button>}
     {open && <section className="assistant-panel" role="dialog" aria-label={t("Assistant")}>
       <header><div><strong>{t("YardMate assistant")}</strong></div>
@@ -69,7 +70,7 @@ export default function Assistant({ open, onOpenChange, pending, onPendingUsed, 
         {turns.length === 0 && <div className="assistant-examples">
           {examples.map(example => <button key={example} type="button" onClick={() => void send(t(example))}>{t(example)}</button>)}</div>}
         {turns.map((turn, index) => <div key={index} className={`bubble ${turn.role}`}>
-          <p>{turn.text}</p>
+          <p>{turn.role === 'assistant' && index === turns.length - 1 ? <Typewriter key={index} text={turn.text} /> : turn.text}</p>
           {turn.notes?.map(note => <small key={note} className="note">{note}</small>)}
           {turn.cards?.filter(card => card.kind !== 'help').map((card, cardIndex) => {
             const body = <><span className={`card-dot ${card.tone ? toneClass[card.tone] ?? '' : ''} ${card.late ? 'fail' : ''}`} aria-hidden="true" />

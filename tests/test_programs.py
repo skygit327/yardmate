@@ -27,7 +27,7 @@ def statuses(match: dict) -> dict:
 
 def test_notice_becomes_one_standard_structure():
     notice = sample("01")
-    assert notice["agency"] == "(가상) 동남권 조선해양혁신센터"
+    assert notice["agency"] == "동남권 조선해양혁신센터"
     assert notice["opens"] == "2026-12-01" and notice["deadline"] == "2026-12-18"
     assert notice["amount"]["manwon"] == 7000
     assert len(notice["documents"]) == 5

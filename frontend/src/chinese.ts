@@ -1,5 +1,8 @@
 // Simplified Chinese UI catalogue. Keys are the English source strings.
 export const chinese: Record<string, string> = {
+  "Upcoming tasks": "即将到期的任务",
+  "Dark mode": "深色模式",
+  "Light mode": "浅色模式",
   "Original notice": "公告原文",
   "chars": "字",
   "Not saved yet": "尚未保存",
