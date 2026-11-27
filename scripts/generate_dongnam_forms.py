@@ -31,10 +31,10 @@ def build(form: dict) -> Path:
     header = form["header"]
     areas = form["areas"]
     width = 3 + len(areas)
-    rows = [[form["title"]] + [""] * (width + 1)]
+    rows = [[form["title"]] + [""] * (width - 1)]
     pairs = list(header.items())
     for left, right in zip(pairs[0::2], pairs[1::2], strict=False):
-        rows.append([left[0], left[1], right[0], right[1]] + [""] * (width - 2))
+        rows.append([left[0], left[1], right[0], right[1]] + [""] * (width - 4))
     rows.append(
         [labels["item"], labels["criteria"]]
         + [""] * (len(areas) - 1)
