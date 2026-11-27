@@ -6,12 +6,14 @@ different stages. Programme notices are loaded as well. Everything is synthetic.
 """
 
 import json
+from datetime import date, timedelta
 from decimal import Decimal
 from pathlib import Path
 from uuid import uuid4
 
 from spec_agent.schemas.inspection import Action, InspectionInput
 from spec_agent.schemas.standard import StandardInput
+from spec_agent.storage.database import timestamp
 
 HERE = Path(__file__).parent
 PLAN = json.loads((HERE / "shipyard_demo.json").read_text("utf-8"))
@@ -92,4 +94,50 @@ def seed_shipyard(intake, workflow, programs, actor: str, actor_user_id: str | N
                 state = _act(workflow, state, "approve", actor)
             created["inspections"] += 1
     created["programs"] = len(programs.load_samples())
+    created["tasks"] = _seed_tasks(workflow, programs, actor)
     return created
+
+
+def _seed_tasks(workflow, programs, actor: str) -> int:
+    """Demo work across overdue, today, this week, later and done, linked to the demo records."""
+    store = workflow.store
+    if any(task.get("source") == "demo" for task in store.tasks()):
+        return 0
+    lots = {item["inputs"]["lot"]: item["inspection_id"] for item in workflow.list()}
+    standards = {s.document_number: s.id for s in store.standards() if s.status == "ACTIVE"}
+    today = date.today()
+    count = 0
+    for item in PLAN["tasks"]:
+        link = item.get("link") or {}
+        target = (
+            {"type": "inspection", "id": lots[link["lot"]]}
+            if link.get("lot") in lots
+            else {"type": "standard", "id": standards[link["document"]]}
+            if link.get("document") in standards
+            else None
+        )
+        due = today + timedelta(days=item["days"])
+        task = {
+            "id": str(uuid4()),
+            "title": item["title"],
+            "detail": "",
+            "due": due.isoformat(),
+            "status": "DONE" if item.get("done") else "TODO",
+            "source": "demo",
+            "kind": "manual",
+            "customer": item.get("customer", ""),
+            "link": target,
+            "created_by": actor,
+            "created_at": timestamp(),
+        }
+        if item.get("done"):
+            task["done_at"] = timestamp()
+        with workflow.lock:
+            store.save_task(task)
+        count += 1
+    program = next(
+        (p for p in programs.list() if p["filename"] == PLAN["register_program_tasks"]), None
+    )
+    if program and not program["tasks"]:
+        count += len(programs.register_tasks(program["id"])["tasks"])
+    return count

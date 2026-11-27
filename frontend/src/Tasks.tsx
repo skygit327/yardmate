@@ -5,9 +5,9 @@ import { useLanguage } from './language';
 import type { Language } from './translations';
 
 type Texts = Record<Language, string>;
-export interface TaskLink { type: 'standard' | 'request' | 'form' | 'trace' | 'program'; id: string }
+export interface TaskLink { type: 'standard' | 'request' | 'form' | 'trace' | 'program' | 'inspection'; id: string }
 interface Task {
-  id: string; title: Texts; detail: string; due: string; status: 'TODO' | 'DONE'; source: 'automation' | 'manual';
+  id: string; title: Texts; detail: string; due: string; status: 'TODO' | 'DONE'; source: 'automation' | 'manual' | 'demo';
   kind: string; file?: string; customer?: string; link: TaskLink | null; job_id?: string;
 }
 interface Job {
@@ -16,7 +16,7 @@ interface Job {
 }
 interface Status { enabled: boolean; watching: boolean; root: string | null; folders: Record<string, string>; last_scan: string | null; jobs: Job[] }
 
-const kindLabel: Record<string, string> = { customer_forms: 'Customer form', ncr: 'NCR', requests: 'Customer request', manual: 'My task' };
+const kindLabel: Record<string, string> = { customer_forms: 'Customer form', ncr: 'NCR', requests: 'Customer request', manual: 'My task', programs: 'Support' };
 const statusLabel = { DONE: 'Processed', NEEDS_REVIEW: 'Needs review', ERROR: 'Failed' };
 const folderOrder = ['customer_forms', 'ncr', 'requests', 'reports', 'done', 'failed'];
 const folderLabel: Record<string, string> = {
@@ -77,14 +77,15 @@ export default function Tasks({ busy, perform, onOpen, initialView = 'board' }: 
       <label className="task-check"><input type="checkbox" aria-label={t("Done")} checked={task.status === 'DONE'} disabled={busy}
         onChange={event => void update(task, { status: event.target.checked ? 'DONE' : 'TODO' })} /></label>
       <div className="task-body">
-        <strong>{title(task)}</strong>
-        <small><span className={`chip kind-${task.kind}`}>{t(kindLabel[task.kind] ?? task.kind)}</span>
-          {task.customer ? ` ${task.customer} ·` : ''} {new Date(`${task.due}T00:00`).toLocaleDateString(locale, { month: 'short', day: 'numeric', weekday: 'short' })}</small>
+        {task.link
+          ? <button type="button" className="task-title link" onClick={() => onOpen(task.link!)} title={t("Open item")}>{title(task)}<Icon name="next" size={14} /></button>
+          : <strong className="task-title">{title(task)}</strong>}
+        <small>{task.kind !== 'manual' && <span className={`chip kind-${task.kind}`}>{t(kindLabel[task.kind] ?? task.kind)}</span>}
+          {task.customer && <span className="task-customer">{task.customer}</span>}</small>
       </div>
       <div className="task-actions">
-        <input type="date" aria-label={t("Due date")} value={task.due} disabled={busy} onChange={event => event.target.value && void update(task, { due: event.target.value })} />
-        {task.link && <button className="small" onClick={() => onOpen(task.link!)}><Icon name="next" size={14} />{t("Open item")}</button>}
-        {task.job_id && <a className="button small" href={`/api/automation/jobs/${task.job_id}/report`} target="_blank" rel="noreferrer" title={t("Processing report")}><Icon name="file" size={14} /></a>}
+        <input type="date" className="task-due" aria-label={t("Due date")} value={task.due} disabled={busy} onChange={event => event.target.value && void update(task, { due: event.target.value })} />
+        {task.job_id && <a className="button small icon-button" href={`/api/automation/jobs/${task.job_id}/report`} target="_blank" rel="noreferrer" title={t("Processing report")} aria-label={t("Processing report")}><Icon name="file" size={14} /></a>}
       </div>
     </article>;
   }

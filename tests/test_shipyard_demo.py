@@ -7,8 +7,9 @@ from pypdf import PdfReader
 
 def test_shipyard_demo_reads_three_languages_and_reports_in_chinese(client):
     created = client.post("/api/demo/shipyard").json()
-    assert created == {"standards": 3, "inspections": 4, "programs": 3}
-    assert client.post("/api/demo/shipyard").json()["standards"] == 0  # loaded once
+    assert created == {"standards": 3, "inspections": 4, "programs": 3, "tasks": 15}
+    again = client.post("/api/demo/shipyard").json()
+    assert again["standards"] == 0 and again["tasks"] == 0  # loaded once
 
     standards = {s["document_number"]: s for s in client.get("/api/standards").json()}
     assert {"HB-WLD-201", "DH-PNT-110", "HC-QC-07"} <= set(standards)
@@ -56,3 +57,20 @@ def test_hosted_demo_bootstrap_creates_account_and_loads_data(tmp_path, monkeypa
             )
             lots = client.get("/api/inspections", headers={"X-Spec-Agent": "1"}).json()
             assert len([lot for lot in lots if lot["inputs"]["lot"] == "E21-B08"]) == 1
+
+
+def test_demo_tasks_fill_the_board_and_link_to_records(client):
+    from datetime import date
+
+    client.post("/api/demo/shipyard")
+    tasks = client.get("/api/tasks").json()
+    today = date.today().isoformat()
+    open_tasks = [task for task in tasks if task["status"] == "TODO"]
+    assert any(task["due"] < today for task in open_tasks)  # overdue column
+    assert any(task["due"] == today for task in open_tasks)  # today column
+    assert any(task["due"] > today for task in open_tasks)  # this week / later
+    assert sum(task["status"] == "DONE" for task in tasks) == 2
+    reweld = next(task for task in tasks if task["title"]["en"].startswith("E21-B08"))
+    lots = {i["inspection_id"]: i["inputs"]["lot"] for i in client.get("/api/inspections").json()}
+    assert reweld["link"]["type"] == "inspection" and lots[reweld["link"]["id"]] == "E21-B08"
+    assert any(task["link"] and task["link"]["type"] == "program" for task in tasks)

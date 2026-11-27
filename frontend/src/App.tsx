@@ -252,6 +252,7 @@ export default function App({ user, onLogout, loggingOut }: {
     else if (link.type === 'request') openRequest(link.id);
     else if (link.type === 'form') { setFormReading(link.id); setTab('forms'); }
     else if (link.type === 'program') { setProgramSelected(link.id); setProgramsView('list'); setTab('programs'); }
+    else if (link.type === 'inspection') { setTab('inspections'); setCreating(false); void perform(() => open(link.id)); }
     else { setTraceCase(link.id); setTab('trace'); }
   }
 
