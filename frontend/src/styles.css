@@ -691,7 +691,7 @@ nav button.active { box-shadow: inset 3px 0 0 var(--primer); }
 
 .home-board { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(320px, 1fr); gap: 18px; align-items: start; }
 .coast-map { margin: 0; background: #fff; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
-.coast-map svg { display: block; width: 100%; height: auto; }
+.coast-map > svg { display: block; width: 100%; height: auto; }
 .coast-map figcaption { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; padding: 10px 14px; font-size: 12.5px; border-top: 1px solid var(--line); }
 .coast-map figcaption span { display: inline-flex; align-items: center; gap: 6px; }
 .coast-map figcaption .muted { margin-left: auto; }
@@ -777,3 +777,19 @@ nav button { text-align: left; }
 .tag.region { background: #eef1f3; color: #4e6372; }
 @media (max-width: 760px) { .search-line { grid-template-columns: 1fr; } .detail-filters { grid-template-columns: 1fr; } }
 .detail-filters { align-items: start; }
+
+.coast-map.live .live-map { position: relative; height: 440px; background: #d6e5ee; }
+.live-map-canvas { position: absolute; inset: 0; }
+.live-map-loading { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); font-size: 13px; }
+.map-pin { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-family: inherit; }
+.map-pin i { width: 16px; height: 16px; border-radius: 50%; background: var(--primer); border: 3px solid #fff; box-shadow: 0 0 0 1px rgba(15, 44, 66, .35); flex-shrink: 0; }
+.map-pin.yard i { border-radius: 3px; background: var(--brand); }
+.map-pin.port i { background: #fff; border-color: var(--brand); }
+.map-pin.crisis i { width: 12px; height: 12px; border-width: 2px; }
+.map-pin-label { display: grid; padding: 3px 8px; border-radius: 6px; background: rgba(255, 255, 255, .95); box-shadow: 0 1px 4px rgba(15, 44, 66, .2); color: #1d2f3c; font-size: 12.5px; font-weight: 700; line-height: 1.3; white-space: nowrap; }
+.map-pin-label small { font-size: 11px; font-weight: 500; color: #4e6372; }
+@media (max-width: 640px) { .coast-map.live .live-map { height: 360px; } }
+.live-map-loading { pointer-events: none; z-index: 500; }
+.live-map .leaflet-container { font-family: inherit; background: #d6e5ee; }
+.live-map .leaflet-marker-icon:focus-visible .map-pin-label { outline: 3px solid #e4b94b; }
+.map-pin.left { flex-direction: row-reverse; transform: translateX(calc(-100% + 16px)); }

@@ -91,6 +91,7 @@ export default function App({ user, onLogout, loggingOut }: {
   const [programSelected, setProgramSelected] = useState<string | null>(null);
   const [programsView, setProgramsView] = useState<'list' | 'profile'>('list');
   const [programsKey, setProgramsKey] = useState(0);
+  const [programsRegion, setProgramsRegion] = useState('');
   const [traceSeed, setTraceSeed] = useState<TraceSeed | null>(null);
   const [customerName, setCustomerName] = useState<string | null>(null);
   const [requestSelected, setRequestSelected] = useState<string | null>(null);
@@ -268,7 +269,7 @@ export default function App({ user, onLogout, loggingOut }: {
     else if (page === 'requests') { setTab('requests'); setRequestSelected(null); setRequestCreating(null); }
     else if (page === 'request_new') newRequest(params.customer ?? '');
     else if (page === 'ai') setTab('ai');
-    else if (page === 'programs' || page === 'profile') { setProgramsView(page === 'profile' ? 'profile' : 'list'); setProgramsKey(key => key + 1); setTab('programs'); }
+    else if (page === 'programs' || page === 'profile') { setProgramsView(page === 'profile' ? 'profile' : 'list'); setProgramsRegion(params.region ?? ''); setProgramsKey(key => key + 1); setTab('programs'); }
     void refresh().catch(() => undefined);
   }
 
@@ -412,11 +413,11 @@ export default function App({ user, onLogout, loggingOut }: {
         {selected.events.length > 0 && <details className="history"><summary><Icon name="history" size={16} />{t("History")} · {selected.events.length}</summary>{selected.events.map((event, index) => <p key={index}>{new Date(event.at).toLocaleString(locale)} · {event.actor} · {t(event.action)}{event.reason ? ` · ${event.reason}` : ''}</p>)}</details>}
       </section>}
 
-      {tab === 'home' && <Home key={homeKey} userName={user.display_name} onGo={page => go(page)} onAsk={message => setAssistantMessage(message)} busy={busy} perform={perform} onLoaded={() => void refresh()} />}
+      {tab === 'home' && <Home key={homeKey} userName={user.display_name} onGo={(page, params) => go(page, params)} onAsk={message => setAssistantMessage(message)} busy={busy} perform={perform} onLoaded={() => void refresh()} />}
       {tab === 'tasks' && <Tasks key={tasksView} initialView={tasksView} busy={busy} perform={perform} onOpen={openLink} />}
       {tab === 'forms' && <FormIntake initialReading={formReading} onReadingUsed={() => setFormReading(null)} busy={busy} perform={perform} onOpenStandard={lineage => { void refresh(); openStandard(lineage); }} />}
       {tab === 'trace' && <Traceback busy={busy} perform={perform} seed={traceSeed} onSeedUsed={() => setTraceSeed(null)} initialCase={traceCase} onCaseUsed={() => setTraceCase(null)} />}
-      {tab === 'programs' && <Programs key={programsKey} initialView={programsView} busy={busy} perform={perform}
+      {tab === 'programs' && <Programs key={programsKey} initialView={programsView} initialRegion={programsRegion} busy={busy} perform={perform}
         initialProgram={programSelected} onProgramUsed={() => setProgramSelected(null)} onOpenTasks={() => go('tasks')} />}
       {tab === 'ai' && <AISettings busy={busy} perform={perform} onChanged={loadHealth} />}
       {tab === 'customers' && <CustomersView selected={customerName} busy={busy} perform={perform} onSelect={setCustomerName}

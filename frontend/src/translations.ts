@@ -9,6 +9,9 @@ export const languages: { code: Language; label: string; short: string; switchLa
 export { chinese };
 
 export const korean: Record<string, string> = {
+  "Loading the map…": "지도를 불러오는 중…",
+  "Show notices for this region": "이 지역 공고 보기",
+  "Synthetic demo companies · city-level pins · tap a pin for its notices": "가상 시연 기업 · 도시 단위 표시 · 핀을 누르면 그 지역 공고",
   "Notice source": "공고 출처",
   "Search notices": "공고 검색",
   "Search title, agency or content": "공고명, 기관, 내용으로 검색",

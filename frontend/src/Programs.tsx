@@ -61,9 +61,9 @@ const textToList = (text: string) => text.split(/[,\n]/).map(item => item.trim()
 interface FeedRun { mode: 'live' | 'sample'; fetched?: number; matched?: number; added?: number; error?: string; at: string }
 interface FeedStatus { mode: 'live' | 'sample'; last: FeedRun | null }
 
-export default function Programs({ busy, perform, initialProgram, onProgramUsed, onOpenTasks, initialView }: {
+export default function Programs({ busy, perform, initialProgram, onProgramUsed, onOpenTasks, initialView, initialRegion }: {
   busy: boolean; perform: (task: () => Promise<void>) => Promise<void>;
-  initialProgram: string | null; onProgramUsed: () => void; onOpenTasks: () => void; initialView?: 'list' | 'profile';
+  initialProgram: string | null; onProgramUsed: () => void; onOpenTasks: () => void; initialView?: 'list' | 'profile'; initialRegion?: string;
 }) {
   const { t, language, locale } = useLanguage();
   const [programs, setPrograms] = useState<Program[]>([]);
@@ -78,11 +78,11 @@ export default function Programs({ busy, perform, initialProgram, onProgramUsed,
   const [feed, setFeed] = useState<FeedStatus | null>(null);
   const [query, setQuery] = useState('');
   const [fields, setFields] = useState<Set<string>>(new Set());
-  const [region, setRegion] = useState('');
+  const [region, setRegion] = useState(initialRegion ?? '');
   const [due, setDue] = useState<'all' | '7' | '30'>('all');
   const [origin, setOrigin] = useState<'all' | 'bizinfo' | 'manual' | 'sample'>('all');
   const [sort, setSort] = useState<'deadline' | 'newest' | 'met'>('deadline');
-  const [detailed, setDetailed] = useState(false);
+  const [detailed, setDetailed] = useState(Boolean(initialRegion));
 
   async function load() {
     const [list, company, status] = await Promise.all([api<Program[]>('/programs'), api<Profile>('/company-profile'), api<FeedStatus>('/programs/feed').catch(() => null)]);

@@ -1,5 +1,8 @@
 // Simplified Chinese UI catalogue. Keys are the English source strings.
 export const chinese: Record<string, string> = {
+  "Loading the map…": "正在加载地图…",
+  "Show notices for this region": "查看该地区公告",
+  "Synthetic demo companies · city-level pins · tap a pin for its notices": "虚拟演示企业 · 按城市标注 · 点击标记查看该地区公告",
   "Notice source": "公告来源",
   "Search notices": "搜索公告",
   "Search title, agency or content": "按公告名称、机构或内容搜索",

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from './api';
 import { Icon } from './icons';
+import LiveMap from './LiveMap';
 import { useLanguage } from './language';
 import type { InspectionSummary, Standard } from './types';
 
@@ -24,6 +25,16 @@ const places = [
 const land = 'M0 0H800V40C792 70 786 96 772 122C756 150 740 170 724 196C706 226 690 252 670 282C650 312 630 340 606 366C590 384 574 400 552 410C530 420 512 412 494 420C474 428 460 412 440 400C420 388 406 396 392 392C372 386 360 404 338 410C318 416 304 400 284 410C262 420 250 444 228 452C206 460 190 438 168 440C140 442 128 470 100 474C70 478 40 466 0 470Z';
 const island = 'M330 462C352 448 386 452 400 474C412 494 404 520 386 534C366 548 340 544 330 526C322 512 336 498 326 486C320 476 322 468 330 462Z';
 const peninsula = 'M226 488C240 476 262 476 276 488C288 500 282 524 266 532C248 540 230 532 222 516C216 504 218 496 226 488Z';
+
+function MapLegend({ note }: { note: string }) {
+  const { t } = useLanguage();
+  return <figcaption>
+    <span><i className="map-key home" />{t("Our plant")}</span>
+    <span><i className="map-key yard" />{t("Customer shipyard")}</span>
+    <span><i className="map-key crisis" />{t("Shipbuilding crisis area")}</span>
+    <span className="muted">{t(note)}</span>
+  </figcaption>;
+}
 
 function CoastMap() {
   const { t } = useLanguage();
@@ -51,17 +62,12 @@ function CoastMap() {
         {place.note && <text x={place.side === 'left' ? -28 : 28} y="25" textAnchor={place.side === 'left' ? 'end' : 'start'} className="map-note">{t(place.note)}</text>}
       </g>)}
     </svg>
-    <figcaption>
-      <span><i className="map-key home" />{t("Our plant")}</span>
-      <span><i className="map-key yard" />{t("Customer shipyard")}</span>
-      <span><i className="map-key crisis" />{t("Shipbuilding crisis area")}</span>
-      <span className="muted">{t("Synthetic demo companies · not to scale")}</span>
-    </figcaption>
+    <MapLegend note="Synthetic demo companies · not to scale" />
   </figure>;
 }
 
 export default function Home({ userName, onGo, busy, perform, onLoaded }: {
-  userName: string; onGo: (page: string) => void; onAsk?: (message: string) => void;
+  userName: string; onGo: (page: string, params?: Record<string, string>) => void; onAsk?: (message: string) => void;
   busy: boolean; perform: (task: () => Promise<void>) => Promise<void>; onLoaded: () => void;
 }) {
   const { t, locale } = useLanguage();
@@ -69,6 +75,7 @@ export default function Home({ userName, onGo, busy, perform, onLoaded }: {
   const [standards, setStandards] = useState<Standard[]>([]);
   const [inspections, setInspections] = useState<InspectionSummary[]>([]);
   const [version, setVersion] = useState(0);
+  const [mapFailed, setMapFailed] = useState(false);
 
   useEffect(() => {
     api<Summary>('/home').then(setSummary).catch(() => setSummary(null));
@@ -111,7 +118,12 @@ export default function Home({ userName, onGo, busy, perform, onLoaded }: {
     </div>}
 
     <section className="home-board">
-      <CoastMap />
+      {!mapFailed
+        ? <figure className="coast-map live">
+          <LiveMap onRegion={region => onGo('programs', { region })} onFail={() => setMapFailed(true)} />
+          <MapLegend note="Synthetic demo companies · city-level pins · tap a pin for its notices" />
+        </figure>
+        : <CoastMap />}
       <div className="home-flow">
         <ol className="yard-steps">{steps.map((step, index) => <li key={step.title}>
           <button className="yard-step" onClick={() => onGo(step.page)}>
