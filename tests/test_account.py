@@ -34,9 +34,9 @@ def test_demo_team_accounts_use_the_env_password(tmp_path, monkeypatch):
     monkeypatch.setenv("SPEC_AGENT_DEMO_PASSWORD", "demo-password-1234")
     monkeypatch.setenv("SPEC_AGENT_DEMO_TEAM_PASSWORD", "0000")
     with TestClient(create_app(Settings(tmp_path))) as client:
-        session = sign_in(client, "jungeunbi", "0000")
+        session = sign_in(client, "jeb", "0000")
         assert session["user"]["display_name"] == "정은비"
-        for username in ("kimjaeik", "limsumin", "kimminkyung"):
+        for username in ("kji", "lsm", "kmk"):
             client.post("/api/auth/logout")
             sign_in(client, username, "0000")
 
@@ -46,7 +46,7 @@ def test_demo_team_is_off_without_a_password(tmp_path, monkeypatch):
     with TestClient(create_app(Settings(tmp_path))) as client:
         client.headers["X-Spec-Agent"] = "1"
         client.headers["Origin"] = str(client.base_url).rstrip("/")
-        response = client.post("/api/auth/login", json={"username": "kimjaeik", "password": "0000"})
+        response = client.post("/api/auth/login", json={"username": "kji", "password": "0000"})
         assert response.status_code == 401
 
 
