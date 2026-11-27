@@ -1,0 +1,9 @@
+{
+  "_comment": "Extra hosted-demo accounts. Created only when SPEC_AGENT_DEMO_TEAM_PASSWORD is set; the password is never stored here.",
+  "members": [
+    {"username": "kimjaeik", "name": "김재익"},
+    {"username": "jungeunbi", "name": "정은비"},
+    {"username": "limsumin", "name": "임수민"},
+    {"username": "kimminkyung", "name": "김민경"}
+  ]
+}

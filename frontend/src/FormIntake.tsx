@@ -83,6 +83,8 @@ export default function FormIntake({ busy, perform, onOpenStandard, initialReadi
 }) {
   const { t, language } = useLanguage();
   const [provenance, setProvenance] = useState<'INTERNAL' | 'SYNTHETIC'>('INTERNAL');
+  const [samples, setSamples] = useState<{ id: number; language: string; label: Record<string, string> }[]>([]);
+  const [dragging, setDragging] = useState(false);
   const [reading, setReading] = useState<Reading | null>(null);
   const [rules, setRules] = useState<ReadRule[]>([]);
   const [header, setHeader] = useState<Draft | null>(null);
@@ -94,6 +96,7 @@ export default function FormIntake({ busy, perform, onOpenStandard, initialReadi
   const [customers, setCustomers] = useState<string[]>([]);
   const [approvalSaved, setApprovalSaved] = useState(false);
 
+  useEffect(() => { api<typeof samples>('/forms/samples').then(setSamples).catch(() => setSamples([])); }, []);
   useEffect(() => { api<{ name: string }[]>('/customers').then(list => setCustomers(list.map(item => item.name))).catch(() => setCustomers([])); }, []);
 
   function show(next: Reading) {
@@ -112,6 +115,10 @@ export default function FormIntake({ busy, perform, onOpenStandard, initialReadi
     void perform(async () => show(await api<Reading>(`/forms/${initialReading}`)));
     onReadingUsed?.();
   }, [initialReading]);
+
+  async function readSample(id: number) {
+    await perform(async () => { show(await api<Reading>(`/forms/samples/${id}`, {})); });
+  }
 
   async function read(file: File) {
     await perform(async () => {
@@ -158,20 +165,41 @@ export default function FormIntake({ busy, perform, onOpenStandard, initialReadi
 
   if (!reading) return <>
     <header className="page-header"><h1>{t("Read specs")}</h1></header>
-    <section className="intake-start compact">
-      <label className={`dropzone big ${busy ? 'disabled' : ''}`}><Icon name="upload" size={30} />
-        <strong>{t("Choose a customer form (PDF)")}</strong>
-        <span className="flow-chips" aria-label={t("Korean, English or Chinese")}><span>KO</span><span>EN</span><span>{'\u4E2D'}</span></span>
-        <input className="file-input" type="file" accept=".pdf,application/pdf" disabled={busy}
-          onChange={event => { const file = event.target.files?.[0]; if (file) void read(file); event.target.value = ''; }} /></label>
-      <div className="intake-options">
-        <div className="segmented small" role="group" aria-label={t("What kind of document is it?")}>
-          <button type="button" aria-pressed={provenance === 'INTERNAL'} className={provenance === 'INTERNAL' ? 'selected' : ''} onClick={() => setProvenance('INTERNAL')}>{t("Real customer document")}</button>
-          <button type="button" aria-pressed={provenance === 'SYNTHETIC'} className={provenance === 'SYNTHETIC' ? 'selected' : ''} onClick={() => setProvenance('SYNTHETIC')}>{t("Demo or sample document")}</button>
+    <section className="intake-layout">
+      <div className="intake-main">
+        <label className={`dropzone big intake-drop ${busy ? 'disabled' : ''} ${dragging ? 'dragging' : ''}`}
+          onDragOver={event => { event.preventDefault(); setDragging(true); }} onDragLeave={() => setDragging(false)}
+          onDrop={event => { event.preventDefault(); setDragging(false); const file = event.dataTransfer.files?.[0]; if (file && !busy) void read(file); }}>
+          <span className="intake-drop-icon"><Icon name="upload" size={34} /></span>
+          <strong>{t("Choose a customer form (PDF)")}</strong>
+          <small>{t("or drop the file here")}</small>
+          <span className="flow-chips" aria-label={t("Korean, English or Chinese")}><span>KO</span><span>EN</span><span>{'\u4E2D'}</span></span>
+          <input className="file-input" type="file" accept=".pdf,application/pdf" disabled={busy}
+            onChange={event => { const file = event.target.files?.[0]; if (file) void read(file); event.target.value = ''; }} /></label>
+        <div className="intake-options">
+          <div className="segmented" role="group" aria-label={t("What kind of document is it?")}>
+            <button type="button" aria-pressed={provenance === 'INTERNAL'} className={provenance === 'INTERNAL' ? 'selected' : ''} onClick={() => setProvenance('INTERNAL')}><Icon name="lock" size={15} />{t("Real customer document")}</button>
+            <button type="button" aria-pressed={provenance === 'SYNTHETIC'} className={provenance === 'SYNTHETIC' ? 'selected' : ''} onClick={() => setProvenance('SYNTHETIC')}><Icon name="file" size={15} />{t("Demo or sample document")}</button>
+          </div>
+          <span className="muted lock-note" title={provenance === 'INTERNAL' ? t("Real customer documents are never sent to an external AI.") : t("Sample documents may be sent to the AI selected in AI settings.")}>
+            <Icon name={provenance === 'INTERNAL' ? 'lock' : 'spark'} size={14} />{provenance === 'INTERNAL' ? t("No external AI") : t("AI may assist")}</span>
         </div>
-        <span className="muted lock-note" title={provenance === 'INTERNAL' ? t("Real customer documents are never sent to an external AI.") : t("Sample documents may be sent to the AI selected in AI settings.")}>
-          <Icon name={provenance === 'INTERNAL' ? 'lock' : 'spark'} size={14} />{provenance === 'INTERNAL' ? t("No external AI") : t("AI may assist")}</span>
       </div>
+      <aside className="intake-side">
+        <section className="panel intake-card">
+          <h2>{t("How it works")}</h2>
+          <ol className="intake-steps">
+            <li><span>1</span><div><strong>{t("Upload the PDF")}</strong><small>{t("Shipyard, coating or owner forms in Korean, English or Chinese")}</small></div></li>
+            <li><span>2</span><div><strong>{t("Check what was read")}</strong><small>{t("Limits and areas become rules; unclear cells are flagged")}</small></div></li>
+            <li><span>3</span><div><strong>{t("Save as a standard")}</strong><small>{t("A new revision is compared with the previous one")}</small></div></li>
+          </ol>
+        </section>
+        {samples.length > 0 && <section className="panel intake-card">
+          <h2>{t("Try a sample form")}</h2>
+          <div className="sample-list">{samples.map(sample => <button key={sample.id} type="button" className="sample-item" disabled={busy} onClick={() => void readSample(sample.id)}>
+            <span className="sample-lang">{sample.language}</span><span className="sample-label">{sample.label[language] || sample.label.en}</span><Icon name="next" size={15} /></button>)}</div>
+        </section>}
+      </aside>
     </section>
   </>;
 

@@ -2,7 +2,7 @@
   {
     "file": "01_KO_shipyard_hull_weld.pdf",
     "language": "ko",
-    "title": "외관 검사 기준\n선체 블록 용접 · (가상) 시연용",
+    "title": "외관 검사 기준\n선체 블록 용접",
     "labels": {
       "item": "검사 항목",
       "criteria": "판정 기준",
@@ -10,7 +10,7 @@
       "frequency": "검사 주기"
     },
     "header": {
-      "고객사": "(가상) 한바다조선 거제조선소",
+      "고객사": "한바다조선 거제조선소",
       "문서번호": "HB-WLD-201",
       "제품명": "174K LNG 운반선 선체 블록",
       "개정": "C",
@@ -76,12 +76,12 @@
         ]
       }
     ],
-    "notice": "※ 시연용 가상 양식입니다. 실제 조선소·선급이 발행한 기준이 아닙니다. (SYNTHETIC DEMO)"
+    "notice": "※ 시연용 샘플 양식 (SYNTHETIC DEMO)"
   },
   {
     "file": "02_EN_coating_ulsan.pdf",
     "language": "en",
-    "title": "Visual inspection standard\nHull block coating · synthetic demo",
+    "title": "Visual inspection standard\nHull block coating",
     "labels": {
       "item": "Inspection item",
       "criteria": "Acceptance criteria",
@@ -89,7 +89,7 @@
       "frequency": "Coverage"
     },
     "header": {
-      "Customer": "(Synthetic) Donghae Heavy Industries, Ulsan",
+      "Customer": "Donghae Heavy Industries, Ulsan",
       "Document ID": "DH-PNT-110",
       "Product": "VLCC hull block",
       "Revision": "B",
@@ -141,12 +141,12 @@
         ]
       }
     ],
-    "notice": "Synthetic demo form. Not issued by any real shipyard, owner or classification society."
+    "notice": "Sample form for demonstration (SYNTHETIC DEMO)."
   },
   {
     "file": "03_ZH_owner_pipe_weld.pdf",
     "language": "zh",
-    "title": "外观检验标准\n管系法兰焊接 · 虚拟演示",
+    "title": "外观检验标准\n管系法兰焊接",
     "labels": {
       "item": "检验项目",
       "criteria": "判定标准",
@@ -154,7 +154,7 @@
       "frequency": "检验比例"
     },
     "header": {
-      "客户": "(虚拟) 海川船务 上海",
+      "客户": "海川船务 上海",
       "文件编号": "HC-QC-07",
       "产品": "8,000 TEU 集装箱船 管系",
       "版本": "A",
@@ -206,6 +206,6 @@
         ]
       }
     ],
-    "notice": "※ 演示用虚拟表格，并非任何真实船东、船厂或船级社发布的标准。(SYNTHETIC DEMO)"
+    "notice": "※ 演示用样本表格 (SYNTHETIC DEMO)"
   }
 ]

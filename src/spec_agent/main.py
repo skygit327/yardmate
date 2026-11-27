@@ -1,4 +1,5 @@
 import hashlib
+import json
 import logging
 import os
 from contextlib import asynccontextmanager, suppress
@@ -9,7 +10,7 @@ from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
-from pydantic import Field
+from pydantic import Field, SecretStr
 
 from spec_agent.auth import (
     COOKIE_NAME,
@@ -58,6 +59,17 @@ from spec_agent.services.traceback_desk import (
 )
 from spec_agent.services.workflow import Conflict, Workflow
 
+FORM_SAMPLES = Path(__file__).parent / "services" / "form_samples" / "samples.json"
+
+
+class ProfileName(StrictModel):
+    display_name: str = Field(min_length=1, max_length=80)
+
+
+class PasswordChange(StrictModel):
+    current_password: SecretStr = Field(min_length=1, max_length=128)
+    new_password: SecretStr = Field(min_length=1, max_length=128)
+
 
 class OriginalFetch(StrictModel):
     url: str | None = Field(default=None, max_length=2000)
@@ -88,6 +100,15 @@ def bootstrap_hosted_demo(app) -> None:
     name = os.environ.get("SPEC_AGENT_DEMO_NAME", "").strip() or username
     with suppress(ValueError):
         app.state.auth.create_user(username, name, password)
+    team_password = os.environ.get("SPEC_AGENT_DEMO_TEAM_PASSWORD", "")
+    if team_password:
+        # Extra demo accounts for the team; names live in a JSON file, the password in the env.
+        team = json.loads(Path(__file__).with_name("demo_team.json").read_text("utf-8"))
+        for member in team["members"]:
+            with suppress(ValueError):
+                app.state.auth.create_user(
+                    member["username"], member["name"], team_password, demo=True
+                )
     if os.environ.get("SPEC_AGENT_LOAD_SHIPYARD_DEMO", "").lower() == "true":
         from spec_agent.services.shipyard_demo import seed_shipyard
 
@@ -185,6 +206,29 @@ def create_app(settings: Settings | None = None, llm_client=None) -> FastAPI:
     @app.get("/api/auth/me")
     def me(request: Request):
         return request.state.session
+
+    @app.patch("/api/auth/me")
+    def rename_me(request: Request, data: ProfileName):
+        user = request.state.session["user"]
+        try:
+            renamed = app.state.auth.rename(user["id"], data.display_name)
+        except ValueError as error:
+            raise HTTPException(400, str(error)) from None
+        return {**request.state.session, "user": renamed}
+
+    @app.post("/api/auth/password")
+    def change_password(request: Request, data: PasswordChange):
+        try:
+            app.state.auth.change_password(
+                request.state.session["user"]["id"],
+                data.current_password.get_secret_value(),
+                data.new_password.get_secret_value(),
+            )
+        except LoginRejected:
+            raise HTTPException(400, "The current password is not correct.") from None
+        except ValueError as error:
+            raise HTTPException(400, str(error)) from None
+        return {"ok": True}
 
     @app.post("/api/auth/logout")
     def logout(request: Request):
@@ -347,6 +391,24 @@ def create_app(settings: Settings | None = None, llm_client=None) -> FastAPI:
         content = file.file.read(MAX_FORM_BYTES + 1)
         intake = app.state.intake
         reading = intake.read(file.filename or "form.pdf", content, provenance)
+        return {**reading, "draft": intake.draft(reading)}
+
+    @app.get("/api/forms/samples")
+    def form_samples():
+        manifest = json.loads(FORM_SAMPLES.read_text("utf-8"))["samples"]
+        return [
+            {"id": index, "language": item["language"], "label": item["label"]}
+            for index, item in enumerate(manifest)
+        ]
+
+    @app.post("/api/forms/samples/{sample_id}", status_code=201)
+    def read_form_sample(sample_id: int):
+        manifest = json.loads(FORM_SAMPLES.read_text("utf-8"))["samples"]
+        if not 0 <= sample_id < len(manifest):
+            raise HTTPException(404, "That sample form does not exist.")
+        path = FORM_SAMPLES.parents[1] / manifest[sample_id]["file"]
+        intake = app.state.intake
+        reading = intake.read(path.name, path.read_bytes(), "SYNTHETIC")
         return {**reading, "draft": intake.draft(reading)}
 
     @app.get("/api/forms/{reading_id}")

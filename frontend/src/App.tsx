@@ -9,6 +9,7 @@ import { displayInspection, displayStandard, setGlossary } from './legacyDisplay
 import { LanguageToggle, useLanguage } from './language';
 import { useMotion } from './motion';
 import { ThemeToggle } from './theme';
+import Account from './Account';
 import AISettings from './AISettings';
 import CustomersView from './Customers';
 import FormIntake from './FormIntake';
@@ -81,11 +82,12 @@ function RuleFields({ rules, values, onChange }: {
   </section>)}</div>;
 }
 
-export default function App({ user, onLogout, loggingOut }: {
+export default function App({ user: initialUser, onLogout, loggingOut }: {
   user: User; onLogout: () => Promise<void>; loggingOut: boolean;
 }) {
   const { t, language, locale } = useLanguage();
-  const [tab, setTab] = useState<'home' | 'tasks' | 'inspections' | 'standards' | 'forms' | 'trace' | 'customers' | 'requests' | 'ai' | 'programs'>('home');
+  const [user, setUser] = useState(initialUser);
+  const [tab, setTab] = useState<'home' | 'tasks' | 'inspections' | 'standards' | 'forms' | 'trace' | 'customers' | 'requests' | 'ai' | 'programs' | 'account'>('home');
   const [tasksView, setTasksView] = useState<'board' | 'calendar' | 'automation'>('board');
   const [assistantOpen, setAssistantOpen] = useState(false);
   const [assistantMessage, setAssistantMessage] = useState<string | null>(null);
@@ -274,6 +276,7 @@ export default function App({ user, onLogout, loggingOut }: {
     else if (page === 'requests') { setTab('requests'); setRequestSelected(null); setRequestCreating(null); }
     else if (page === 'request_new') newRequest(params.customer ?? '');
     else if (page === 'ai') setTab('ai');
+    else if (page === 'account') setTab('account');
     else if (page === 'programs' || page === 'profile') { setProgramsView(page === 'profile' ? 'profile' : 'list'); setProgramsRegion(params.region ?? ''); setProgramsKey(key => key + 1); setTab('programs'); }
     void refresh().catch(() => undefined);
   }
@@ -332,7 +335,7 @@ export default function App({ user, onLogout, loggingOut }: {
         {llm && llm.provider !== 'none' && llm.external && !llm.allow_internal && <small>{t("Internal data stays rule-based")}</small>}
         <small className="settings-link"><Icon name="gear" size={12} /> {t("AI settings")}</small>
       </button>
-        <ThemeToggle /><LanguageToggle /><span className="user-name">{user.display_name}</span>
+        <ThemeToggle /><LanguageToggle /><button type="button" className={`user-name ${tab === 'account' ? 'active' : ''}`} title={t("My page")} onClick={() => go('account')}><span className="user-avatar" aria-hidden="true">{(user.display_name || user.username).trim().charAt(0).toUpperCase()}</span><span className="user-label">{user.display_name}</span></button>
         <button className="icon-button" aria-label={t("Sign out")} title={t("Sign out")} disabled={busy || loggingOut} onClick={() => void onLogout()}><Icon name="logout" /></button>
       </div>
     </header>
@@ -452,6 +455,7 @@ export default function App({ user, onLogout, loggingOut }: {
       {tab === 'trace' && <Traceback busy={busy} perform={perform} seed={traceSeed} onSeedUsed={() => setTraceSeed(null)} initialCase={traceCase} onCaseUsed={() => setTraceCase(null)} />}
       {tab === 'programs' && <Programs key={programsKey} initialView={programsView} initialRegion={programsRegion} aiReady={Boolean(llm && llm.provider !== 'none' && (!llm.external || llm.allow_internal))} busy={busy} perform={perform}
         initialProgram={programSelected} onProgramUsed={() => setProgramSelected(null)} onOpenTasks={() => go('tasks')} />}
+      {tab === 'account' && <Account user={user} busy={busy} perform={perform} onRenamed={next => { setUser(next); setInspector(next.display_name); }} onGo={page => go(page)} onLogout={() => void onLogout()} />}
       {tab === 'ai' && <AISettings busy={busy} perform={perform} onChanged={loadHealth} />}
       {tab === 'customers' && <CustomersView selected={customerName} busy={busy} perform={perform} onSelect={setCustomerName}
         onOpenRequest={openRequest} onNewRequest={newRequest} onOpenInspection={openInspection} onOpenStandard={lineage => openStandard(lineage)} />}

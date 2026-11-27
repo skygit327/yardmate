@@ -70,10 +70,22 @@ class AuthStore:
             );
         """)
 
-    def create_user(self, username: str, display_name: str, password: str) -> dict:
-        account = AccountInput(
-            username=username.lower(), display_name=display_name.strip(), password=password
-        )
+    def create_user(
+        self, username: str, display_name: str, password: str, demo: bool = False
+    ) -> dict:
+        """Create an account. `demo` allows the short shared password of hosted demo accounts."""
+        if demo:
+            if len(password) < 4:
+                raise ValueError("Demo passwords need at least 4 characters.")
+            account = AccountInput.model_construct(
+                username=LoginInput(username=username.lower(), password=password).username,
+                display_name=display_name.strip()[:80],
+                password=SecretStr(password),
+            )
+        else:
+            account = AccountInput(
+                username=username.lower(), display_name=display_name.strip(), password=password
+            )
         salt = secrets.token_bytes(16)
         digest = password_hash(account.password.get_secret_value(), salt)
         user = {
@@ -158,6 +170,35 @@ class AuthStore:
                 if row
                 else None
             )
+
+    def rename(self, user_id: str, display_name: str) -> dict:
+        name = display_name.strip()
+        if not 1 <= len(name) <= 80:
+            raise ValueError("Use a name of 1 to 80 characters.")
+        with self.lock, self.connection:
+            self.connection.execute("UPDATE users SET display_name=? WHERE id=?", (name, user_id))
+            row = self.connection.execute(
+                "SELECT id, username, display_name FROM users WHERE id=?", (user_id,)
+            ).fetchone()
+        return {key: row[key] for key in ("id", "username", "display_name")}
+
+    def change_password(self, user_id: str, current: str, new: str) -> None:
+        if not 12 <= len(new) <= 128:
+            raise ValueError("Use a new password of 12 to 128 characters.")
+        with self.lock:
+            row = self.connection.execute(
+                "SELECT salt, password_hash FROM users WHERE id=?", (user_id,)
+            ).fetchone()
+            if not row or not hmac.compare_digest(
+                password_hash(current, row["salt"]), row["password_hash"]
+            ):
+                raise LoginRejected()
+            salt = secrets.token_bytes(16)
+            with self.connection:
+                self.connection.execute(
+                    "UPDATE users SET salt=?, password_hash=? WHERE id=?",
+                    (salt, password_hash(new, salt), user_id),
+                )
 
     def logout(self, token: str):
         with self.lock, self.connection:

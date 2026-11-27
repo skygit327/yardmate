@@ -1318,3 +1318,62 @@ h1.plate-title { font-family: inherit; }
 :root[data-theme="dark"] .assistant-panel header .icon-button { color: var(--ink); }
 :root[data-theme="dark"] .status-tabs button.selected b { background: #0000001a; color: #111317; }
 :root[data-theme="dark"] .assistant-panel { background: var(--surface); border: 1px solid var(--line); }
+
+/* ==========================================================================
+   Read specs: a large drop area with the steps and sample forms beside it.
+   ========================================================================== */
+.intake-layout { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(300px, 1fr); gap: 20px; align-items: start; }
+.intake-main { display: grid; gap: 14px; }
+.intake-drop { min-height: 380px; gap: 10px; border-width: 2px; background: var(--surface); transition: border-color .2s, background-color .2s, transform .2s; }
+.intake-drop strong { font-size: 22px; font-weight: 800; letter-spacing: -.02em; color: var(--ink); }
+.intake-drop small { font-size: 14px; }
+.intake-drop:hover, .intake-drop.dragging { border-color: var(--accent); background: var(--accent-soft); }
+.intake-drop.dragging { transform: scale(1.01); }
+.intake-drop-icon { display: grid; place-items: center; width: 76px; height: 76px; border-radius: 24px; background: var(--accent-soft); color: var(--accent); margin-bottom: 6px; transition: transform .3s cubic-bezier(.2, .8, .2, 1); }
+.intake-drop:hover .intake-drop-icon { transform: translateY(-4px); }
+.intake-options { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+.intake-options .segmented { display: inline-flex; gap: 4px; padding: 4px; border: 1px solid var(--line); border-radius: var(--r-pill); background: var(--surface); }
+.intake-options .segmented button { min-height: 40px; border: 0; border-radius: var(--r-pill); padding: 0 16px; gap: 6px; background: transparent; }
+.intake-options .segmented button.selected { background: var(--ink); color: var(--surface); }
+.intake-side { display: grid; gap: 16px; }
+.intake-card { padding: 22px 24px; }
+.intake-card h2 { font-size: 18px; margin-bottom: 14px; }
+.intake-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.intake-steps li { display: grid; grid-template-columns: 32px 1fr; gap: 12px; align-items: start; }
+.intake-steps li > span { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 11px; background: var(--surface-muted); border: 1px solid var(--line); font-weight: 800; font-size: 14px; }
+.intake-steps strong { display: block; font-size: 15px; }
+.intake-steps small { display: block; color: var(--muted); font-size: 13px; line-height: 1.45; margin-top: 2px; text-wrap: pretty; }
+.sample-list { display: grid; gap: 6px; }
+.sample-item { justify-content: flex-start; gap: 10px; min-height: 46px; padding: 0 12px 0 8px; border-radius: 14px; border: 1px solid var(--line-subtle); background: var(--surface-muted); text-align: left; font-size: 13.5px; }
+.sample-item:hover:not(:disabled) { background: var(--surface); border-color: var(--line-strong); transform: translateX(2px); }
+.sample-lang { display: inline-grid; place-items: center; min-width: 34px; height: 26px; border-radius: 8px; background: var(--accent-soft); color: var(--accent); font-size: 11.5px; font-weight: 800; }
+.sample-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+.sample-item .icon { color: var(--muted); }
+@media (max-width: 1000px) { .intake-layout { grid-template-columns: 1fr; } .intake-drop { min-height: 260px; } }
+
+/* ==========================================================================
+   Name button (opens My page) and My page.
+   ========================================================================== */
+.top-actions .user-name { display: inline-flex !important; align-items: center; gap: 8px; min-height: 40px; padding: 0 14px 0 4px; border: 1px solid var(--line); border-radius: var(--r-pill); background: var(--surface); font-weight: 700; font-size: 13px; color: var(--ink); max-width: 220px; }
+.top-actions .user-name:hover, .top-actions .user-name.active { border-color: var(--ink); background: var(--surface); }
+.user-avatar { display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--ink); color: var(--surface); font-size: 13px; font-weight: 800; flex-shrink: 0; }
+.user-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 1520px) { .top-actions .user-name { padding: 0 3px; width: 40px; justify-content: center; } .top-actions .user-name .user-label { display: none; } }
+@media (max-width: 760px) { .top-actions .user-name { display: inline-flex !important; } }
+.account { display: grid; gap: 18px; }
+.account-hero { display: flex; align-items: center; gap: 18px; }
+.account-hero h1 { font-size: clamp(26px, 2.6vw, 34px); }
+.account-hero small { color: var(--muted); font-size: 14px; }
+.account-hero > button { margin-left: auto; }
+.account-avatar { display: grid; place-items: center; width: 68px; height: 68px; border-radius: 24px; background: var(--ink); color: var(--surface); font-size: 28px; font-weight: 800; flex-shrink: 0; }
+.account-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; align-items: start; }
+.account-card h2 { font-size: 18px; margin-bottom: 14px; }
+.account-card form { display: grid; gap: 12px; }
+.account-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line-subtle); }
+.account-row:first-of-type { border-top: 0; }
+.account-links { display: grid; gap: 6px; }
+.account-links button { justify-content: flex-start; gap: 12px; min-height: 52px; border-radius: 16px; border: 1px solid var(--line-subtle); background: var(--surface-muted); font-size: 15px; }
+.account-links button span { flex: 1; text-align: left; }
+.account-links button:hover { background: var(--surface); border-color: var(--line-strong); }
+.success-banner { display: flex; align-items: center; gap: 8px; margin: 0; padding: 10px 14px; border-radius: 14px; background: var(--good-soft); color: var(--good); font-weight: 600; }
+@media (max-width: 900px) { .account-grid { grid-template-columns: 1fr; } }

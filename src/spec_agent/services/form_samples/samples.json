@@ -1,0 +1,12 @@
+{
+  "_comment": "Sample customer forms for the Read specs page. All synthetic; none was issued by a real shipyard, owner or class society.",
+  "samples": [
+    {"file": "shipyard_samples/01_KO_shipyard_hull_weld.pdf", "language": "KO", "label": {"en": "Hanbada Shipbuilding · hull weld Rev C", "ko": "한바다조선 · 선체 용접 개정 C", "zh": "韩巴达造船 · 船体焊接 版本C"}},
+    {"file": "shipyard_samples/02_EN_coating_ulsan.pdf", "language": "EN", "label": {"en": "Donghae Heavy · coating Rev B", "ko": "동해중공업 · 도장 개정 B", "zh": "东海重工 · 涂装 版本B"}},
+    {"file": "shipyard_samples/03_ZH_owner_pipe_weld.pdf", "language": "中", "label": {"en": "Haichuan Shipping · pipe weld Rev A", "ko": "海川船务 · 배관 용접 개정 A", "zh": "海川船务 · 管系焊接 版本A"}},
+    {"file": "form_samples/04_KO_hull_weld_revD.pdf", "language": "KO", "label": {"en": "Hanbada Shipbuilding · hull weld Rev D (new)", "ko": "한바다조선 · 선체 용접 개정 D (신규 개정)", "zh": "韩巴达造船 · 船体焊接 版本D（新版）"}},
+    {"file": "form_samples/05_KO_outfitting_weld.pdf", "language": "KO", "label": {"en": "Namhae Shipbuilding · outfitting weld (new customer)", "ko": "남해조선 · 의장품 용접 (신규 고객사)", "zh": "南海造船 · 舾装件焊接（新客户）"}},
+    {"file": "form_samples/06_EN_coating_revC.pdf", "language": "EN", "label": {"en": "Donghae Heavy · coating Rev C (new)", "ko": "동해중공업 · 도장 개정 C (신규 개정)", "zh": "东海重工 · 涂装 版本C（新版）"}},
+    {"file": "form_samples/07_ZH_pipe_weld_revB.pdf", "language": "中", "label": {"en": "Haichuan Shipping · pipe weld Rev B (new)", "ko": "海川船务 · 배관 용접 개정 B (신규 개정)", "zh": "海川船务 · 管系焊接 版本B（新版）"}}
+  ]
+}
