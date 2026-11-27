@@ -1,0 +1,17 @@
+# Render Blueprint: New + → Blueprint → choose this repository.
+services:
+  - type: web
+    name: yardmate
+    runtime: docker
+    plan: free
+    region: singapore
+    healthCheckPath: /
+    envVars:
+      - key: SPEC_AGENT_DEMO_USERNAME
+        value: demo
+      - key: SPEC_AGENT_DEMO_NAME
+        value: "(가상) 한빛조선기자재 품질팀"
+      - key: SPEC_AGENT_DEMO_PASSWORD
+        sync: false   # entered in the Render dashboard, never stored in the repository
+      - key: SPEC_AGENT_LOAD_SHIPYARD_DEMO
+        value: "true"

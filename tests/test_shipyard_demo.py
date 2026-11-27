@@ -31,3 +31,28 @@ def test_demo_loader_and_glossary_need_a_session(client):
     client.cookies.clear()
     assert client.post("/api/demo/shipyard").status_code in {401, 403}
     assert client.get("/api/glossary").status_code == 401
+
+
+def test_hosted_demo_bootstrap_creates_account_and_loads_data(tmp_path, monkeypatch):
+    from fastapi.testclient import TestClient
+
+    from spec_agent.config import Settings
+    from spec_agent.main import create_app
+
+    monkeypatch.setenv("SPEC_AGENT_DATA_DIR", str(tmp_path / "data"))
+    monkeypatch.setenv("SPEC_AGENT_AUTOMATION", "false")
+    monkeypatch.setenv("SPEC_AGENT_DEMO_USERNAME", "demo")
+    monkeypatch.setenv("SPEC_AGENT_DEMO_PASSWORD", "hosted-demo-password-1")
+    monkeypatch.setenv("SPEC_AGENT_LOAD_SHIPYARD_DEMO", "true")
+    for _ in range(2):  # a restart must not fail on the existing account or data
+        with TestClient(create_app(Settings.from_env())) as client:
+            assert (
+                client.post(
+                    "/api/auth/login",
+                    json={"username": "demo", "password": "hosted-demo-password-1"},
+                    headers={"X-Spec-Agent": "1"},
+                ).status_code
+                == 200
+            )
+            lots = client.get("/api/inspections", headers={"X-Spec-Agent": "1"}).json()
+            assert len([lot for lot in lots if lot["inputs"]["lot"] == "E21-B08"]) == 1

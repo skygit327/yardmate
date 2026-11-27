@@ -30,3 +30,12 @@ uv run spec-agent serve --port 8770
 uv run pytest -q
 npm --prefix frontend test
 ```
+
+## 인터넷 주소로 띄우기 (Render)
+
+1. [Render](https://render.com)에 GitHub 계정으로 가입하고 `skygit327/yardmate` 접근을 허용합니다.
+2. **New + → Blueprint**에서 이 저장소를 고르면 `render.yaml` 설정을 읽습니다.
+3. `SPEC_AGENT_DEMO_PASSWORD`에 로그인 비밀번호(12자 이상)를 입력하고 **Apply**를 누릅니다.
+4. 빌드가 끝나면 `https://yardmate-….onrender.com` 주소가 생깁니다. 아이디는 `demo`입니다.
+
+무료 요금제는 접속이 없으면 서버가 잠들고, 다시 깰 때 저장된 데이터가 초기화됩니다. 서버가 켜질 때마다 계정과 조선 시연 데이터가 자동으로 다시 만들어집니다.

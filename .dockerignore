@@ -1,0 +1,13 @@
+.git
+.venv
+frontend/node_modules
+frontend/dist
+.runtime
+workspace
+data
+tests
+docs
+scripts
+**/__pycache__
+.env
+.env.*

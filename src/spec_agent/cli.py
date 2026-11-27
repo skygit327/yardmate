@@ -1,6 +1,7 @@
 import argparse
 import getpass
 import json
+import os
 from uuid import uuid4
 
 from pydantic import ValidationError
@@ -78,8 +79,15 @@ def main():
     if args.command == "serve":
         import uvicorn
 
+        behind_proxy = os.environ.get("SPEC_AGENT_BEHIND_PROXY", "").lower() == "true"
         uvicorn.run(
-            "spec_agent.main:create_app", factory=True, host=args.host, port=args.port, workers=1
+            "spec_agent.main:create_app",
+            factory=True,
+            host=args.host,
+            port=int(os.environ.get("PORT", args.port)),
+            workers=1,
+            proxy_headers=behind_proxy,
+            forwarded_allow_ips="*" if behind_proxy else None,
         )
         return
     workflow = Workflow(Settings.from_env())

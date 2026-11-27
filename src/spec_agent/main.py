@@ -1,6 +1,7 @@
 import hashlib
 import logging
-from contextlib import asynccontextmanager
+import os
+from contextlib import asynccontextmanager, suppress
 from pathlib import Path
 from typing import Annotated, Literal
 
@@ -66,6 +67,25 @@ class LimitApprovalSave(StrictModel):
     customer: str
 
 
+def bootstrap_hosted_demo(app) -> None:
+    """For a hosted demo whose disk resets: create the sign-in account and load the shipyard demo.
+
+    Both run only when the operator sets the environment variables; the password is never in
+    the repository.
+    """
+    username = os.environ.get("SPEC_AGENT_DEMO_USERNAME", "").strip()
+    password = os.environ.get("SPEC_AGENT_DEMO_PASSWORD", "")
+    if not username or not password:
+        return
+    name = os.environ.get("SPEC_AGENT_DEMO_NAME", "").strip() or username
+    with suppress(ValueError):
+        app.state.auth.create_user(username, name, password)
+    if os.environ.get("SPEC_AGENT_LOAD_SHIPYARD_DEMO", "").lower() == "true":
+        from spec_agent.services.shipyard_demo import seed_shipyard
+
+        seed_shipyard(app.state.intake, app.state.workflow, app.state.programs, name, None)
+
+
 def create_app(settings: Settings | None = None, llm_client=None) -> FastAPI:
     settings = settings or Settings.from_env()
 
@@ -97,6 +117,7 @@ def create_app(settings: Settings | None = None, llm_client=None) -> FastAPI:
                 apply_llm(effective)
         try:
             app.state.auth = AuthStore(settings)
+            bootstrap_hosted_demo(app)
             app.state.automation.start()
             try:
                 yield
