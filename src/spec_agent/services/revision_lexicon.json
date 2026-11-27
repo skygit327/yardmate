@@ -1,0 +1,234 @@
+{
+  "_comment": "Korean/English/Vietnamese vocabulary for the offline revision interpreter. Extend this file for new customer terms; no code changes are needed.",
+  "keyword_pairs": [
+    [
+      "버",
+      "burr"
+    ],
+    [
+      "기공",
+      "pore"
+    ],
+    [
+      "기공",
+      "porosity"
+    ],
+    [
+      "크랙",
+      "crack"
+    ],
+    [
+      "균열",
+      "crack"
+    ],
+    [
+      "거칠기",
+      "roughness"
+    ],
+    [
+      "게이트",
+      "gate"
+    ],
+    [
+      "오버플로",
+      "overflow"
+    ],
+    [
+      "싱크",
+      "sink"
+    ],
+    [
+      "수축",
+      "shrinkage"
+    ],
+    [
+      "함몰",
+      "dent"
+    ],
+    [
+      "돌출",
+      "build-up"
+    ],
+    [
+      "블리스터",
+      "blister"
+    ],
+    [
+      "얼룩",
+      "stain"
+    ],
+    [
+      "긁힘",
+      "scratch"
+    ],
+    [
+      "콜드셧",
+      "cold shut"
+    ],
+    [
+      "깨짐",
+      "chip"
+    ],
+    [
+      "외측면",
+      "outer"
+    ],
+    [
+      "내측면",
+      "inner"
+    ],
+    [
+      "체결면",
+      "fastening"
+    ],
+    [
+      "체결부",
+      "fastening"
+    ],
+    [
+      "표면",
+      "surface"
+    ],
+    [
+      "전체",
+      "entire"
+    ],
+    [
+      "bavia",
+      "burr"
+    ],
+    [
+      "ba via",
+      "burr"
+    ],
+    [
+      "rỗ khí",
+      "pore"
+    ],
+    [
+      "rỗ",
+      "porosity"
+    ],
+    [
+      "vết nứt",
+      "crack"
+    ],
+    [
+      "nứt",
+      "crack"
+    ],
+    [
+      "độ nhám",
+      "roughness"
+    ],
+    [
+      "mặt ngoài",
+      "outer"
+    ],
+    [
+      "mặt trong",
+      "inner"
+    ],
+    [
+      "bề mặt",
+      "surface"
+    ],
+    [
+      "vùng lắp ghép",
+      "fastening"
+    ],
+    [
+      "toàn bộ",
+      "entire"
+    ],
+    [
+      "trầy xước",
+      "scratch"
+    ],
+    [
+      "vết bẩn",
+      "stain"
+    ]
+  ],
+  "field_synonyms": {
+    "height": [
+      "높이",
+      "height",
+      "chiều cao"
+    ],
+    "depth": [
+      "깊이",
+      "depth",
+      "độ sâu"
+    ],
+    "diameter": [
+      "직경",
+      "지름",
+      "diameter",
+      "đường kính"
+    ],
+    "length": [
+      "길이",
+      "length",
+      "chiều dài"
+    ],
+    "width": [
+      "폭",
+      "너비",
+      "width",
+      "chiều rộng"
+    ],
+    "roughness": [
+      "거칠기",
+      "roughness",
+      "độ nhám"
+    ],
+    "thickness": [
+      "두께",
+      "thickness"
+    ]
+  },
+  "operators": [
+    [
+      "미만|less than|\\bunder\\b|\\bbelow\\b|nhỏ hơn(?! hoặc)",
+      "lt"
+    ],
+    [
+      "이하|or less|at most|max(?:imum)?|≤|<=|nhỏ hơn hoặc bằng|không quá|tối đa",
+      "lte"
+    ],
+    [
+      "초과|greater than|more than|\\bover\\b|\\babove\\b|lớn hơn(?! hoặc)",
+      "gt"
+    ],
+    [
+      "이상|or more|at least|min(?:imum)?|≥|>=|lớn hơn hoặc bằng|ít nhất|tối thiểu",
+      "gte"
+    ],
+    [
+      "<",
+      "lt"
+    ],
+    [
+      ">",
+      "gt"
+    ]
+  ],
+  "patterns": {
+    "warning": "경고|근접|warning|margin|cảnh báo",
+    "remove": "삭제|제거|빼|\\bremove\\b|\\bdelete\\b|\\bdrop\\b|xóa|loại bỏ",
+    "add": "추가|신설|\\badd\\b|\\bnew\\b|thêm",
+    "prohibit": "불허|금지|불합격 처리|prohibit|not (?:be )?(?:allowed|permitted)|không cho phép|cấm",
+    "not_applicable": "해당\\s*없음|미적용|적용\\s*제외|not applicable|n/a|không áp dụng",
+    "all_areas": "모든|전\\s*부위|전체\\s*부위|\\ball\\b|every area|tất cả",
+    "clear_warning": "(?:경고|warning).{0,12}(?:없애|해제|삭제|제거|remove|clear|none)",
+    "revision_label": "(?:개정|phiên bản|rev(?:ision)?\\.?)\\s*([A-Za-z0-9][A-Za-z0-9.\\-]{0,15})(?![A-Za-z0-9])",
+    "revision_only": "(?:개정|phiên bản|rev(?:ision)?\\.?)\\s*\\S+\\s*(?:으로|로|to)?\\s*(?:변경|개정|올림|update)?.*",
+    "document_number": "(?:문서\\s*번호|document\\s*(?:number|no\\.?))\\s*(?:를|을|은|는|:)?\\s*([A-Za-z0-9][A-Za-z0-9.\\-_]+)",
+    "arrow": "→|->|=>|에서|\\bfrom\\b|\\btừ\\b",
+    "arrow_from_to": "에서|\\bfrom\\b|\\btừ\\b",
+    "clause_split": ",|，|;|하고\\s|\\s그리고\\s|\\s및\\s|\\sand\\s|\\svà\\s",
+    "segment_split": ",|，|\\s및\\s|\\s그리고\\s|\\sand\\s|\\svà\\s",
+    "list_marker": "^\\s*(?:\\d+[.)]|[-*•·]|[①-⑳])\\s*"
+  }
+}

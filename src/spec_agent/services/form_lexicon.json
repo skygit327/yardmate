@@ -1,0 +1,329 @@
+{
+  "_comment": "Vocabulary for reading customer inspection forms. Add synonyms here when a new customer layout appears; no code change is needed.",
+  "header_fields": {
+    "customer": [
+      "고객사",
+      "고객",
+      "Customer",
+      "Khách hàng",
+      "客户",
+      "船东"
+    ],
+    "product_name": [
+      "제품명",
+      "Product",
+      "Sản phẩm",
+      "Product name",
+      "产品",
+      "产品名称",
+      "船型"
+    ],
+    "part_name": [
+      "부품명",
+      "품명",
+      "Part name",
+      "Tên chi tiết",
+      "Part",
+      "零件名称",
+      "部件名称",
+      "部件"
+    ],
+    "revision": [
+      "개정",
+      "Rev",
+      "Revision",
+      "Lần sửa đổi",
+      "版本",
+      "修订版"
+    ],
+    "drawing_number": [
+      "도면번호",
+      "Drawing No",
+      "Drawing no.",
+      "Drawing number",
+      "Mã bản vẽ",
+      "图号",
+      "图纸编号"
+    ],
+    "document_number": [
+      "문서번호",
+      "Document No",
+      "Document ID",
+      "Document no.",
+      "Mã tài liệu",
+      "文件编号"
+    ],
+    "issued": [
+      "발행일",
+      "Issue date",
+      "Ngày phát hành",
+      "Issued",
+      "签发日期"
+    ],
+    "process": [
+      "공정명",
+      "Process",
+      "Công đoạn",
+      "工序"
+    ]
+  },
+  "matrix_titles": [
+    "외관 검사 기준",
+    "검사 기준",
+    "Inspection standard",
+    "Visual inspection standard",
+    "Tiêu chuẩn kiểm tra ngoại quan",
+    "外观检验标准",
+    "检验标准",
+    "焊接外观检验标准",
+    "涂装检验标准"
+  ],
+  "matrix_markers": {
+    "item": [
+      "검사 항목",
+      "Inspection item",
+      "Hạng mục kiểm tra",
+      "检验项目"
+    ],
+    "criteria": [
+      "판정 기준",
+      "Criteria",
+      "Acceptance criteria",
+      "Tiêu chí đánh giá",
+      "判定标准",
+      "验收标准"
+    ],
+    "method": [
+      "검사 방법",
+      "Method",
+      "Cách kiểm tra",
+      "Inspection method",
+      "检验方法"
+    ],
+    "frequency": [
+      "검사 주기",
+      "Frequency",
+      "Coverage",
+      "Tỷ lệ kiểm tra",
+      "检验比例",
+      "抽检比例"
+    ],
+    "remarks": [
+      "비고",
+      "Remarks",
+      "Ghi chú",
+      "备注"
+    ]
+  },
+  "history_markers": [
+    "변경 이력",
+    "Change history",
+    "변경이력",
+    "Revision history",
+    "Lịch sử sửa đổi",
+    "修订记录"
+  ],
+  "condition_markers": [
+    "검사 기준 조건",
+    "외관 검사 기준 조건"
+  ],
+  "allow": [
+    "허용",
+    "Allowed",
+    "OK",
+    "allowed",
+    "Cho phép",
+    "cho phép",
+    "允许"
+  ],
+  "prohibit": [
+    "불허",
+    "불가",
+    "Not allowed",
+    "Prohibited",
+    "Không cho phép",
+    "不允许"
+  ],
+  "not_applicable": [
+    "-",
+    "해당 없음",
+    "N/A",
+    "不适用"
+  ],
+  "fail_phrase": "발생 시 불합격",
+  "dimensions": {
+    "length": [
+      "길이",
+      "Length",
+      "length",
+      "Chiều dài",
+      "dài",
+      "长度"
+    ],
+    "width": [
+      "폭",
+      "Width",
+      "width",
+      "Chiều rộng",
+      "rộng",
+      "宽度"
+    ],
+    "depth": [
+      "깊이",
+      "Depth",
+      "depth",
+      "Độ sâu",
+      "sâu",
+      "深度"
+    ],
+    "diameter": [
+      "직경",
+      "지름",
+      "Diameter",
+      "diameter",
+      "Đường kính",
+      "đường kính",
+      "直径"
+    ],
+    "height": [
+      "높이",
+      "Height",
+      "height",
+      "Chiều cao",
+      "cao",
+      "高度"
+    ],
+    "roughness": [
+      "거칠기",
+      "Roughness",
+      "roughness",
+      "Độ nhám"
+    ],
+    "residue": [
+      "잔류물",
+      "Residue",
+      "residue",
+      "Phần dư"
+    ],
+    "recess_depth": [
+      "표면 아래 깊이",
+      "recess",
+      "độ lõm"
+    ],
+    "thickness": [
+      "두께",
+      "Thickness",
+      "thickness",
+      "DFT",
+      "厚度",
+      "膜厚"
+    ]
+  },
+  "relative_limit": [
+    "살두께의",
+    "of wall thickness",
+    "chiều dày thành"
+  ],
+  "within": [
+    "이내",
+    "or less",
+    "以内"
+  ],
+  "below_surface": [
+    "낮으면",
+    "below the surface"
+  ],
+  "no_protrusion": [
+    "돌출 불가",
+    "No protrusion above surface",
+    "Không nhô cao hơn bề mặt"
+  ],
+  "recess_label": "표면 아래 깊이",
+  "value_label": "값",
+  "colors": {
+    "red": [
+      "적색",
+      "red",
+      "đỏ"
+    ],
+    "yellow": [
+      "황색",
+      "노란색",
+      "yellow",
+      "vàng"
+    ],
+    "blue": [
+      "청색",
+      "파란색",
+      "blue",
+      "xanh dương"
+    ],
+    "green": [
+      "녹색",
+      "green",
+      "xanh lá"
+    ]
+  },
+  "limit_titles": [
+    "한도 기준서",
+    "Limit Standard",
+    "한도 확인"
+  ],
+  "limit_fields": {
+    "code": [
+      "Model/Item/Code"
+    ],
+    "defect": [
+      "불량 내용"
+    ],
+    "cause": [
+      "발생 원인"
+    ],
+    "countermeasure": [
+      "개선 대책"
+    ],
+    "rate": [
+      "불량률"
+    ],
+    "quantity": [
+      "한도 기준 수량"
+    ]
+  },
+  "decision_header": [
+    "구분",
+    "불량유형"
+  ],
+  "decision_groups": {
+    "OK": [
+      "날인 완료",
+      "(OK)"
+    ],
+    "NG": [
+      "날인 불가",
+      "(NG)"
+    ],
+    "HOLD": [
+      "판단 보류",
+      "보류"
+    ]
+  },
+  "export": {
+    "allow_prefix": "허용: ",
+    "prohibited": "불허: 발생 시 불합격",
+    "not_applicable": "-",
+    "history_title": "변경 이력",
+    "history_columns": [
+      "NO",
+      "변경 번호",
+      "변경 내용",
+      "변경일",
+      "작성",
+      "확인",
+      "승인"
+    ],
+    "conditions_title": "검사 조건",
+    "added_rows": "추가된 항목",
+    "changed_legend": "노란 칸 = 이전 버전에서 바뀐 기준",
+    "imported_summary": "고객 양식 반영 ({filename})"
+  }
+}

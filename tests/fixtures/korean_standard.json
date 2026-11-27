@@ -1,0 +1,103 @@
+{
+  "customer": "MASKED CUSTOMER",
+  "part_number": "MASKED-PART-B",
+  "product_name": "Top Cover Assy",
+  "document_number": "MASKED-STD-B",
+  "revision": "C",
+  "provenance": "INTERNAL",
+  "rules": [
+    {
+      "id": "burr-outer",
+      "area": "외측면",
+      "item": "파팅면 버(Burr)",
+      "kind": "NUMERIC",
+      "source": "합성 테스트 기준 / 회사 승인 기준 아님",
+      "conditions": [
+        {
+          "field": "height",
+          "label": "높이",
+          "operator": "lt",
+          "limit": "0.18",
+          "unit": "mm",
+          "warning_margin": "0.009"
+        }
+      ]
+    },
+    {
+      "id": "burr-inner",
+      "area": "내측면",
+      "item": "파팅면 버(Burr)",
+      "kind": "NUMERIC",
+      "source": "합성 테스트 기준 / 회사 승인 기준 아님",
+      "conditions": [
+        {
+          "field": "height",
+          "label": "높이",
+          "operator": "lt",
+          "limit": "0.18",
+          "unit": "mm"
+        }
+      ]
+    },
+    {
+      "id": "burr-fastening",
+      "area": "체결면",
+      "item": "파팅면 버(Burr)",
+      "kind": "PROHIBITED",
+      "source": "합성 테스트 기준 / 회사 승인 기준 아님"
+    },
+    {
+      "id": "pore-outer",
+      "area": "외측면",
+      "item": "표면 기공",
+      "kind": "NUMERIC",
+      "source": "합성 테스트 기준 / 회사 승인 기준 아님",
+      "conditions": [
+        {
+          "field": "depth",
+          "label": "깊이",
+          "operator": "lt",
+          "limit": "0.25",
+          "unit": "mm"
+        },
+        {
+          "field": "diameter",
+          "label": "직경",
+          "operator": "lt",
+          "limit": "0.6",
+          "unit": "mm"
+        }
+      ]
+    },
+    {
+      "id": "pore-fastening",
+      "area": "체결면",
+      "item": "표면 기공",
+      "kind": "PROHIBITED",
+      "source": "합성 테스트 기준 / 회사 승인 기준 아님"
+    },
+    {
+      "id": "overflow-outer",
+      "area": "외측면",
+      "item": "오버플로 잔류물 높이",
+      "kind": "NUMERIC",
+      "source": "합성 테스트 기준 / 회사 승인 기준 아님",
+      "conditions": [
+        {
+          "field": "height",
+          "label": "잔류물",
+          "operator": "lt",
+          "limit": "0.45",
+          "unit": "mm"
+        }
+      ]
+    },
+    {
+      "id": "crack-outer",
+      "area": "외측면",
+      "item": "크랙",
+      "kind": "PROHIBITED",
+      "source": "합성 테스트 기준 / 회사 승인 기준 아님"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "_comment": "Synthetic Dongnam shipbuilding demo: forms to read and lots to inspect. Every company here is invented.",
+  "forms": [
+    {
+      "file": "01_KO_shipyard_hull_weld.pdf",
+      "lots": [
+        {"lot": "E21-B07", "inspector": "(가상) 김도윤 · 거제 2공장", "stage": "approved"},
+        {"lot": "E21-B08", "inspector": "(가상) 김도윤 · 거제 2공장", "stage": "review",
+         "values": {"언더컷|맞대기": "0.62"}}
+      ]
+    },
+    {
+      "file": "02_EN_coating_ulsan.pdf",
+      "lots": [
+        {"lot": "VL-P12", "inspector": "(가상) 박서연 · 울산 도장장", "stage": "report"}
+      ]
+    },
+    {
+      "file": "03_ZH_owner_pipe_weld.pdf",
+      "lots": [
+        {"lot": "HC-S03", "inspector": "(가상) 이준호 · 통영 배관공장", "stage": "approved"}
+      ]
+    }
+  ]
+}

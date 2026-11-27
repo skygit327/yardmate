@@ -1,0 +1,9 @@
+{
+  "outer_burr": "외측면 파팅면 버 높이를 0.16 mm 이하로 변경해 주세요",
+  "ambiguous_burr": "파팅면 버 높이 0.18 → 0.15 mm",
+  "all_areas_burr": "모든 부위 파팅면 버 높이 0.15mm 미만으로",
+  "allow_fastening_pore": "체결면 표면 기공은 깊이 0.1 mm, 직경 0.3 mm 미만 허용",
+  "pore_warning_percent": "외측면 기공 경고 범위 5%",
+  "numbered_request": "1. 외측면 버 높이 0.18 mm에서 0.16 mm로\n2. 오버플로 잔류물 0.40 mm로\n3. 개정 E",
+  "two_items": "외측면 버 높이 0.16 mm 이하로 변경하고 외측면 크랙은 해당 없음으로"
+}

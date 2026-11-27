@@ -1,0 +1,27 @@
+{
+  "customer": "DEMO CUSTOMER",
+  "part_number": "DEMO-PLATE",
+  "product_name": "Synthetic plate",
+  "document_number": "DEMO-STD-002",
+  "revision": "1",
+  "provenance": "SYNTHETIC",
+  "rules": [
+    {
+      "id": "burr",
+      "area": "Outer surface",
+      "item": "Burr height",
+      "kind": "NUMERIC",
+      "source": "Synthetic criterion 1 / Not company-approved",
+      "conditions": [
+        {
+          "field": "height",
+          "label": "Height",
+          "operator": "lt",
+          "limit": "0.20",
+          "unit": "mm",
+          "warning_margin": "0.010"
+        }
+      ]
+    }
+  ]
+}

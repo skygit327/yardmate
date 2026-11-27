@@ -1,0 +1,277 @@
+{
+  "_comment": "Words the chat assistant uses to understand a request without an AI model (Korean, English, Vietnamese). Add phrases here; no code change is needed.",
+  "intents": {
+    "add_task": [
+      "할 일 추가",
+      "할일 추가",
+      "일정 추가",
+      "일정 등록",
+      "할 일 등록",
+      "알려줘",
+      "리마인드",
+      "add task",
+      "add a task",
+      "remind me",
+      "schedule",
+      "thêm việc",
+      "nhắc tôi"
+    ],
+    "revise": [
+      "개정",
+      "강화",
+      "완화",
+      "바꿔",
+      "변경해",
+      "수정해",
+      "로 해",
+      "로 바꾸",
+      "revise",
+      "tighten",
+      "loosen",
+      "change the",
+      "sửa tiêu chuẩn",
+      "thay đổi"
+    ],
+    "trace": [
+      "원인",
+      "역추적",
+      "추적",
+      "어느 공정",
+      "어떤 공정",
+      "root cause",
+      "trace",
+      "which process",
+      "nguyên nhân",
+      "truy vết"
+    ],
+    "ncr": [
+      "NCR",
+      "부적합"
+    ],
+    "request": [
+      "고객 요청",
+      "요청 등록",
+      "메일",
+      "문의",
+      "회신",
+      "클레임",
+      "request",
+      "complaint",
+      "email",
+      "reply",
+      "yêu cầu",
+      "khiếu nại"
+    ],
+    "form": [
+      "고객 양식",
+      "양식",
+      "검사서",
+      "한도 승인",
+      "한도승인",
+      "form",
+      "limit approval",
+      "biểu mẫu"
+    ],
+    "inspection": [
+      "검사 시작",
+      "검사 등록",
+      "새 검사",
+      "검사하",
+      "측정값",
+      "판정",
+      "start inspection",
+      "new inspection",
+      "inspect",
+      "kiểm tra mới",
+      "bắt đầu kiểm tra"
+    ],
+    "customer": [
+      "고객사",
+      "customer page",
+      "khách hàng"
+    ],
+    "standard": [
+      "기준서",
+      "기준 찾",
+      "스펙",
+      "standard",
+      "spec",
+      "tiêu chuẩn"
+    ],
+    "tasks": [
+      "할 일",
+      "할일",
+      "일정",
+      "오늘",
+      "이번 주",
+      "밀린",
+      "기한",
+      "to do",
+      "tasks",
+      "today",
+      "this week",
+      "overdue",
+      "việc",
+      "lịch",
+      "hôm nay"
+    ],
+    "calendar": [
+      "캘린더",
+      "달력",
+      "calendar",
+      "lịch tháng"
+    ],
+    "automation": [
+      "작업 폴더",
+      "자동 처리",
+      "처리 보고서",
+      "workspace",
+      "automation",
+      "thư mục"
+    ],
+    "settings": [
+      "AI 설정",
+      "모델 바꿔",
+      "API 키",
+      "api key",
+      "ai settings",
+      "cài đặt ai"
+    ],
+    "help": [
+      "도움",
+      "뭘 할 수",
+      "무엇을 할 수",
+      "사용법",
+      "어떻게 써",
+      "help",
+      "what can you",
+      "how do i",
+      "giúp",
+      "hướng dẫn"
+    ]
+  },
+  "dates": {
+    "today": [
+      "오늘",
+      "today",
+      "hôm nay"
+    ],
+    "tomorrow": [
+      "내일",
+      "tomorrow",
+      "ngày mai"
+    ],
+    "day_after": [
+      "모레",
+      "day after tomorrow",
+      "ngày kia"
+    ],
+    "next_week": [
+      "다음 주",
+      "다음주",
+      "next week",
+      "tuần sau"
+    ],
+    "month_marker": "월",
+    "day_marker": "일",
+    "in_days": [
+      "일 후",
+      "일 뒤",
+      "days later",
+      "in {n} days",
+      "ngày nữa"
+    ]
+  },
+  "strip": [
+    "해줘",
+    "해 줘",
+    "해주세요",
+    "주세요",
+    "좀",
+    "please",
+    "에",
+    "까지",
+    "을",
+    "를",
+    "로",
+    "으로",
+    "vui lòng",
+    "by",
+    "until",
+    "for"
+  ],
+  "replies": {
+    "ko": {
+      "help": "이런 일을 말로 시킬 수 있어요: 오늘 할 일 보기, 할 일 추가(예: 내일까지 8D 보고서 작성), 기준서 찾기·개정(예: Top Cover Assy 버 높이 0.15로 강화), 불량 원인 찾기(예: 크랙 원인 공정), 고객 요청 등록(요청 내용을 붙여넣기), 새 검사 시작, 고객사 페이지 열기, 고객 양식 읽기.",
+      "tasks": "할 일 {open}개 중 기한 지남 {overdue}개, 오늘 {today}개, 이번 주 {week}개입니다.",
+      "task_added": "할 일을 추가했어요: {title} ({due})",
+      "task_missing": "추가할 할 일 내용을 함께 말씀해 주세요. 예: 내일까지 8D 보고서 작성",
+      "trace": "{defect} 원인 공정 후보: {steps}",
+      "trace_unknown": "어떤 불량인지 알아듣지 못했어요. 불량 원인 추적 화면에서 불량 유형을 골라 주세요.",
+      "trace_page": "불량 원인 추적 화면으로 이동합니다. NCR PDF를 올리거나 불량 유형을 고르면 원인 공정 후보를 보여줍니다.",
+      "request_created": "고객 요청으로 등록하고 분석했어요: {summary} (유형 {category}, 긴급도 {priority})",
+      "request_page": "고객 요청 등록 화면을 엽니다. 메일이나 요청 내용을 붙여넣으면 분석과 회신 초안을 만듭니다.",
+      "revise": "{standard} 기준서 개정 화면을 열고 요청 내용을 넣어 두었어요. 변경 제안을 확인한 뒤 적용하세요.",
+      "revise_which": "어느 기준서를 개정할지 알려 주세요. 문서번호·품번·제품명 중 하나면 됩니다.",
+      "standards_found": "기준서 {count}개를 찾았어요.",
+      "standards_page": "기준서 라이브러리를 엽니다.",
+      "inspection": "새 검사 화면을 엽니다{standard}.",
+      "customer": "{customer} 고객사 페이지를 엽니다.",
+      "customers_page": "고객사 목록을 엽니다.",
+      "form": "고객 양식 읽기 화면을 엽니다. PDF를 올리거나 작업 폴더 1_고객양식에 넣으면 자동으로 처리됩니다.",
+      "calendar": "캘린더를 엽니다.",
+      "automation": "작업 폴더 자동 처리 현황을 엽니다.",
+      "settings": "AI 설정 화면을 엽니다.",
+      "unknown": "무엇을 원하시는지 정확히 몰라서 할 수 있는 일을 정리했어요. 아래에서 고르거나 다시 말씀해 주세요.",
+      "llm_blocked": "고객 자료 보호 설정 때문에 외부 AI 대신 규칙으로 이해했어요."
+    },
+    "en": {
+      "help": "You can ask me to: show today's tasks, add a task (e.g. write the 8D report by tomorrow), find or revise a standard (e.g. tighten burr height on Top Cover Assy to 0.15), find a defect's likely process (e.g. root cause of a crack), register a customer request (paste it), start an inspection, open a customer page, or read a customer form.",
+      "tasks": "{open} open tasks: {overdue} overdue, {today} due today, {week} due this week.",
+      "task_added": "Task added: {title} ({due})",
+      "task_missing": "Tell me what the task is, e.g. write the 8D report by tomorrow.",
+      "trace": "Likely processes for {defect}: {steps}",
+      "trace_unknown": "I could not tell which defect you mean. Pick the defect type on the root-cause screen.",
+      "trace_page": "Opening root-cause tracing. Upload an NCR PDF or pick a defect type to see likely processes.",
+      "request_created": "Registered and analysed the customer request: {summary} (type {category}, priority {priority})",
+      "request_page": "Opening a new customer request. Paste the mail or request to get an analysis and a reply draft.",
+      "revise": "Opened the revision of {standard} with your request filled in. Review the proposed changes before applying them.",
+      "revise_which": "Which standard should I revise? A document number, part number or product name is enough.",
+      "standards_found": "Found {count} standards.",
+      "standards_page": "Opening the standards library.",
+      "inspection": "Opening a new inspection{standard}.",
+      "customer": "Opening the {customer} customer page.",
+      "customers_page": "Opening the customer list.",
+      "form": "Opening customer forms. Upload a PDF, or drop it into the 1_customer-forms work folder to process it automatically.",
+      "calendar": "Opening the calendar.",
+      "automation": "Opening the work-folder automation status.",
+      "settings": "Opening AI settings.",
+      "unknown": "I'm not sure what you need, so here is what I can do. Pick one below or rephrase.",
+      "llm_blocked": "Customer data protection is on, so I understood this with rules instead of the external AI."
+    },
+    "zh": {
+      "help": "您可以让我：查看今天的任务、添加任务（例如明天前写好8D报告）、查找或修订标准、查找缺陷的可能工序、登记客户请求（直接粘贴）、开始检验、打开客户页面或读取客户表格。",
+      "tasks": "未完成任务 {open} 项：逾期 {overdue} 项，今天到期 {today} 项，本周到期 {week} 项。",
+      "task_added": "已添加任务：{title}（{due}）",
+      "task_missing": "请告诉我任务内容，例如：明天前写好8D报告。",
+      "trace": "{defect} 的可能工序：{steps}",
+      "trace_unknown": "无法判断您指的是哪种缺陷。请在原因追溯页面选择缺陷类型。",
+      "trace_page": "正在打开原因追溯。上传 NCR PDF 或选择缺陷类型即可查看可能工序。",
+      "request_created": "已登记并分析客户请求：{summary}（类型 {category}，优先级 {priority}）",
+      "request_page": "正在打开新的客户请求。粘贴邮件或请求即可获得分析和回复草稿。",
+      "revise": "已打开 {standard} 的修订并填入您的要求。应用前请审核建议的变更。",
+      "revise_which": "要修订哪个标准？提供文件编号、零件号或产品名称即可。",
+      "standards_found": "找到 {count} 个标准。",
+      "standards_page": "正在打开标准库。",
+      "inspection": "正在打开新的检验{standard}。",
+      "customer": "正在打开 {customer} 客户页面。",
+      "customers_page": "正在打开客户列表。",
+      "form": "正在打开检验标准导入。上传 PDF，或放入工作文件夹即可自动处理。",
+      "calendar": "正在打开日历。",
+      "automation": "正在打开工作文件夹自动处理状态。",
+      "settings": "正在打开 AI 设置。",
+      "unknown": "我不太确定您需要什么，以下是我能做的。请选择或换个说法。",
+      "llm_blocked": "客户数据保护已开启，因此使用规则而非外部 AI 理解了您的请求。"
+    }
+  }
+}

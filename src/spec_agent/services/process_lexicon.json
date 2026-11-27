@@ -1,0 +1,677 @@
+{
+  "_comment": "Process knowledge used to suggest root-cause process candidates. These are general manufacturing defaults, not company data: edit the flow per part in the app or extend this file.",
+  "defects": {
+    "dimension": {
+      "names": {
+        "ko": "치수 불량",
+        "en": "Dimension out of specification",
+        "zh": "尺寸不良"
+      },
+      "aliases": [
+        "치수",
+        "직경",
+        "지름",
+        "Diameter",
+        "Dimension",
+        "out of specification",
+        "Out of spec",
+        "Flatness",
+        "평면도",
+        "kích thước"
+      ]
+    },
+    "porosity": {
+      "names": {
+        "ko": "기공",
+        "en": "Porosity",
+        "zh": "气孔"
+      },
+      "aliases": [
+        "기공",
+        "블리스터",
+        "Porosity",
+        "Pore",
+        "Blister",
+        "Trim hole",
+        "보이드",
+        "rỗ"
+      ]
+    },
+    "cold_shut": {
+      "names": {
+        "ko": "콜드셧",
+        "en": "Cold shut",
+        "zh": "冷隔"
+      },
+      "aliases": [
+        "콜드셧",
+        "Cold shut",
+        "표면선",
+        "Surface Lines",
+        "가로 줄"
+      ]
+    },
+    "shrinkage": {
+      "names": {
+        "ko": "수축·함몰",
+        "en": "Shrinkage / dent",
+        "zh": "缩孔·凹陷"
+      },
+      "aliases": [
+        "함몰",
+        "수축",
+        "싱크",
+        "Dent",
+        "Sink",
+        "Shrink"
+      ]
+    },
+    "wrinkle": {
+      "names": {
+        "ko": "주름",
+        "en": "Wrinkling",
+        "zh": "皱纹"
+      },
+      "aliases": [
+        "주름",
+        "Wrinkl"
+      ]
+    },
+    "crack": {
+      "names": {
+        "ko": "크랙·균열",
+        "en": "Crack",
+        "zh": "裂纹"
+      },
+      "aliases": [
+        "크랙",
+        "균열",
+        "깨짐",
+        "Crack",
+        "nứt"
+      ]
+    },
+    "short_shot": {
+      "names": {
+        "ko": "미성형·소재 부족",
+        "en": "Short shot / lack of material",
+        "zh": "欠铸·材料不足"
+      },
+      "aliases": [
+        "미성형",
+        "수지 부족",
+        "소재 부족",
+        "결손",
+        "Lack of material",
+        "Short shot"
+      ]
+    },
+    "roughness": {
+      "names": {
+        "ko": "표면 거칠기·소착",
+        "en": "Surface roughness / soldering",
+        "zh": "表面粗糙·粘模"
+      },
+      "aliases": [
+        "거칠기",
+        "소착",
+        "Roughness"
+      ]
+    },
+    "press_mark": {
+      "names": {
+        "ko": "눌림·찍힘",
+        "en": "Press mark / dent mark",
+        "zh": "压痕·磕碰"
+      },
+      "aliases": [
+        "눌림",
+        "찍힘",
+        "음각",
+        "Press mark"
+      ]
+    },
+    "burr": {
+      "names": {
+        "ko": "버",
+        "en": "Burr",
+        "zh": "毛刺"
+      },
+      "aliases": [
+        "버",
+        "Burr",
+        "bavia"
+      ]
+    },
+    "scratch": {
+      "names": {
+        "ko": "스크래치·긁힘",
+        "en": "Scratch",
+        "zh": "划伤"
+      },
+      "aliases": [
+        "스크래치",
+        "긁힘",
+        "드래그",
+        "Scratch",
+        "Drag",
+        "trầy",
+        "xước"
+      ]
+    },
+    "overcut": {
+      "names": {
+        "ko": "과절단·과연삭",
+        "en": "Over-cut / over-grinding",
+        "zh": "过切·过磨"
+      },
+      "aliases": [
+        "과절단",
+        "과연삭",
+        "Overcut",
+        "Over-grind"
+      ]
+    },
+    "stain": {
+      "names": {
+        "ko": "오염·얼룩",
+        "en": "Stain / dirt",
+        "zh": "污染·污渍"
+      },
+      "aliases": [
+        "오염",
+        "얼룩",
+        "Dirt",
+        "Stain",
+        "bẩn",
+        "ố"
+      ]
+    },
+    "paint_bump": {
+      "names": {
+        "ko": "도장 돌기·돌출",
+        "en": "Paint bump / build-up",
+        "zh": "涂层凸起"
+      },
+      "aliases": [
+        "도장 돌기",
+        "돌기",
+        "돌출",
+        "Paint bump",
+        "Build-up",
+        "Bulge"
+      ]
+    },
+    "gate_residue": {
+      "names": {
+        "ko": "게이트·오버플로 잔류",
+        "en": "Gate / overflow residue",
+        "zh": "浇口·溢流残留"
+      },
+      "aliases": [
+        "게이트",
+        "오버플로",
+        "잔류물",
+        "Gate",
+        "Overflow",
+        "이젝터"
+      ]
+    }
+  },
+  "steps": {
+    "mold": {
+      "names": {
+        "ko": "금형 준비·관리",
+        "en": "Mold preparation",
+        "zh": "模具准备·管理"
+      },
+      "aliases": [
+        "MOLD",
+        "Mold",
+        "금형"
+      ],
+      "defects": {
+        "shrinkage": 1,
+        "crack": 2,
+        "roughness": 2,
+        "dimension": 1,
+        "press_mark": 1
+      },
+      "checks": [
+        {
+          "ko": "금형 마모·손상·균열 점검",
+          "en": "Inspect the mold for wear, damage and cracks",
+          "zh": "检查模具磨损、损伤、裂纹"
+        },
+        {
+          "ko": "금형 온도·냉각수 상태 확인",
+          "en": "Check mold temperature and cooling",
+          "zh": "确认模具温度和冷却水状态"
+        },
+        {
+          "ko": "이형제 도포 위치·양 확인",
+          "en": "Check release-agent position and amount",
+          "zh": "确认脱模剂喷涂位置和用量"
+        }
+      ]
+    },
+    "casting": {
+      "names": {
+        "ko": "다이캐스팅 (주조)",
+        "en": "Die casting",
+        "zh": "压铸（铸造）"
+      },
+      "aliases": [
+        "Casting",
+        "Die casting",
+        "다이캐스팅",
+        "주조"
+      ],
+      "defects": {
+        "porosity": 3,
+        "cold_shut": 3,
+        "shrinkage": 3,
+        "wrinkle": 3,
+        "crack": 3,
+        "short_shot": 3,
+        "roughness": 2,
+        "dimension": 1,
+        "gate_residue": 1
+      },
+      "checks": [
+        {
+          "ko": "주입 속도·압력·보압 시간 조건 확인",
+          "en": "Check injection speed, pressure and holding time",
+          "zh": "确认压射速度、压力、保压时间"
+        },
+        {
+          "ko": "용탕 온도·가스 관리 상태",
+          "en": "Check melt temperature and degassing",
+          "zh": "铝液温度和除气管理状态"
+        },
+        {
+          "ko": "주조 수축률과 도면 공차 비교",
+          "en": "Compare casting shrinkage with the drawing tolerance",
+          "zh": "对比铸造收缩率与图纸公差"
+        }
+      ]
+    },
+    "injection": {
+      "names": {
+        "ko": "사출 성형",
+        "en": "Injection molding",
+        "zh": "注塑成型"
+      },
+      "aliases": [
+        "Injection",
+        "사출"
+      ],
+      "defects": {
+        "short_shot": 3,
+        "wrinkle": 2,
+        "shrinkage": 2,
+        "scratch": 1,
+        "dimension": 2,
+        "gate_residue": 2
+      },
+      "checks": [
+        {
+          "ko": "사출 압력·속도·보압 조건 확인",
+          "en": "Check injection pressure, speed and holding pressure",
+          "zh": "确认注射压力、速度、保压条件"
+        },
+        {
+          "ko": "수지 건조 상태 확인",
+          "en": "Check resin drying",
+          "zh": "确认树脂干燥状态"
+        },
+        {
+          "ko": "취출·이송 시 제품 간 접촉 여부",
+          "en": "Check part contact during removal and transfer",
+          "zh": "取件和搬运时产品是否相互接触"
+        }
+      ]
+    },
+    "trimming": {
+      "names": {
+        "ko": "트리밍·프레스",
+        "en": "Trimming / press",
+        "zh": "切边·冲压"
+      },
+      "aliases": [
+        "STAMPING DIE",
+        "Stamping",
+        "Trimming",
+        "트리밍",
+        "프레스"
+      ],
+      "defects": {
+        "press_mark": 3,
+        "porosity": 1,
+        "burr": 2,
+        "dimension": 1,
+        "gate_residue": 2,
+        "overcut": 2
+      },
+      "checks": [
+        {
+          "ko": "트리밍 금형 날·지그 이물 점검",
+          "en": "Inspect trimming die edges and jig debris",
+          "zh": "检查切边模刃口和夹具异物"
+        },
+        {
+          "ko": "프레스 하중·위치 확인",
+          "en": "Check press load and position",
+          "zh": "确认冲压载荷和位置"
+        }
+      ]
+    },
+    "gate_cut": {
+      "names": {
+        "ko": "게이트 커팅",
+        "en": "Gate cutting",
+        "zh": "浇口切割"
+      },
+      "aliases": [
+        "Gate cut",
+        "게이트 커팅"
+      ],
+      "defects": {
+        "gate_residue": 3,
+        "burr": 2,
+        "overcut": 2
+      },
+      "checks": [
+        {
+          "ko": "커팅 위치·공구 상태 확인",
+          "en": "Check cutting position and tool",
+          "zh": "确认切割位置和刀具状态"
+        }
+      ]
+    },
+    "polishing": {
+      "names": {
+        "ko": "사상·폴리싱",
+        "en": "Deburring / polishing",
+        "zh": "打磨·抛光"
+      },
+      "aliases": [
+        "Polishing",
+        "사상",
+        "폴리싱"
+      ],
+      "defects": {
+        "scratch": 3,
+        "burr": 3,
+        "overcut": 3
+      },
+      "checks": [
+        {
+          "ko": "사상 작업 표준·작업자 교육 상태",
+          "en": "Check the deburring standard and operator training",
+          "zh": "打磨作业标准和作业员培训状态"
+        },
+        {
+          "ko": "적재 시 간지 사용 등 제품 간 접촉 방지",
+          "en": "Prevent part contact when stacking (separators)",
+          "zh": "堆放时使用隔纸等防止产品相互接触"
+        }
+      ]
+    },
+    "machining": {
+      "names": {
+        "ko": "CNC 가공",
+        "en": "CNC machining",
+        "zh": "CNC加工"
+      },
+      "aliases": [
+        "MACHINING",
+        "MACHINE",
+        "CNC",
+        "가공"
+      ],
+      "defects": {
+        "dimension": 3,
+        "burr": 2,
+        "scratch": 1,
+        "overcut": 1
+      },
+      "checks": [
+        {
+          "ko": "가공 프로그램·공구 보정값(오프셋) 확인",
+          "en": "Check the NC program and tool offsets",
+          "zh": "确认加工程序和刀具补偿值"
+        },
+        {
+          "ko": "공구 마모·교체 이력 확인",
+          "en": "Check tool wear and replacement history",
+          "zh": "确认刀具磨损和更换记录"
+        },
+        {
+          "ko": "설비 열변위·워밍업 상태",
+          "en": "Check machine thermal drift and warm-up",
+          "zh": "设备热变形·预热状态"
+        },
+        {
+          "ko": "지그·클램핑 상태와 기준면",
+          "en": "Check jig, clamping and datum faces",
+          "zh": "夹具·装夹状态与基准面"
+        }
+      ]
+    },
+    "washing": {
+      "names": {
+        "ko": "세척",
+        "en": "Washing",
+        "zh": "清洗"
+      },
+      "aliases": [
+        "Washing",
+        "세척"
+      ],
+      "defects": {
+        "stain": 2
+      },
+      "checks": [
+        {
+          "ko": "세척액 농도·오염도, 건조 상태",
+          "en": "Check washing fluid and drying",
+          "zh": "清洗液浓度、污染度和干燥状态"
+        }
+      ]
+    },
+    "surface": {
+      "names": {
+        "ko": "표면처리 (크로메이트·도장)",
+        "en": "Surface treatment (chromate / coating)",
+        "zh": "表面处理（铬酸盐·涂装）"
+      },
+      "aliases": [
+        "Chromate",
+        "Coating",
+        "Painting",
+        "표면처리",
+        "크로메이트",
+        "도장"
+      ],
+      "defects": {
+        "stain": 3,
+        "paint_bump": 3,
+        "scratch": 1
+      },
+      "checks": [
+        {
+          "ko": "처리 지그 접촉부·오염 상태",
+          "en": "Check treatment jig contact points and contamination",
+          "zh": "处理夹具接触部位和污染状态"
+        },
+        {
+          "ko": "도장 환경(이물·도막 두께)",
+          "en": "Check coating environment (debris, film thickness)",
+          "zh": "涂装环境（异物·膜厚）"
+        }
+      ]
+    },
+    "assembly": {
+      "names": {
+        "ko": "조립",
+        "en": "Assembly",
+        "zh": "装配"
+      },
+      "aliases": [
+        "Assembly",
+        "조립"
+      ],
+      "defects": {
+        "scratch": 2,
+        "press_mark": 1
+      },
+      "checks": [
+        {
+          "ko": "조립 지그·취급 방법 확인",
+          "en": "Check assembly jigs and handling",
+          "zh": "确认装配夹具和搬运方法"
+        }
+      ]
+    },
+    "inspection": {
+      "names": {
+        "ko": "검사 (측정)",
+        "en": "Inspection (measurement)",
+        "zh": "检验（测量）"
+      },
+      "aliases": [
+        "Method",
+        "CMM",
+        "Inspection",
+        "검사",
+        "측정"
+      ],
+      "role": "inspection",
+      "defects": {
+        "dimension": 1
+      },
+      "checks": [
+        {
+          "ko": "측정기(CMM) 교정 상태",
+          "en": "Check measuring equipment (CMM) calibration",
+          "zh": "测量仪（CMM）校准状态"
+        },
+        {
+          "ko": "측정 온도(20 ℃)·제품 안정화 시간",
+          "en": "Check measuring temperature (20 °C) and part soak time",
+          "zh": "测量温度（20 ℃）和产品稳定时间"
+        },
+        {
+          "ko": "공급사·고객사 측정 위치·방법 일치 여부",
+          "en": "Confirm supplier and customer measure the same positions the same way",
+          "zh": "供应商与客户测量位置和方法是否一致"
+        }
+      ]
+    },
+    "packing": {
+      "names": {
+        "ko": "포장·출하",
+        "en": "Packing / shipping",
+        "zh": "包装·出货"
+      },
+      "aliases": [
+        "Packing",
+        "Shipping",
+        "포장",
+        "출하"
+      ],
+      "defects": {
+        "scratch": 2,
+        "press_mark": 1
+      },
+      "checks": [
+        {
+          "ko": "포장재·칸막이 트레이 사용 여부",
+          "en": "Check packaging and divider trays",
+          "zh": "是否使用包装材料和隔板托盘"
+        }
+      ]
+    }
+  },
+  "templates": [
+    {
+      "id": "die_casting_housing",
+      "names": {
+        "ko": "다이캐스팅 하우징",
+        "en": "Die-cast housing",
+        "zh": "压铸壳体"
+      },
+      "steps": [
+        "mold",
+        "casting",
+        "trimming",
+        "polishing",
+        "machining",
+        "washing",
+        "surface",
+        "inspection",
+        "packing"
+      ]
+    },
+    {
+      "id": "injection_part",
+      "names": {
+        "ko": "사출품",
+        "en": "Injection-molded part",
+        "zh": "注塑件"
+      },
+      "steps": [
+        "mold",
+        "injection",
+        "gate_cut",
+        "surface",
+        "assembly",
+        "inspection",
+        "packing"
+      ]
+    }
+  ],
+  "ncr": {
+    "fields": {
+      "date": [
+        "Date"
+      ],
+      "supplier": [
+        "Supplier"
+      ],
+      "ncr_no": [
+        "NCR No"
+      ],
+      "part_number": [
+        "Part Number"
+      ],
+      "description": [
+        "Part Description"
+      ],
+      "problem": [
+        "Problem Description"
+      ],
+      "process": [
+        "Process"
+      ],
+      "lot": [
+        "Lot No"
+      ],
+      "qty": [
+        "Qty"
+      ],
+      "stock_qty": [
+        "Stock Qty"
+      ],
+      "occurrence": [
+        "Occurrence No"
+      ],
+      "inspector": [
+        "Inspector"
+      ]
+    },
+    "measurement_marker": "Measurement values",
+    "actions_marker": "Request Actions"
+  }
+}

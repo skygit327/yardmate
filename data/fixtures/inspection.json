@@ -1,0 +1,13 @@
+{
+  "standard_id": "demo-cover-en-v1",
+  "lot": "DEMO-2026-001",
+  "inspector": "Demo Inspector",
+  "observations": {
+    "burr": {"measurements": {"height": "0.195"}, "units": {"height": "mm"}},
+    "pore": {
+      "measurements": {"depth": "0.20", "diameter": "0.50"},
+      "units": {"depth": "mm", "diameter": "mm"}
+    },
+    "crack": {"defect_present": false}
+  }
+}

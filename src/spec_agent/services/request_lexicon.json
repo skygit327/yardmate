@@ -1,0 +1,180 @@
+{
+  "_comment": "Vocabulary and reply templates for the customer request agent (Korean, English, Vietnamese). Extend without code changes.",
+  "categories": {
+    "COMPLAINT": "불량|클레임|불만|반품|부적합|이상 발생|complaint|claim|defect|nonconform|non-conform|rejected|return(?:ed)?\\b|khiếu nại|hàng lỗi|trả hàng|không đạt",
+    "SPEC_CHANGE": "기준\\s*변경|사양\\s*변경|스펙\\s*변경|개정|상향|하향|완화|강화|변경\\s*요청|spec(?:ification)? change|change (?:the )?(?:spec|limit|criteria|standard)|revis(?:e|ion)|tighten|relax|thay đổi tiêu chuẩn|sửa đổi|thay đổi giới hạn",
+    "INQUIRY": "문의|질문|궁금|확인\\s*부탁|확인\\s*바랍니다|inquiry|enquiry|question|could you (?:please )?confirm|please confirm|hỏi|xác nhận giúp|cho biết",
+    "DELIVERY": "납기|출하|배송|선적|delivery|shipment|shipping|ship date|giao hàng|xuất hàng",
+    "REPORT_REQUEST": "성적서|검사\\s*결과|검사\\s*데이터|측정\\s*데이터|inspection (?:report|result|data)|test report|certificate|coa\\b|báo cáo kiểm tra|kết quả kiểm tra"
+  },
+  "urgent": "긴급|즉시|급히|빠른 회신|asap|urgent|immediately|as soon as possible|gấp|khẩn",
+  "request_verbs": "요청|부탁|바랍니다|주시기|주세요|해 주십시오|please|request|kindly|we need|need you to|cần|đề nghị|vui lòng|yêu cầu",
+  "quote_markers": "^(?:>|-----Original Message-----|On .+ wrote:|From: .+|보낸 사람:|-----원본 메시지-----)",
+  "signature_markers": "^(?:--\\s*$|감사합니다\\.?$|Best regards|Kind regards|Regards,|Trân trọng)",
+  "replies": {
+    "en": {
+      "greeting": "Dear {customer} team,",
+      "thanks": "Thank you for your message regarding \"{subject}\". We have registered it as case {case}.",
+      "understanding": "Our understanding of your request:",
+      "facts": "Current status on our side:",
+      "standard": "{part}: current standard {document} Rev {revision} — {item}: {criteria}",
+      "inspection": "Lot {lot} ({date}): overall result {result}, status {status}",
+      "actions": "Planned actions:",
+      "closing": "We will update you as soon as these actions are complete. Please let us know if any information above is incorrect.",
+      "sign": "Best regards,\nQuality Assurance",
+      "no_facts": "We are reviewing the related standards and inspection records."
+    },
+    "ko": {
+      "greeting": "{customer} 담당자님께,",
+      "thanks": "\"{subject}\" 관련 문의 주셔서 감사합니다. 접수 번호 {case}로 등록하였습니다.",
+      "understanding": "요청하신 내용을 다음과 같이 이해하였습니다.",
+      "facts": "현재 당사 확인 내용:",
+      "standard": "{part}: 현행 기준 {document} Rev {revision} — {item}: {criteria}",
+      "inspection": "로트 {lot} ({date}): 종합 판정 {result}, 상태 {status}",
+      "actions": "조치 계획:",
+      "closing": "조치가 완료되는 대로 다시 안내드리겠습니다. 위 내용 중 다른 점이 있으면 알려 주시기 바랍니다.",
+      "sign": "감사합니다.\n품질보증팀 드림",
+      "no_facts": "관련 기준서와 검사 기록을 확인하고 있습니다."
+    },
+    "zh": {
+      "greeting": "{customer} 团队您好：",
+      "thanks": "感谢您关于“{subject}”的来信。我们已登记为案件 {case}。",
+      "understanding": "我们对您需求的理解：",
+      "facts": "我方当前状况：",
+      "standard": "{part}：现行标准 {document} Rev {revision} — {item}：{criteria}",
+      "inspection": "批次 {lot}（{date}）：综合结果 {result}，状态 {status}",
+      "actions": "计划措施：",
+      "closing": "上述措施完成后我们会第一时间通知您。如以上信息有误，请告知我们。",
+      "sign": "此致\n质量保证部",
+      "no_facts": "我们正在核查相关标准和检验记录。"
+    }
+  },
+  "actions": {
+    "en": {
+      "open_revision": "Prepare a standard revision draft for {part} and review it before activation",
+      "review_inspection": "Review inspection record of lot {lot} (result {result})",
+      "reinspect": "Re-inspect retained samples of lot {lot} for: {items}",
+      "reinspect_generic": "Re-inspect retained samples for: {items}",
+      "check_standard": "Confirm current criteria for: {items}",
+      "send_report": "Send the approved inspection report of lot {lot}",
+      "ask_customer": "Ask the customer for missing information: {missing}",
+      "check_delivery": "Check shipment schedule with production / logistics",
+      "missing_part": "part number",
+      "missing_lot": "lot number",
+      "missing_values": "measured values or photos"
+    },
+    "ko": {
+      "open_revision": "{part} 기준 개정 초안을 작성하고 활성화 전 검토",
+      "review_inspection": "로트 {lot} 검사 기록 검토 (판정 {result})",
+      "reinspect": "로트 {lot} 보관 샘플 재검사: {items}",
+      "reinspect_generic": "보관 샘플 재검사: {items}",
+      "check_standard": "현행 기준 확인: {items}",
+      "send_report": "로트 {lot} 승인 성적서 송부",
+      "ask_customer": "고객사에 추가 정보 요청: {missing}",
+      "check_delivery": "생산·물류 부서와 출하 일정 확인",
+      "missing_part": "품번",
+      "missing_lot": "로트 번호",
+      "missing_values": "측정값 또는 사진"
+    },
+    "zh": {
+      "open_revision": "为 {part} 准备标准修订草稿，并在启用前审核",
+      "review_inspection": "复核批次 {lot} 的检验记录（结果 {result}）",
+      "reinspect": "对批次 {lot} 的留样复检：{items}",
+      "reinspect_generic": "对留样复检：{items}",
+      "check_standard": "确认现行标准：{items}",
+      "send_report": "发送批次 {lot} 已批准的检验报告",
+      "ask_customer": "向客户询问缺失信息：{missing}",
+      "check_delivery": "与生产/物流确认出货计划",
+      "missing_part": "零件号",
+      "missing_lot": "批次号",
+      "missing_values": "测量值或照片"
+    }
+  },
+  "findings": {
+    "en": {
+      "value_differs": "{item}: requested value {value} {unit} differs from current criteria ({criteria})",
+      "inspection_fail": "Lot {lot} was judged {result} on {date}",
+      "inspection_pass_but_complaint": "Lot {lot} passed inspection on {date}; the complaint may relate to items or areas not covered by the standard",
+      "unknown_lot": "Lot {lot} mentioned in the request is not in the inspection records"
+    },
+    "ko": {
+      "value_differs": "{item}: 요청 값 {value} {unit}이(가) 현행 기준({criteria})과 다릅니다",
+      "inspection_fail": "로트 {lot}은(는) {date}에 {result} 판정되었습니다",
+      "inspection_pass_but_complaint": "로트 {lot}은(는) {date} 검사에서 합격했습니다. 기준에 없는 항목·부위의 문제일 수 있습니다",
+      "unknown_lot": "요청에 언급된 로트 {lot}이(가) 검사 기록에 없습니다"
+    },
+    "zh": {
+      "value_differs": "{item}：要求值 {value} {unit} 与现行标准（{criteria}）不同",
+      "inspection_fail": "批次 {lot} 于 {date} 判定为 {result}",
+      "inspection_pass_but_complaint": "批次 {lot} 于 {date} 检验合格；投诉可能涉及标准未覆盖的项目或部位",
+      "unknown_lot": "请求中提到的批次 {lot} 不在检验记录中"
+    }
+  },
+  "generic_tokens": [
+    "표면",
+    "surface",
+    "높이",
+    "height",
+    "깊이",
+    "depth",
+    "직경",
+    "diameter",
+    "길이",
+    "length",
+    "폭",
+    "width",
+    "외측면",
+    "내측면",
+    "체결면",
+    "outer",
+    "inner",
+    "area",
+    "part",
+    "entire",
+    "전체",
+    "mặt",
+    "bề",
+    "cao",
+    "chiều",
+    "độ",
+    "sâu",
+    "부",
+    "면",
+    "item",
+    "check"
+  ],
+  "greetings": "^(?:dear\\b|hello\\b|hi\\b|to whom|good (?:morning|afternoon)|안녕하세요|안녕하십니까|수고 많으십니다|kính gửi|xin chào|chào\\b)",
+  "statuses": {
+    "en": {
+      "CREATED": "created",
+      "EVALUATED": "evaluating",
+      "NEEDS_INPUT": "input required",
+      "AWAITING_REVIEW": "awaiting review",
+      "AWAITING_REPORT_APPROVAL": "awaiting report approval",
+      "APPROVED": "approved",
+      "CANCELLED": "cancelled",
+      "ERROR": "processing error"
+    },
+    "ko": {
+      "CREATED": "생성됨",
+      "EVALUATED": "판정 중",
+      "NEEDS_INPUT": "입력 보완 필요",
+      "AWAITING_REVIEW": "검사 확인 대기",
+      "AWAITING_REPORT_APPROVAL": "성적서 승인 대기",
+      "APPROVED": "승인 완료",
+      "CANCELLED": "취소됨",
+      "ERROR": "처리 오류"
+    },
+    "zh": {
+      "CREATED": "已创建",
+      "EVALUATED": "判定中",
+      "NEEDS_INPUT": "需要输入",
+      "AWAITING_REVIEW": "待审核",
+      "AWAITING_REPORT_APPROVAL": "待批准报告",
+      "APPROVED": "已批准",
+      "CANCELLED": "已取消",
+      "ERROR": "处理错误"
+    }
+  },
+  "lot_pattern": "(?:\\blot\\b|\\bL/N\\b|로트|\\bLô\\b)\\s*(?:no\\.?|number|#|:)?\\s*([A-Za-z0-9][A-Za-z0-9\\-_/]{2,40})"
+}

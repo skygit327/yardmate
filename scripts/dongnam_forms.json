@@ -1,0 +1,211 @@
+[
+  {
+    "file": "01_KO_shipyard_hull_weld.pdf",
+    "language": "ko",
+    "title": "외관 검사 기준\n선체 블록 용접 · (가상) 시연용",
+    "labels": {
+      "item": "검사 항목",
+      "criteria": "판정 기준",
+      "method": "검사 방법",
+      "frequency": "검사 주기"
+    },
+    "header": {
+      "고객사": "(가상) 한바다조선 거제조선소",
+      "문서번호": "HB-WLD-201",
+      "제품명": "174K LNG 운반선 선체 블록",
+      "개정": "C",
+      "부품명": "E21 블록 맞대기 및 필릿 용접부",
+      "도면번호": "E21-HUL-0412",
+      "공정명": "블록 조립 용접",
+      "발행일": "2026-10-12"
+    },
+    "areas": [
+      "맞대기 용접부",
+      "필릿 용접부"
+    ],
+    "method": "육안·게이지",
+    "frequency": "100%",
+    "items": [
+      {
+        "item": "언더컷",
+        "criteria": [
+          "허용: 깊이 <= 0.5 mm",
+          "허용: 깊이 <= 0.8 mm"
+        ]
+      },
+      {
+        "item": "덧살 높이",
+        "criteria": [
+          "높이 <= 3.0 mm",
+          "-"
+        ]
+      },
+      {
+        "item": "각장",
+        "criteria": [
+          "-",
+          "길이 >= 6.0 mm"
+        ]
+      },
+      {
+        "item": "표면 기공",
+        "criteria": [
+          "허용: 직경 < 1.5 mm",
+          "허용: 직경 < 2.0 mm"
+        ]
+      },
+      {
+        "item": "오버랩",
+        "criteria": [
+          "불허",
+          "불허"
+        ]
+      },
+      {
+        "item": "균열",
+        "criteria": [
+          "불허",
+          "불허"
+        ]
+      },
+      {
+        "item": "아크 스트라이크",
+        "criteria": [
+          "불허",
+          "불허"
+        ]
+      }
+    ],
+    "notice": "※ 시연용 가상 양식입니다. 실제 조선소·선급이 발행한 기준이 아닙니다. (SYNTHETIC DEMO)"
+  },
+  {
+    "file": "02_EN_coating_ulsan.pdf",
+    "language": "en",
+    "title": "Visual inspection standard\nHull block coating · synthetic demo",
+    "labels": {
+      "item": "Inspection item",
+      "criteria": "Acceptance criteria",
+      "method": "Method",
+      "frequency": "Coverage"
+    },
+    "header": {
+      "Customer": "(Synthetic) Donghae Heavy Industries, Ulsan",
+      "Document ID": "DH-PNT-110",
+      "Product": "VLCC hull block",
+      "Revision": "B",
+      "Part name": "Ballast tank and outer hull coating",
+      "Drawing no.": "VL-PNT-2208",
+      "Process": "Block painting",
+      "Issue date": "2026-09-30"
+    },
+    "areas": [
+      "Ballast tank",
+      "Outer hull"
+    ],
+    "method": "DFT gauge",
+    "frequency": "100%",
+    "items": [
+      {
+        "item": "Dry film thickness",
+        "criteria": [
+          "DFT >= 320 µm, DFT <= 640 µm",
+          "DFT >= 250 µm, DFT <= 500 µm"
+        ]
+      },
+      {
+        "item": "Surface profile",
+        "criteria": [
+          "Height >= 30 µm, Height <= 75 µm",
+          "Height >= 30 µm, Height <= 75 µm"
+        ]
+      },
+      {
+        "item": "Runs and sags",
+        "criteria": [
+          "Not allowed",
+          "Not allowed"
+        ]
+      },
+      {
+        "item": "Pinholes",
+        "criteria": [
+          "Not allowed",
+          "Not allowed"
+        ]
+      },
+      {
+        "item": "Rust and mill scale",
+        "criteria": [
+          "Not allowed",
+          "Not allowed"
+        ]
+      }
+    ],
+    "notice": "Synthetic demo form. Not issued by any real shipyard, owner or classification society."
+  },
+  {
+    "file": "03_ZH_owner_pipe_weld.pdf",
+    "language": "zh",
+    "title": "外观检验标准\n管系法兰焊接 · 虚拟演示",
+    "labels": {
+      "item": "检验项目",
+      "criteria": "判定标准",
+      "method": "检验方法",
+      "frequency": "检验比例"
+    },
+    "header": {
+      "客户": "(虚拟) 海川船务 上海",
+      "文件编号": "HC-QC-07",
+      "产品": "8,000 TEU 集装箱船 管系",
+      "版本": "A",
+      "零件名称": "压载管法兰焊缝",
+      "图号": "HC-PIP-3310",
+      "工序": "管系预制焊接",
+      "签发日期": "2026-11-02"
+    },
+    "areas": [
+      "法兰角焊缝",
+      "管对接焊缝"
+    ],
+    "method": "目视·量规",
+    "frequency": "100%",
+    "items": [
+      {
+        "item": "咬边",
+        "criteria": [
+          "允许：深度 <= 0.5 mm",
+          "允许：深度 <= 0.3 mm"
+        ]
+      },
+      {
+        "item": "焊缝余高",
+        "criteria": [
+          "不适用",
+          "高度 <= 2.5 mm"
+        ]
+      },
+      {
+        "item": "焊脚长度",
+        "criteria": [
+          "长度 >= 6.0 mm",
+          "不适用"
+        ]
+      },
+      {
+        "item": "气孔",
+        "criteria": [
+          "不允许",
+          "不允许"
+        ]
+      },
+      {
+        "item": "裂纹",
+        "criteria": [
+          "不允许",
+          "不允许"
+        ]
+      }
+    ],
+    "notice": "※ 演示用虚拟表格，并非任何真实船东、船厂或船级社发布的标准。(SYNTHETIC DEMO)"
+  }
+]

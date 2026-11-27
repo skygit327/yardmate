@@ -1,0 +1,180 @@
+{
+  "_comment": "Watched work folders and the default deadlines for tasks created automatically. Deadlines are general defaults; change them here.",
+  "folders": {
+    "customer_forms": "1_고객양식",
+    "ncr": "2_NCR",
+    "requests": "3_고객요청",
+    "reports": "보고서",
+    "done": "처리완료",
+    "failed": "오류",
+    "programs": "4_지원사업공고"
+  },
+  "readme": {
+    "ko": "이 폴더에 파일을 넣으면 Spec Agent가 자동으로 처리합니다.\n\n1_고객양식: 고객사 검사서 PDF (검사 기준표 → 기준서 초안, 한도 승인서 → 견본 목록)\n2_NCR: 부적합 보고서 PDF (원인 공정 분석, 요청 조치 일정)\n3_고객요청: 메일(.eml)·문서·사진 (요청 분석, 회신 초안, 회신 일정)\n4_지원사업공고: 지원사업 공고 PDF·텍스트 (자격요건 자동 판정, 제출서류·마감 일정)\n\n처리 결과 보고서는 '보고서', 원본은 '처리완료'로 옮겨집니다. 처리하지 못한 파일은 '오류'로 옮겨집니다.\n확정(기준서 활성화, 성적서 승인, 회신 발송)은 앱에서 사람이 합니다.\n",
+    "en": "Drop files into these folders and Spec Agent processes them automatically.\n4_지원사업공고: support-programme notices (PDF/text) are judged against the company profile; documents and deadlines become tasks.\n"
+  },
+  "due_days": {
+    "request": {
+      "HIGH": 1,
+      "NORMAL": 3,
+      "LOW": 5
+    },
+    "ncr_actions": [
+      {
+        "match": "containment",
+        "days": 1
+      },
+      {
+        "match": "suspicious window",
+        "days": 2
+      },
+      {
+        "match": "clean point",
+        "days": 3
+      },
+      {
+        "match": "3l+5w",
+        "days": 7
+      },
+      {
+        "match": "8d",
+        "days": 14
+      }
+    ],
+    "ncr_default": 7,
+    "ncr_candidate": 2,
+    "standard_review": 3,
+    "limit_samples": 2,
+    "failed_file": 1,
+    "programs_unknown": 2
+  },
+  "report": {
+    "ko": {
+      "title": "자동 처리 보고서",
+      "file": "파일",
+      "folder": "작업 폴더",
+      "processed": "처리 시각",
+      "status": "결과",
+      "status_DONE": "처리 완료",
+      "status_NEEDS_REVIEW": "확인 필요",
+      "status_ERROR": "처리 실패",
+      "read": "읽은 내용",
+      "created": "만든 결과",
+      "warnings": "확인할 점",
+      "tasks": "등록한 할 일",
+      "due": "기한",
+      "kind_customer_forms": "고객 양식",
+      "kind_ncr": "NCR (부적합 보고서)",
+      "kind_requests": "고객 요청",
+      "note": "이 보고서는 자동으로 작성되었습니다. 기준서 활성화·성적서 승인·회신 발송은 앱에서 담당자가 확정합니다.",
+      "kind_programs": "지원사업 공고"
+    },
+    "en": {
+      "title": "Automatic processing report",
+      "file": "File",
+      "folder": "Work folder",
+      "processed": "Processed at",
+      "status": "Result",
+      "status_DONE": "Processed",
+      "status_NEEDS_REVIEW": "Needs review",
+      "status_ERROR": "Failed",
+      "read": "What was read",
+      "created": "What was created",
+      "warnings": "To check",
+      "tasks": "Tasks added",
+      "due": "Due",
+      "kind_customer_forms": "Customer form",
+      "kind_ncr": "NCR (non-conformance report)",
+      "kind_requests": "Customer request",
+      "note": "This report was written automatically. A person confirms activation, approval and replies in the app.",
+      "kind_programs": "Support programme notice"
+    },
+    "zh": {
+      "title": "自动处理报告",
+      "file": "文件",
+      "folder": "工作文件夹",
+      "processed": "处理时间",
+      "status": "结果",
+      "status_DONE": "已处理",
+      "status_NEEDS_REVIEW": "需要确认",
+      "status_ERROR": "处理失败",
+      "read": "读取内容",
+      "created": "生成内容",
+      "warnings": "待确认事项",
+      "tasks": "新增任务",
+      "due": "截止",
+      "kind_customer_forms": "客户表格",
+      "kind_ncr": "NCR（不合格报告）",
+      "kind_requests": "客户请求",
+      "note": "本报告由系统自动生成。启用、批准和回复由人员在应用中确认。",
+      "kind_programs": "支持项目公告"
+    }
+  },
+  "texts": {
+    "ko": {
+      "Check and activate draft standard {document}": "기준서 초안 {document} 확인 후 활성화",
+      "Confirm the colour mismatch with the customer ({area})": "색상 불일치 고객사 확인 ({area})",
+      "Assign a customer and save limit samples ({file})": "고객사 지정 후 한도 견본 저장 ({file})",
+      "Decide samples on hold: No. {numbers}": "판단 보류 견본 결정: No. {numbers}",
+      "Verify root-cause candidate {rank}: {step}": "원인 후보 {rank}순위 확인: {step}",
+      "Reply to {customer}: {subject}": "{customer} 회신: {subject}",
+      "Check the file that could not be processed: {file}": "처리하지 못한 파일 확인: {file}",
+      "Customer request action: {action}": "고객 요청 조치: {action}",
+      "NCR action: {action}": "NCR 요청 조치: {action}",
+      "Inspection criteria table: {rules} criteria, {review} to check": "검사 기준표: 기준 {rules}개, 확인 필요 {review}개",
+      "Limit-sample approval: {samples} samples (OK {ok}, NG {ng}, on hold {hold})": "한도 승인서: 견본 {samples}개 (OK {ok}, NG {ng}, 보류 {hold})",
+      "Unknown layout": "알 수 없는 양식",
+      "Draft standard {document} revision {revision} (version {version})": "기준서 초안 {document} 개정 {revision} (버전 {version})",
+      "{ncr}: {problem}": "{ncr}: {problem}",
+      "{ng} of {n} pieces out of tolerance, offset {shift} mm": "{n}개 중 {ng}개 공차 벗어남, 치우침 {shift} mm",
+      "Root-cause candidates: {steps}": "원인 공정 후보: {steps}",
+      "Request: {subject} ({customer}, {category}, {priority})": "요청: {subject} ({customer}, {category}, {priority})",
+      "Customer request with analysis and reply draft": "요청 분석과 회신 초안이 담긴 고객 요청",
+      "Root-cause analysis": "원인 공정 분석",
+      "Form reading waiting for a customer": "고객사 지정을 기다리는 양식 읽기 결과",
+      "Error: {error}": "오류: {error}",
+      "unknown customer": "고객사 미상",
+      "Every factor level fails alike ({ng}/{n}): look for a cause shared by all pieces": "모든 요인 수준에서 비슷하게 불량 ({ng}/{n}): 모든 제품이 공통으로 거치는 원인을 찾을 것",
+      "Systematic offset of {shift} mm with small spread ({std} mm)": "계통적 치우침 {shift} mm, 산포는 작음 ({std} mm)",
+      "Failures concentrate on {factor} {level}": "불량이 {factor} {level}에 집중됨",
+      "Defect type not recognised": "불량 유형을 인식하지 못함",
+      "Support programme: {title}": "지원사업: {title}",
+      "Result: {result} · {met}/{required} conditions met · deadline {deadline}": "판정: {result} · 조건 {met}/{required}개 충족 · 마감 {deadline}",
+      "Check conditions the rules could not decide: {title}": "자동 판정이 어려운 조건 확인: {title}",
+      "Not eligible: {reasons}": "신청 불가: {reasons}"
+    },
+    "en": {},
+    "zh": {
+      "Check and activate draft standard {document}": "确认并启用标准草稿 {document}",
+      "Confirm the colour mismatch with the customer ({area})": "与客户确认颜色不一致（{area}）",
+      "Assign a customer and save limit samples ({file})": "指定客户并保存限度样品（{file}）",
+      "Decide samples on hold: No. {numbers}": "判定待定样品：No. {numbers}",
+      "Verify root-cause candidate {rank}: {step}": "确认第 {rank} 位原因候选：{step}",
+      "Reply to {customer}: {subject}": "回复 {customer}：{subject}",
+      "Check the file that could not be processed: {file}": "确认未能处理的文件：{file}",
+      "Customer request action: {action}": "客户请求措施：{action}",
+      "NCR action: {action}": "NCR 措施：{action}",
+      "Inspection criteria table: {rules} criteria, {review} to check": "检验标准表：标准 {rules} 项，待确认 {review} 项",
+      "Limit-sample approval: {samples} samples (OK {ok}, NG {ng}, on hold {hold})": "限度样品批准书：样品 {samples} 个（OK {ok}，NG {ng}，待定 {hold}）",
+      "Unknown layout": "未知格式",
+      "Draft standard {document} revision {revision} (version {version})": "标准草稿 {document} 修订 {revision}（版本 {version}）",
+      "{ncr}: {problem}": "{ncr}：{problem}",
+      "{ng} of {n} pieces out of tolerance, offset {shift} mm": "{n} 件中 {ng} 件超差，偏移 {shift} mm",
+      "Root-cause candidates: {steps}": "原因工序候选：{steps}",
+      "Request: {subject} ({customer}, {category}, {priority})": "请求：{subject}（{customer}，{category}，{priority}）",
+      "Customer request with analysis and reply draft": "含分析和回复草稿的客户请求",
+      "Root-cause analysis": "原因工序分析",
+      "Form reading waiting for a customer": "等待指定客户的表格读取结果",
+      "Error: {error}": "错误：{error}",
+      "unknown customer": "客户未知",
+      "Every factor level fails alike ({ng}/{n}): look for a cause shared by all pieces": "各因素水平不良率相近（{ng}/{n}）：请查找所有产品共同经过的原因",
+      "Systematic offset of {shift} mm with small spread ({std} mm)": "系统性偏移 {shift} mm，离散较小（{std} mm）",
+      "Failures concentrate on {factor} {level}": "不良集中于 {factor} {level}",
+      "Defect type not recognised": "未识别缺陷类型",
+      "Support programme: {title}": "支持项目：{title}",
+      "Result: {result} · {met}/{required} conditions met · deadline {deadline}": "判定：{result} · 满足 {met}/{required} 项条件 · 截止 {deadline}",
+      "Check conditions the rules could not decide: {title}": "确认规则无法判定的条件：{title}",
+      "Not eligible: {reasons}": "不可申请：{reasons}"
+    }
+  }
+}
