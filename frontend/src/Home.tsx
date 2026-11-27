@@ -62,7 +62,7 @@ function CoastMap() {
         {place.note && <text x={place.side === 'left' ? -28 : 28} y="25" textAnchor={place.side === 'left' ? 'end' : 'start'} className="map-note">{t(place.note)}</text>}
       </g>)}
     </svg>
-    <MapLegend note="Synthetic demo companies · not to scale" />
+    <MapLegend note="Synthetic companies" />
   </figure>;
 }
 
@@ -89,12 +89,9 @@ export default function Home({ userName, onGo, busy, perform, onLoaded }: {
   const programs = summary?.programs;
 
   const steps = [
-    { page: 'forms', icon: 'scan', title: 'Read a spec form', text: 'Shipyard, coating or owner form in Korean, English or Chinese → one standard',
-      value: yardStandards.length, unit: 'standards in use', tone: '' },
-    { page: 'inspections', icon: 'list', title: 'Inspect a lot', text: 'Enter weld and coating measurements → pass or fail against that customer',
-      value: failed, unit: 'failed lots to review', tone: failed ? 'bad' : '' },
-    { page: 'inspections', icon: 'file', title: 'Send the report', text: 'One approval, reports in English, Korean and Chinese',
-      value: approved, unit: 'approved reports', tone: approved ? 'good' : '' },
+    { page: 'forms', title: 'Read specs', chips: ['KO', 'EN', '\u4E2D'], value: yardStandards.length, unit: 'standards in use', tone: '' },
+    { page: 'inspections', title: 'Inspect a lot', chips: null, value: failed, unit: 'failed lots to review', tone: failed ? 'bad' : '' },
+    { page: 'inspections', title: 'Send the report', chips: ['EN', 'KO', '\u4E2D'], value: approved, unit: 'approved reports', tone: approved ? 'good' : '' },
   ];
 
   async function loadDemo() {
@@ -108,12 +105,11 @@ export default function Home({ userName, onGo, busy, perform, onLoaded }: {
   return <div className="home">
     <header className="home-hero">
       <div><small>{new Date().toLocaleDateString(locale, { month: 'long', day: 'numeric', weekday: 'long' })}</small>
-        <h1>{t("Hello")}, {userName}</h1>
-        <p className="home-lede">{t("Every shipyard, class society and owner writes its specs differently. Read them once, inspect against the right one, and report in the language each reader needs.")}</p></div>
+        <h1>{t("Hello")}, {userName}</h1></div>
     </header>
 
     {summary && yardStandards.length === 0 && <div className="demo-banner">
-      <div><strong>{t("No shipyard specs yet")}</strong><span>{t("Load three synthetic forms (Korean shipyard, English coating, Chinese owner), four lots and three support notices.")}</span></div>
+      <strong>{t("No shipyard specs yet")}</strong>
       <button className="primary" disabled={busy} onClick={() => void loadDemo()}><Icon name="upload" />{t("Load the shipyard demo")}</button>
     </div>}
 
@@ -121,19 +117,18 @@ export default function Home({ userName, onGo, busy, perform, onLoaded }: {
       {!mapFailed
         ? <figure className="coast-map live">
           <LiveMap onRegion={region => onGo('programs', { region })} onFail={() => setMapFailed(true)} />
-          <MapLegend note="Synthetic demo companies · city-level pins · tap a pin for its notices" />
+          <MapLegend note="Synthetic companies" />
         </figure>
         : <CoastMap />}
       <div className="home-flow">
         <ol className="yard-steps">{steps.map((step, index) => <li key={step.title}>
           <button className="yard-step" onClick={() => onGo(step.page)}>
             <span className="flow-index" aria-hidden="true">{index + 1}</span>
-            <span className="flow-text"><strong>{t(step.title)}</strong><small>{t(step.text)}</small></span>
+            <span className="flow-text"><strong>{t(step.title)}</strong>{step.chips && <span className="flow-chips">{step.chips.map(chip => <span key={chip}>{chip}</span>)}</span>}</span>
             <span className={`flow-stat ${step.tone}`}><b>{step.value}</b><small>{t(step.unit)}</small></span>
           </button></li>)}</ol>
         <button className="support-card" onClick={() => onGo('programs')}>
-          <span className="support-head"><Icon name="grant" size={20} /><strong>{t("Support for shipbuilding crisis areas")}</strong></span>
-          <small>{t("Geoje, Tongyeong, Goseong, Ulsan Dong-gu and Changwon Jinhae notices judged against your company")}</small>
+          <span className="support-head"><Icon name="grant" size={20} /><strong>{t("Support for shipbuilding crisis areas")}</strong><Icon name="next" size={16} /></span>
           {programs && <span className="support-stats">
             <span className="good"><b>{programs.eligible}</b>{t("can apply")}</span>
             <span className="warn"><b>{programs.check}</b>{t("to check")}</span>

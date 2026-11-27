@@ -56,13 +56,13 @@ test('workspace renders in the saved language with an accessible toggle', async 
     for (const language of ['en', 'ko']) {
       Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: { getItem: () => language } });
       const html = render(app);
-      assert.ok(html.includes(language === 'ko' ? '검사·성적서' : 'Inspections &amp; reports'));
+      assert.ok(html.includes(language === 'ko' ? '기준서 읽기' : 'Read specs'));
       assert.ok(html.includes(language === 'ko' ? '영어로 전환' : 'Switch to Korean'));
       assert.ok(html.includes('Jane Kim'));
       assert.ok(render(createElement(AuthGate)).includes(language === 'ko' ? '로그인 상태 확인 중...' : 'Checking your session...'));
     }
     Object.defineProperty(globalThis, 'localStorage', { configurable: true, get() { throw new Error('Storage unavailable'); } });
-    assert.ok(render(app).includes('Inspections &amp; reports'));
+    assert.ok(render(app).includes('Read specs'));
   } finally {
     if (storage) Object.defineProperty(globalThis, 'localStorage', storage);
     else delete globalThis.localStorage;

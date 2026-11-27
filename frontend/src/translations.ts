@@ -9,6 +9,20 @@ export const languages: { code: Language; label: string; short: string; switchLa
 export { chinese };
 
 export const korean: Record<string, string> = {
+  "Open standard": "열기",
+  "Show notice wording": "원문 보기",
+  "Hide notice wording": "원문 숨기기",
+  "No external AI": "외부 AI 미사용",
+  "AI may assist": "AI 보조 가능",
+  "Korean, English or Chinese": "한국어·영어·중국어",
+  "Passed items": "합격 항목",
+  "Passed": "합격",
+  "Synthetic": "가상",
+  "Sample": "샘플",
+  "Synthetic companies": "가상 기업",
+  "Support": "지원사업",
+  "Read specs": "기준서 읽기",
+  "Main": "메인 메뉴",
   "Loading the map…": "지도를 불러오는 중…",
   "Show notices for this region": "이 지역 공고 보기",
   "Synthetic demo companies · city-level pins · tap a pin for its notices": "가상 시연 기업 · 도시 단위 표시 · 핀을 누르면 그 지역 공고",

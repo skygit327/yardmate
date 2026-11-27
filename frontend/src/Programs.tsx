@@ -42,12 +42,6 @@ const statusTone = { pass: 'pass', fail: 'fail', unknown: 'warning' } as const;
 const groupTitle: Record<Group, string> = {
   eligibility: 'Who can apply', exclusion: 'Exclusions', preferred: 'Preferred (bonus points)',
 };
-const overallHint: Record<Overall, string> = {
-  ELIGIBLE: 'Every required condition is met. Register the documents and deadline as tasks.',
-  CHECK: 'No condition fails, but some could not be decided automatically. Read the highlighted sentences.',
-  INELIGIBLE: 'At least one required condition is not met.',
-  CLOSED: 'The application period has ended.',
-};
 
 function dday(days: number | null) {
   if (days === null) return '';
@@ -60,6 +54,18 @@ const textToList = (text: string) => text.split(/[,\n]/).map(item => item.trim()
 
 interface FeedRun { mode: 'live' | 'sample'; fetched?: number; matched?: number; added?: number; error?: string; at: string }
 interface FeedStatus { mode: 'live' | 'sample'; last: FeedRun | null }
+
+// Province names as the notices write them (Busan, Ulsan, Gyeongnam), escaped to keep the source ASCII.
+const regionNames: Record<string, Texts> = {
+  '\uBD80\uC0B0': { en: 'Busan', ko: '\uBD80\uC0B0', zh: '\u91DC\u5C71' },
+  '\uC6B8\uC0B0': { en: 'Ulsan', ko: '\uC6B8\uC0B0', zh: '\u851A\u5C71' },
+  '\uACBD\uB0A8': { en: 'Gyeongnam', ko: '\uACBD\uB0A8', zh: '\u5E86\u5357' },
+};
+
+// "[Sample · synthetic notice] 2026 ..." -> "2026 ..."; the synthetic chip says it instead.
+function plainTitle(title: string) {
+  return title.replace(/^\s*\[[^\]]*\]\s*/, '');
+}
 
 export default function Programs({ busy, perform, initialProgram, onProgramUsed, onOpenTasks, initialView, initialRegion }: {
   busy: boolean; perform: (task: () => Promise<void>) => Promise<void>;
@@ -83,6 +89,7 @@ export default function Programs({ busy, perform, initialProgram, onProgramUsed,
   const [origin, setOrigin] = useState<'all' | 'bizinfo' | 'manual' | 'sample'>('all');
   const [sort, setSort] = useState<'deadline' | 'newest' | 'met'>('deadline');
   const [detailed, setDetailed] = useState(Boolean(initialRegion));
+  const [showWording, setShowWording] = useState(false);
 
   async function load() {
     const [list, company, status] = await Promise.all([api<Program[]>('/programs'), api<Profile>('/company-profile'), api<FeedStatus>('/programs/feed').catch(() => null)]);
@@ -171,11 +178,8 @@ export default function Programs({ busy, perform, initialProgram, onProgramUsed,
 
   const profileLine = profile && <div className="profile-strip">
     <Icon name="building" size={18} />
-    <span><strong>{profile.name || t("Company profile")}</strong> · {profile.region || '-'} · {profile.industry || '-'}
-      {profile.employees !== null && <> · {profile.employees} {t("employees")}</>}
-      {profile.revenue_eok !== null && <> · {t("revenue")} {profile.revenue_eok} {t("×100M KRW")}</>}</span>
-    {profile.demo && <span className="chip demo-chip">{t("Demo company")}</span>}
-    <button className="small ghost" onClick={() => { setSelected(null); setView('profile'); }}><Icon name="edit" size={14} />{t("Edit profile")}</button>
+    <span><strong>{profile.name || t("Company profile")}</strong> · {profile.region || '-'}</span>
+    <button className="small ghost" onClick={() => { setSelected(null); setView('profile'); }} aria-label={t("Edit profile")} title={t("Edit profile")}><Icon name="edit" size={14} /></button>
   </div>;
 
   // --- detail -------------------------------------------------------------------------------
@@ -186,10 +190,10 @@ export default function Programs({ busy, perform, initialProgram, onProgramUsed,
       <div className="panel-top">
         <button className="ghost" onClick={() => setSelected(null)}><Icon name="back" />{t("Back")}</button>
         <span className={`badge ${overallTone[match.overall]}`}>{t(overallLabel[match.overall])}</span>
-        {notice.synthetic && <span className="chip">{t("Synthetic sample notice")}</span>}
-        {selected.source === 'bizinfo' && <span className="chip source-chip">{t("Collected from Bizinfo")}</span>}
+        {notice.synthetic && <span className="chip synthetic">{t("Synthetic")}</span>}
+        {selected.source === 'bizinfo' && <span className="chip source-chip">{t("Bizinfo")}</span>}
       </div>
-      <h1 className="program-title">{notice.title}</h1>
+      <h1 className="program-title">{plainTitle(notice.title)}</h1>
       {selected.fit && <p className="fit-line">{selected.fit.reasons.map(pick).join(' · ')}
         {selected.url && <> · <a href={selected.url} target="_blank" rel="noopener noreferrer">{t("Open the original notice")}</a></>}</p>}
       <div className="program-meta">
@@ -202,9 +206,9 @@ export default function Programs({ busy, perform, initialProgram, onProgramUsed,
       <div className={`program-verdict ${overallTone[match.overall]}`}>
         <div><strong>{match.met}/{match.required}</strong><span>{t("required conditions met")}</span></div>
         {match.preferred > 0 && <div><strong>{match.bonus}/{match.preferred}</strong><span>{t("preferred conditions met")}</span></div>}
-        <p>{t(overallHint[match.overall])}</p>
+        <button type="button" className="ghost small wording-toggle" aria-pressed={showWording} onClick={() => setShowWording(value => !value)}>
+          <Icon name="file" size={14} />{t(showWording ? "Hide notice wording" : "Show notice wording")}</button>
       </div>
-      {profileLine}
 
       {groups.map(group => {
         const rows = match.conditions.filter(c => c.group === group);
@@ -212,10 +216,10 @@ export default function Programs({ busy, perform, initialProgram, onProgramUsed,
         return <div key={group} className="condition-block">
           <h2>{t(groupTitle[group])}</h2>
           <div className="table-scroll"><table className="program-table">
-            <thead><tr><th>{t("Condition")}</th><th>{t("The notice says")}</th><th>{t("Our company")}</th><th>{t("Result")}</th></tr></thead>
-            <tbody>{rows.map(row => <tr key={row.id} className={row.status}>
+            <thead><tr><th>{t("Condition")}</th>{showWording && <th>{t("The notice says")}</th>}<th>{t("Our company")}</th><th>{t("Result")}</th></tr></thead>
+            <tbody>{rows.map(row => <tr key={row.id} className={row.status} title={showWording ? undefined : row.source}>
               <td><strong>{pick(row.label)}</strong></td>
-              <td className="original-text">“{row.source}”</td>
+              {showWording && <td className="original-text">“{row.source}”</td>}
               <td>{pick(row.actual)}</td>
               <td><span className={`badge ${statusTone[row.status]}`}>{t(statusLabel[row.status])}</span></td>
             </tr>)}</tbody>
@@ -295,22 +299,16 @@ export default function Programs({ busy, perform, initialProgram, onProgramUsed,
 
   // --- list -----------------------------------------------------------------------------------
   return <>
-    <header className="page-header"><div><h1>{t("Support programmes")}</h1>
-      <p className="muted">{t("Notices from Busan, Ulsan and Gyeongnam agencies, judged for your company")}</p></div>
+    <header className="page-header"><h1>{t("Support")}</h1>
       <div className="card-actions">
-        <button disabled={busy} onClick={() => perform(addSamples)}><Icon name="file" size={16} />{t("Load sample notices")}</button>
-        <button className="primary" disabled={busy} onClick={() => setView('add')}><Icon name="plus" size={16} />{t("Add a notice")}</button>
+        <button className="icon-button" disabled={busy} onClick={() => setView('add')} aria-label={t("Add a notice")} title={t("Add a notice")}><Icon name="plus" size={18} /></button>
+        <button className="primary" disabled={busy} onClick={() => perform(collect)} title={feed?.mode === 'live' ? t("Every 12 hours with your API key") : t("No API key: a synthetic sample response is used")}><Icon name="download" size={16} />{t("Collect now")}</button>
       </div></header>
-    {profileLine}
-    <div className="feed-bar">
-      <span className="feed-text"><Icon name="refresh" size={16} />
-        <strong>{t("Automatic collection from Bizinfo")}</strong>
-        <span className="muted">{feed?.mode === 'live' ? t("Every 12 hours with your API key") : t("No API key: a synthetic sample response is used")}</span>
-        {feed?.last && (feed.last.error
-          ? <span className="feed-error">{t("Collection failed")}: {feed.last.error}</span>
-          : <span>{t("Last run")} {new Date(feed.last.at).toLocaleString(locale, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })} · {t("{matched} of {fetched} fit your company, {added} new").replace('{matched}', String(feed.last.matched ?? 0)).replace('{fetched}', String(feed.last.fetched ?? 0)).replace('{added}', String(feed.last.added ?? 0))}</span>)}
-      </span>
-      <button disabled={busy} onClick={() => perform(collect)}><Icon name="download" size={16} />{t("Collect now")}</button>
+    <div className="context-line">
+      {profileLine}
+      {feed?.last && <span className={`feed-status ${feed.last.error ? 'bad' : ''}`} title={feed.last.error ?? undefined}>
+        <Icon name="refresh" size={14} />{t("Bizinfo")}{feed.mode === 'sample' && <span className="chip">{t("Sample")}</span>}
+        {feed.last.error ? t("Collection failed") : <>{new Date(feed.last.at).toLocaleString(locale, { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })} · +{feed.last.added ?? 0}</>}</span>}
     </div>
     <div className="program-search" role="search">
       <div className="search-line">
@@ -329,7 +327,7 @@ export default function Programs({ busy, perform, initialProgram, onProgramUsed,
       {detailed && <div className="detail-filters">
         <label>{t("Region")}<select value={region} onChange={event => setRegion(event.target.value)}>
           <option value="">{t("All regions")}</option>
-          {(profile?.choices.regions ?? []).map(name => <option key={name} value={name}>{name}</option>)}
+          {(profile?.choices.regions ?? []).map(name => <option key={name} value={name}>{regionNames[name] ? pick(regionNames[name]) : name}</option>)}
         </select><small>{t("Nationwide notices are included")}</small></label>
         <label>{t("Deadline")}<select value={due} onChange={event => setDue(event.target.value as typeof due)}>
           <option value="all">{t("Any time")}</option>
@@ -346,24 +344,24 @@ export default function Programs({ busy, perform, initialProgram, onProgramUsed,
       {filtering && <p className="search-result">{t("{count} notices match").replace('{count}', String(searched.length))}
         <button type="button" className="ghost small" onClick={resetFilters}><Icon name="x" size={14} />{t("Clear filters")}</button></p>}
     </div>
-    <div className="filter-tiles four" role="group" aria-label={t("Filter programmes")}>
-      {(['ELIGIBLE', 'CHECK', 'INELIGIBLE', 'ALL'] as const).map(kind => <button key={kind} aria-pressed={filter === kind}
-        className={`${filter === kind ? 'selected' : ''} ${kind === 'INELIGIBLE' && counts(kind) ? 'bad' : ''}`} onClick={() => setFilter(kind)}>
-        <strong>{counts(kind)}</strong><span>{t(kind === 'ALL' ? 'All notices' : overallLabel[kind])}</span></button>)}
+    <div className="status-tabs" role="group" aria-label={t("Filter programmes")}>
+      {(['ALL', 'ELIGIBLE', 'CHECK', 'INELIGIBLE'] as const).map(kind => <button key={kind} aria-pressed={filter === kind}
+        className={`${filter === kind ? 'selected' : ''} ${kind === 'ALL' ? '' : overallTone[kind]}`} onClick={() => setFilter(kind)}>
+        {t(kind === 'ALL' ? 'All' : overallLabel[kind])}<b>{counts(kind)}</b></button>)}
     </div>
-    <section className="panel">
+    <section className="program-list">
       {programs.length === 0
         ? <div className="empty"><p>{t("No notices yet. Add one, drop a file into the support-notice work folder, or load the samples.")}</p>
           <button className="primary big" disabled={busy} onClick={() => perform(addSamples)}><Icon name="file" />{t("Load sample notices")}</button></div>
         : visible.length === 0 ? <div className="empty"><p className="muted center">{filtering ? t("No notices match these filters.") : t("No notices in this group.")}</p>
           {filtering && <button type="button" onClick={resetFilters}>{t("Clear filters")}</button>}</div>
           : <div className="inspection-list">{visible.map(program => <button key={program.id} className="inspection-row program-row" disabled={busy} onClick={() => setSelected(program)}>
-            <div><strong>{program.notice.title}</strong>
+            <div><strong>{program.notice.synthetic && <span className="chip synthetic">{t("Synthetic")}</span>}{plainTitle(program.notice.title)}</strong>
               {program.facets && <span className="row-tags">{program.facets.categories.map(key => <span key={key} className="tag">{pick(profile?.choices.categories?.[key] ?? { en: key, ko: key, zh: key })}</span>)}
-                {program.facets.regions.map(name => <span key={name} className="tag region">{name === '*' ? t("Nationwide") : name}</span>)}</span>}
-              <small>{program.source === 'bizinfo' && <span className="source-mark">{t("Bizinfo")} · </span>}{program.notice.agency || '-'} · {t("Deadline")} {fmtDate(program.notice.deadline)}
-                {program.notice.amount && <> · {program.notice.amount.text}</>} · {t("Conditions met")} {program.match.met}/{program.match.required}
-                {program.tasks.length > 0 && <> · {t("Tasks registered")}</>}</small></div>
+                {program.facets.regions.map(name => <span key={name} className="tag region">{name === '*' ? t("Nationwide") : regionNames[name] ? pick(regionNames[name]) : name}</span>)}</span>}
+              <small>{program.source === 'bizinfo' && <span className="source-mark">{t("Bizinfo")} · </span>}{program.notice.agency || '-'}
+                {program.notice.amount && <> · {program.notice.amount.text}</>}{program.tasks.length > 0 && <> · <Icon name="calendar" size={12} /></>}</small></div>
+            <span className="met" title={t("Conditions met")}><b>{program.match.met}</b>/{program.match.required}</span>
             {program.match.days_left !== null && program.match.overall !== 'CLOSED'
               ? <span className={`chip ${program.match.days_left <= 7 ? 'soon' : ''}`}>{dday(program.match.days_left)}</span> : <span />}
             <span className={`badge ${overallTone[program.match.overall]}`}>{t(overallLabel[program.match.overall])}</span>

@@ -157,20 +157,21 @@ export default function FormIntake({ busy, perform, onOpenStandard, initialReadi
   }
 
   if (!reading) return <>
-    <header className="page-header"><div><h1>{t("Customer forms")}</h1>
-      <p className="muted">{t("Read a customer's inspection form and convert it into the standard layout.")}</p></div></header>
-    <section className="panel intake-start">
-      <h2 className="step-title"><span>1</span>{t("What kind of document is it?")}</h2>
-      <div className="segmented">
-        <button type="button" className={provenance === 'INTERNAL' ? 'selected' : ''} onClick={() => setProvenance('INTERNAL')}>{t("Real customer document")}</button>
-        <button type="button" className={provenance === 'SYNTHETIC' ? 'selected' : ''} onClick={() => setProvenance('SYNTHETIC')}>{t("Demo or sample document")}</button>
-      </div>
-      <p className="muted">{provenance === 'INTERNAL' ? t("Real customer documents are never sent to an external AI.") : t("Sample documents may be sent to the AI selected in AI settings.")}</p>
-      <h2 className="step-title"><span>2</span>{t("Upload the PDF")}</h2>
-      <label className={`dropzone ${busy ? 'disabled' : ''}`}><Icon name="upload" size={28} />
-        <strong>{t("Choose a customer form (PDF)")}</strong><small>{t("Inspection criteria tables and limit-sample approvals are recognised.")}</small>
+    <header className="page-header"><h1>{t("Read specs")}</h1></header>
+    <section className="intake-start compact">
+      <label className={`dropzone big ${busy ? 'disabled' : ''}`}><Icon name="upload" size={30} />
+        <strong>{t("Choose a customer form (PDF)")}</strong>
+        <span className="flow-chips" aria-label={t("Korean, English or Chinese")}><span>KO</span><span>EN</span><span>{'\u4E2D'}</span></span>
         <input className="file-input" type="file" accept=".pdf,application/pdf" disabled={busy}
           onChange={event => { const file = event.target.files?.[0]; if (file) void read(file); event.target.value = ''; }} /></label>
+      <div className="intake-options">
+        <div className="segmented small" role="group" aria-label={t("What kind of document is it?")}>
+          <button type="button" aria-pressed={provenance === 'INTERNAL'} className={provenance === 'INTERNAL' ? 'selected' : ''} onClick={() => setProvenance('INTERNAL')}>{t("Real customer document")}</button>
+          <button type="button" aria-pressed={provenance === 'SYNTHETIC'} className={provenance === 'SYNTHETIC' ? 'selected' : ''} onClick={() => setProvenance('SYNTHETIC')}>{t("Demo or sample document")}</button>
+        </div>
+        <span className="muted lock-note" title={provenance === 'INTERNAL' ? t("Real customer documents are never sent to an external AI.") : t("Sample documents may be sent to the AI selected in AI settings.")}>
+          <Icon name={provenance === 'INTERNAL' ? 'lock' : 'spark'} size={14} />{provenance === 'INTERNAL' ? t("No external AI") : t("AI may assist")}</span>
+      </div>
     </section>
   </>;
 

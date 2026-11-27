@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { api, requestId } from './api';
 import { DocLanguagePicker, reportLanguages } from './docLanguage';
@@ -298,18 +298,23 @@ export default function App({ user, onLogout, loggingOut }: {
         : { name: 'approve', label: 'Approve report', icon: 'check' }
     : null;
 
+  const navItems: { tab: string; icon: string; label: string; hint?: string }[] = [
+    { tab: 'home', icon: 'home', label: 'Home' },
+    { tab: 'forms', icon: 'scan', label: 'Read specs', hint: 'Shipyard, coating and owner forms in Korean, English or Chinese → one standard' },
+    { tab: 'standards', icon: 'book', label: 'Standards' },
+    { tab: 'inspections', icon: 'list', label: 'Inspections' },
+    { tab: 'programs', icon: 'grant', label: 'Support', hint: 'Support notices judged for your company, deadlines as tasks' },
+    { tab: 'tasks', icon: 'calendar', label: 'Tasks' },
+  ];
+
   return <div className="app-shell">
     <aside className="sidebar">
       <a className="brand" href="/" aria-label={t("YardMate home")}><span className="brand-mark" aria-hidden="true"><svg viewBox="0 0 40 40" width="40" height="40"><path d="M6 22h28l-4 9H10z" fill="#c4532f" /><path d="M6 22h28" stroke="#fff" strokeWidth="2" /><path d="M12 22V12h9v10M23 22v-6h6v6" fill="none" stroke="#dbe7ef" strokeWidth="2.4" strokeLinejoin="round" /></svg></span><div>YardMate<small>{t("Shipyard supplier workspace")}</small></div></a>
-      <nav>
-        <button className={tab === 'home' ? 'active' : ''} onClick={() => go('home')}><Icon name="home" />{t("Home")}</button>
-        <p className="nav-group">{t("Shipyard specs")}</p>
-        <button className={tab === 'forms' ? 'active' : ''} onClick={() => go('forms')} title={t("Shipyard, coating and owner forms in Korean, English or Chinese → one standard")}><Icon name="scan" />{t("Read a spec form")}</button>
-        <button className={tab === 'standards' ? 'active' : ''} onClick={() => go('standards')}><Icon name="book" />{t("Standards library")}</button>
-        <button className={tab === 'inspections' ? 'active' : ''} onClick={() => go('inspections')}><Icon name="list" />{t("Inspections & reports")}</button>
-        <p className="nav-group">{t("Local support")}</p>
-        <button className={tab === 'programs' ? 'active' : ''} onClick={() => go('programs')} title={t("Support notices judged for your company, deadlines as tasks")}><Icon name="grant" />{t("Support programmes")}</button>
-        <button className={tab === 'tasks' ? 'active' : ''} onClick={() => go('tasks')}><Icon name="calendar" />{t("Tasks & schedule")}</button></nav>
+      <nav aria-label={t("Main")}>
+        {navItems.map((item, index) => <Fragment key={item.tab}>
+          {index === 1 || index === 4 ? <span className="nav-divider" aria-hidden="true" /> : null}
+          <button className={tab === item.tab ? 'active' : ''} aria-current={tab === item.tab ? 'page' : undefined} onClick={() => go(item.tab)} title={item.hint ? t(item.hint) : undefined}>
+            <Icon name={item.icon} /><span>{t(item.label)}</span></button></Fragment>)}</nav>
       <button className="sidebar-cta primary" disabled={busy} onClick={startInspection}><Icon name="plus" />{t("New inspection")}</button>
       <button className={`sidebar-note ${tab === 'ai' ? 'active' : ''}`} onClick={() => setTab('ai')} title={llm && llm.provider !== 'none' && llm.external && !llm.allow_internal ? t("Internal standards and customer requests use the rule-based analysis.") : undefined}>
         <span className={`live-dot ${llm && llm.provider !== 'none' ? 'ai' : ''}`} />
@@ -321,25 +326,26 @@ export default function App({ user, onLogout, loggingOut }: {
       </button>
     </aside>
     <main>
-      <div className="account-bar"><span className="chip demo-chip">{t("Demo data")}</span><LanguageToggle /><span className="user-name">{user.display_name}</span>
+      <div className="account-bar"><span className="mobile-brand" aria-hidden="true">YardMate</span><span className="chip demo-chip">{t("Demo data")}</span><LanguageToggle /><span className="user-name">{user.display_name}</span>
         <button className="icon-button" aria-label={t("Sign out")} title={t("Sign out")} disabled={busy || loggingOut} onClick={() => void onLogout()}><Icon name="logout" /></button></div>
       {error && <div role="alert" className="error-banner">{t(error)}<button onClick={() => setError('')} aria-label={t("Dismiss error")}><Icon name="x" /></button></div>}
       {busy && <div className="busy" role="status"><span className="spinner" />{t("Processing...")}</div>}
 
       {tab === 'inspections' && !creating && !selected && <>
-        <header className="page-header"><h1>{t("Inspection workspace")}</h1>
+        <header className="page-header"><h1>{t("Inspections")}</h1>
           <button className="primary big" disabled={busy} onClick={startInspection}><Icon name="plus" />{t("New inspection")}</button></header>
-        <div className="filter-tiles" role="group" aria-label={t("Filter inspections")}>
-          {(['all', 'pending', 'approved'] as const).map(key => <button key={key} aria-pressed={filter === key} className={filter === key ? 'selected' : ''} onClick={() => setFilter(key)}>
-            <strong>{counts[key]}</strong><span>{t(key === 'all' ? 'All' : key === 'pending' ? 'Pending review' : 'Approved')}</span></button>)}
-        </div>
-        <section className="panel">
-          <div className="toolbar"><input className="search" aria-label={t("Search inspections")} placeholder={t("Search lot / part")} value={search} onChange={event => setSearch(event.target.value)} />
+        <div className="list-toolbar">
+          <div className="status-tabs" role="group" aria-label={t("Filter inspections")}>
+            {(['all', 'pending', 'approved'] as const).map(key => <button key={key} aria-pressed={filter === key} className={`${filter === key ? 'selected' : ''} ${key === 'pending' ? 'warning' : key === 'approved' ? 'pass' : ''}`} onClick={() => setFilter(key)}>
+              {t(key === 'all' ? 'All' : key === 'pending' ? 'Pending review' : 'Approved')}<b>{counts[key]}</b></button>)}
+          </div>
+          <label className="search-box"><Icon name="search" size={16} /><input type="search" aria-label={t("Search inspections")} placeholder={t("Search lot / part")} value={search} onChange={event => setSearch(event.target.value)} /></label>
             <button className="icon-button" aria-label={t("Refresh")} title={t("Refresh")} disabled={busy} onClick={() => perform(refresh)}><Icon name="refresh" /></button></div>
+        <section className="program-list">
           {inspections.length === 0 ? <div className="empty"><button className="primary big" disabled={busy} onClick={startInspection}><Icon name="plus" />{t("Start your first inspection")}</button></div>
             : visible.length === 0 ? <p className="muted center">{t("No matching inspections.")}</p>
               : <div className="inspection-list">{visible.map(item => <button className="inspection-row" key={item.inspection_id} disabled={busy} onClick={() => perform(() => open(item.inspection_id))}>
-                <div><strong>{item.inputs.lot}</strong><small>{item.standard.part_number} · {new Date(item.created_at).toLocaleDateString(locale)}</small></div>
+                <div><strong>{item.inputs.lot}</strong><small>{item.standard.customer} · {new Date(item.created_at).toLocaleDateString(locale, { month: 'numeric', day: 'numeric' })}</small></div>
                 <Badge value={item.overall_result} /><Badge value={item.status} /><Icon name="next" size={16} />
               </button>)}</div>}
         </section>
@@ -369,7 +375,11 @@ export default function App({ user, onLogout, loggingOut }: {
         <Stepper status={selected.status} />
         {selected.status === 'CANCELLED' && <p className="warning-text center">{t("Cancelled")}</p>}
 
-        <div className="results">{selected.item_results.map(result => <article className={`result-row ${result.auto_result.toLowerCase()} ${result.warning ? 'warn' : ''}`} key={result.rule_id}>
+        {(() => {
+          const attention = selected.item_results.filter(result => result.auto_result === 'FAIL' || result.auto_result === 'REVIEW' || result.warning);
+          const passed = selected.item_results.filter(result => !attention.includes(result) && result.auto_result !== 'N_A');
+          const skipped = selected.item_results.filter(result => result.auto_result === 'N_A');
+          const card = (result: typeof selected.item_results[number]) => <article className={`result-row ${result.auto_result.toLowerCase()} ${result.warning ? 'warn' : ''}`} key={result.rule_id}>
           <div className="result-main"><div><small>{result.area}</small><strong>{result.item}</strong></div>
             <div className="numbers"><span>{t(result.measured)}</span><small>{t("Criteria")} {t(result.criteria)}</small></div>
             <div className="inline">{result.warning && <span className="badge warning">{t("Warning")}</span>}<Badge value={result.final_result ?? result.auto_result} /></div></div>
@@ -382,7 +392,21 @@ export default function App({ user, onLogout, loggingOut }: {
               onChange={value => setDecisions({ ...decisions, [result.rule_id]: { result: value, reason: decisions[result.rule_id]?.reason ?? '' } })} />
             <input maxLength={1000} disabled={busy} value={decisions[result.rule_id]?.reason ?? ''} placeholder={t("Reason (required)")} aria-label={t("Review reason")}
               onChange={event => setDecisions({ ...decisions, [result.rule_id]: { result: decisions[result.rule_id]?.result ?? '', reason: event.target.value } })} /></div>}
-        </article>)}</div>
+        </article>;
+          return <>
+            {attention.length > 0 && <div className="results">{attention.map(card)}</div>}
+            {passed.length > 0 && <div className="result-table" role="table" aria-label={t("Passed items")}>
+              <div className="result-table-head" role="row"><span role="columnheader">{t("Passed")} {passed.length}</span></div>
+              {passed.map(result => <div className="result-line" role="row" key={result.rule_id} title={`${t("Source")}: ${result.source}`}>
+                <span role="cell"><small>{result.area}</small> {result.item}</span>
+                <span role="cell" className="num">{t(result.measured)}</span>
+                <span role="cell" className="crit">{t(result.criteria)}</span>
+                <span role="cell"><Badge value={result.final_result ?? result.auto_result} /></span></div>)}
+            </div>}
+            {skipped.length > 0 && <details className="skipped"><summary>{t("Not applicable")} {skipped.length}</summary>
+              <ul>{skipped.map(result => <li key={result.rule_id}>{result.area} · {result.item}</li>)}</ul></details>}
+          </>;
+        })()}
 
         {selected.pending?.kind === 'correction' && <div className="correction"><h2 className="step-title"><span>!</span>{t("Fill in the missing values")}</h2><fieldset disabled={busy}><RuleFields rules={selected.standard.rules} values={values} onChange={setValues} /></fieldset></div>}
 
@@ -426,17 +450,17 @@ export default function App({ user, onLogout, loggingOut }: {
         onSelect={setRequestSelected} onCreate={setRequestCreating} onOpenCustomer={openCustomer} onOpenInspection={openInspection} onOpenStandard={openStandard} />}
       {tab === 'standards' && family && <StandardWorkspace key={`${family}-${familyInstruction}`} lineage={family} initialInstruction={familyInstruction} busy={busy} perform={perform} onClose={() => { setFamily(null); setFamilyInstruction(''); }} onChanged={refresh} />}
       {tab === 'standards' && !family && <>
-        <header className="page-header"><h1>{t("Standards library")}</h1>
+        <header className="page-header"><h1>{t("Standards")}</h1>
           <label className="button"><Icon name="upload" />{t("Import JSON")}<input className="file-input" type="file" accept=".json" disabled={busy} onChange={event => { const file = event.target.files?.[0]; if (file) importStandard(file); event.target.value = ''; }} /></label></header>
-        <div className="standard-grid">{families.map(({ head: standard, versions, active }) => <article className="standard-card" key={lineageOf(standard)}>
+        <div className="standard-grid">{families.filter(item => !item.head.id.startsWith('demo-cover') || families.every(other => other.head.id.startsWith('demo-cover'))).map(({ head: standard, versions, active }) => <article className="standard-card" key={lineageOf(standard)}>
           <div className="card-head"><span className={`badge ${standard.status.toLowerCase()}`}>{standard.status === 'ACTIVE' ? t("Active") : standard.status === 'DRAFT' ? t("Draft") : t("Superseded")}</span><span className="chip">{t('Rev')} {standard.revision}</span></div>
           <h3>{standard.product_name}</h3>
-          <p className="muted">{standard.customer} · {standard.part_number}</p>
-          <p className="meta">{standard.rules.length} {t("items")} · {versions.length} {t("versions")}{standard.status === 'DRAFT' && active ? ` · ${t('Current revision')} ${active.revision}` : ''}{standard.provenance === 'SYNTHETIC' ? ` · ${t('Demo')}` : ''}</p>
+          <p className="muted">{standard.customer}</p>
+          <p className="meta">{standard.rules.length} {t("items")}{versions.length > 1 ? ` · ${versions.length} ${t("versions")}` : ''}{standard.status === 'DRAFT' && active ? ` · ${t('Current revision')} ${active.revision}` : ''}</p>
           <div className="card-actions">
-            <button className="primary" disabled={busy} onClick={() => setFamily(lineageOf(standard))}><Icon name="edit" />{t("Revise / versions")}</button>
+            <button className="primary" disabled={busy} onClick={() => setFamily(lineageOf(standard))} title={t("Revise / versions")}><Icon name="edit" />{t("Open standard")}</button>
             <a className="button icon-button" title={t("Standard PDF")} aria-label={t("Standard PDF")} href={`/api/standards/${standard.id}/document/pdf${language === 'en' ? '' : `?lang=${language}`}`} target="_blank" rel="noreferrer"><Icon name="file" /></a>
-            {formFamilies.has(lineageOf(standard)) && <a className="button" title={t("Customer form")} href={`/api/standards/${standard.id}/customer-form/xlsx`}><Icon name="scan" />{t("Customer form")}</a>}
+            {formFamilies.has(lineageOf(standard)) && <a className="button icon-button" title={t("Customer form")} aria-label={t("Customer form")} href={`/api/standards/${standard.id}/customer-form/xlsx`}><Icon name="scan" /></a>}
             {standard.source_file && <a className="button icon-button" title={t("Download source")} aria-label={t("Download source")} href={`/api/standards/${standard.id}/source`}><Icon name="download" /></a>}
           </div>
           {standard.status === 'DRAFT' && <div className="card-actions">

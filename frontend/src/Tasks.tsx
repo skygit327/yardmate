@@ -103,8 +103,8 @@ export default function Tasks({ busy, perform, onOpen, initialView = 'board' }: 
   const needsReview = status?.jobs.filter(job => job.status !== 'DONE').length ?? 0;
 
   return <>
-    <header className="page-header"><div><h1>{t("Tasks & schedule")}</h1>
-      <p className="muted">{t("Files dropped into the work folders are processed automatically; their follow-up tasks appear here.")}</p></div>
+    <header className="page-header"><div><h1>{t("Tasks")}</h1>
+      </div>
       <button className="button" disabled={busy} onClick={() => void perform(async () => { await api('/automation/scan', {}); await load(); })}><Icon name="refresh" />{t("Check folders now")}</button></header>
 
     <div className="tabs" role="tablist">

@@ -793,3 +793,115 @@ nav button { text-align: left; }
 .live-map .leaflet-container { font-family: inherit; background: #d6e5ee; }
 .live-map .leaflet-marker-icon:focus-visible .map-pin-label { outline: 3px solid #e4b94b; }
 .map-pin.left { flex-direction: row-reverse; transform: translateX(calc(-100% + 16px)); }
+
+/* ---- Less text: compact navigation, home and lists ---------------------------------- */
+html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+h1, h2, h3, .program-title { text-wrap: balance; }
+.nav-divider { display: block; height: 1px; margin: 10px 12px; background: rgba(255, 255, 255, .12); }
+.sidebar nav button span { min-width: 0; }
+.mobile-brand { display: none; }
+.home-hero h1 { font-size: 26px; }
+.flow-chips { display: inline-flex; gap: 4px; }
+.flow-chips span { font-size: 11px; font-weight: 700; padding: 1px 6px; border-radius: 5px; background: #eef2f5; color: #4e6372; }
+.flow-text { grid-auto-flow: row; gap: 6px; }
+.support-head .icon:last-child { margin-left: auto; color: #8a3119; }
+.support-head { width: 100%; }
+.demo-banner { justify-content: space-between; }
+button { transition-property: background-color, border-color, color, box-shadow, transform; transition-duration: 150ms; transition-timing-function: ease-out; }
+button:active:not(:disabled) { transform: scale(0.97); }
+@media (prefers-reduced-motion: reduce) { button { transition: none; } button:active:not(:disabled) { transform: none; } }
+
+@media (max-width: 760px) {
+  .sidebar { position: fixed; inset: auto 0 0 0; z-index: 60; width: auto; height: auto; padding: 6px 6px calc(6px + env(safe-area-inset-bottom)); box-shadow: 0 -6px 18px rgba(15, 44, 66, .18); }
+  .sidebar .brand, .sidebar-cta, .sidebar-note, .nav-divider { display: none; }
+  .sidebar nav { display: grid; grid-auto-flow: column; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 2px; width: 100%; }
+  .sidebar nav button { flex-direction: column; justify-content: center; gap: 3px; min-height: 54px; padding: 6px 2px; font-size: 11px; line-height: 1.15; text-align: center; border-radius: 10px; box-shadow: none; }
+  .sidebar nav button.active { box-shadow: inset 0 3px 0 var(--primer); }
+  main { padding: 12px 12px 96px; }
+  .account-bar { justify-content: flex-end; }
+  .mobile-brand { display: block; margin-right: auto; font-weight: 800; font-size: 17px; color: var(--hull); }
+  .user-name { display: none; }
+}
+
+/* Support list: one context line, status tabs, rows without a surrounding card */
+.context-line { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; margin: -6px 0 14px; color: var(--muted); font-size: 13px; }
+.context-line .profile-strip { background: none; border: 0; padding: 0; margin: 0; font-size: 13px; gap: 6px; }
+.context-line .profile-strip > span:first-of-type { flex: none; min-width: 0; }
+.context-line .profile-strip .ghost { min-height: 32px; min-width: 32px; padding: 4px; justify-content: center; }
+.feed-status { display: inline-flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; }
+.feed-status.bad { color: var(--bad); }
+.feed-status .chip { padding: 1px 7px; font-size: 11px; }
+.program-search { background: none; border: 0; padding: 0; }
+.status-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.status-tabs button { min-height: 38px; padding: 6px 12px; gap: 8px; border-radius: 999px; background: #fff; font-weight: 600; }
+.status-tabs button b { font-variant-numeric: tabular-nums; font-size: 13px; padding: 0 7px; border-radius: 999px; background: #eef2f5; }
+.status-tabs button.pass b { background: var(--good-soft, #e3f2e6); color: var(--good); }
+.status-tabs button.warning b { background: #fff1c6; color: var(--warn); }
+.status-tabs button.fail b { background: #fbe7e1; color: var(--bad); }
+.status-tabs button.selected { background: var(--hull); border-color: var(--hull); color: #fff; }
+.status-tabs button.selected b { background: rgba(255, 255, 255, .18); color: #fff; }
+.program-list .inspection-list { gap: 0; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: #fff; }
+.program-list .program-row { border: 0; border-radius: 0; grid-template-columns: minmax(0, 1fr) 52px 56px auto 16px; padding: 14px 16px; }
+.program-list .program-row + .program-row { border-top: 1px solid var(--line); }
+.program-row strong { display: flex; align-items: baseline; gap: 6px; text-wrap: pretty; }
+.chip.synthetic { flex-shrink: 0; padding: 1px 7px; font-size: 11px; background: #f2eee9; color: #7a5a3e; }
+.met { font-size: 12px; color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
+.met b { font-size: 15px; color: var(--ink); }
+.program-row .row-tags { margin: 5px 0 3px; }
+@media (max-width: 640px) {
+  .program-list .program-row { grid-template-columns: minmax(0, 1fr) auto; row-gap: 8px; }
+  .program-list .program-row > .met, .program-list .program-row > .icon { display: none; }
+  .program-list .program-row > .chip { grid-column: 2; grid-row: 1; align-self: start; }
+  .program-list .program-row > .badge { grid-column: 1; justify-self: start; }
+}
+.support-card { justify-items: stretch; text-align: left; }
+.support-head { justify-content: flex-start; }
+.support-stats { justify-content: flex-start; }
+
+/* Inspection: problems as cards, passed items as one compact table, n/a folded away */
+.results + .result-table { margin-top: 12px; }
+.result-table { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: #fff; }
+.result-table-head { padding: 8px 14px; background: #f3f7f4; color: var(--good); font-size: 12.5px; font-weight: 700; border-bottom: 1px solid var(--line); }
+.result-line { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, .8fr) minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 8px 14px; font-size: 13.5px; }
+.result-line + .result-line { border-top: 1px solid #eef1f3; }
+.result-line small { color: var(--muted); margin-right: 4px; }
+.result-line .num { font-weight: 650; font-variant-numeric: tabular-nums; }
+.result-line .crit { color: var(--muted); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.result-line .badge { font-size: 11.5px; }
+details.skipped { margin-top: 10px; font-size: 13px; color: var(--muted); }
+details.skipped ul { margin: 4px 0 0; padding-left: 18px; }
+@media (max-width: 640px) {
+  .result-line { grid-template-columns: minmax(0, 1fr) auto; row-gap: 2px; }
+  .result-line .crit { grid-column: 1; }
+  .result-line > span:last-child { grid-row: 1; grid-column: 2; }
+}
+
+/* Read specs: one big drop target, options underneath */
+.intake-start.compact { max-width: 720px; display: grid; gap: 12px; }
+.dropzone.big { min-height: 220px; gap: 10px; background: #fff; }
+.intake-options { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.segmented.small button { min-height: 36px; padding: 6px 12px; font-size: 13px; }
+.lock-note { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; }
+.list-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 10px; }
+.list-toolbar .status-tabs { margin: 0; flex: 1; }
+.list-toolbar .search-box { width: min(280px, 100%); }
+.program-list .inspection-row { border: 0; border-radius: 0; background: #fff; }
+.program-list .inspection-row + .inspection-row { border-top: 1px solid var(--line); }
+.program-verdict { align-items: center; }
+.wording-toggle { margin-left: auto; }
+.program-table tr[title] td:first-child strong { text-decoration: underline dotted #b9c6cf; text-underline-offset: 3px; }
+/* Press feedback only on compact controls; large rows and cards stay still. */
+.inspection-row:active, .yard-step:active, .support-card:active, .tasks-line:active, .dropzone:active, .sidebar nav button:active { transform: none !important; }
+.field-chips .chip-button { min-height: 36px; }
+.flow-stat b, .support-stats b, .stat strong, .filter-tiles strong { font-variant-numeric: tabular-nums; }
+.program-row small, .inspection-row small { text-wrap: pretty; }
+.status-tabs button { white-space: nowrap; }
+@media (max-width: 760px) {
+  .sidebar .sidebar-note, .sidebar .sidebar-cta, .sidebar .brand { display: none; }
+  .list-toolbar { flex-direction: column; align-items: stretch; }
+  .list-toolbar .search-box { width: 100%; }
+  .list-toolbar > .icon-button { display: none; }
+  .status-tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+  .status-tabs::-webkit-scrollbar { display: none; }
+}
+@media (max-width: 640px) { .map-pin-label small { display: none; } }

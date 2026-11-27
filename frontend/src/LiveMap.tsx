@@ -10,7 +10,7 @@ export const yardPlaces = [
   { name: 'Ulsan Dong-gu', lat: 35.5049, lng: 129.4166, kind: 'crisis', region: '\uC6B8\uC0B0' },
   { name: 'Changwon Jinhae', lat: 35.1328, lng: 128.7102, kind: 'crisis', region: '\uACBD\uB0A8' },
   { name: 'Goseong', lat: 34.9730, lng: 128.3223, kind: 'crisis', region: '\uACBD\uB0A8' },
-  { name: 'Tongyeong', lat: 34.8544, lng: 128.4331, kind: 'crisis', note: 'Pipe shop', region: '\uACBD\uB0A8' },
+  { name: 'Tongyeong', lat: 34.8544, lng: 128.4331, kind: 'crisis', note: 'Pipe shop', region: '\uACBD\uB0A8', side: 'left' },
   { name: 'Busan port', lat: 35.1040, lng: 129.0420, kind: 'port', region: '\uBD80\uC0B0' },
 ] as const;
 
@@ -60,6 +60,8 @@ export default function LiveMap({ onRegion, onFail }: { onRegion: (region: strin
           }),
         }).on('click keypress', () => onRegion(place.region)).addTo(map);
       }
+      // Fit every place, whatever the width of the screen.
+      map.fitBounds(L.latLngBounds(yardPlaces.map(place => [place.lat, place.lng] as [number, number])), { padding: [36, 36], maxZoom: 10 });
       offline = window.setTimeout(() => { if (!tiles) onFail(); }, 10000);
     }).catch(() => { if (!cancelled) onFail(); });
     return () => { cancelled = true; window.clearTimeout(offline); map?.remove(); };

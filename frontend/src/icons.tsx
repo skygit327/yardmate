@@ -1,5 +1,6 @@
 const paths: Record<string, string> = {
   plus: 'M12 5v14M5 12h14',
+  lock: 'M7 11V8a5 5 0 0 1 10 0v3M5 11h14v10H5z',
   search: 'M11 4a7 7 0 1 0 0 14a7 7 0 1 0 0-14M20 20l-4-4',
   filter: 'M4 6h16M7 12h10M10 18h4',
   grant: 'M12 3v18M16.5 7H10a3 3 0 0 0 0 6h4a3 3 0 0 1 0 6H7',
