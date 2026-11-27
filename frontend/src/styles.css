@@ -948,3 +948,12 @@ button.assistant-card:hover { background: #e9eef2; border-color: var(--line); }
   .assistant-fab span { display: none; }
   .assistant-panel { inset: 8px 8px calc(74px + env(safe-area-inset-bottom)) 8px; width: auto; height: auto; }
 }
+
+/* AI opinion beside a rule verdict */
+.ai-check { border-color: #c9b8ef; color: #4b3a86; background: #f6f2ff; }
+.ai-check:hover:not(:disabled) { background: #ece5ff; }
+.ai-opinion { display: grid; grid-template-columns: auto 1fr; column-gap: 4px; align-items: center; margin-top: 6px; padding: 4px 7px; border-radius: 8px; background: #f6f2ff; color: #4b3a86; font-size: 11.5px; font-weight: 650; max-width: 240px; }
+.ai-opinion small { grid-column: 1 / -1; font-weight: 500; color: #5d5478; font-size: 11px; line-height: 1.35; margin-top: 2px; }
+@media (min-width: 761px) { .ai-opinion { min-width: 190px; } }
+.ai-opinion.pass { color: var(--good); }
+.ai-opinion.fail { color: var(--bad); }

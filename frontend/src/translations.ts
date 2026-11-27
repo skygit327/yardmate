@@ -9,6 +9,12 @@ export const languages: { code: Language; label: string; short: string; switchLa
 export { chinese };
 
 export const korean: Record<string, string> = {
+  "Ask the AI about the conditions the rules could not decide": "규칙으로 판단하지 못한 조건을 AI에게 물어봅니다",
+  "Connect an AI model in AI settings to use this": "AI 설정에서 모델을 연결하면 쓸 수 있어요",
+  "Ask AI again": "AI에게 다시 묻기",
+  "Check with AI": "AI로 확인",
+  "No AI model is connected. Add one in AI settings.": "연결된 AI 모델이 없습니다. AI 설정에서 연결하세요.",
+  "Company data is kept from external AI. Allow it in AI settings first.": "회사 정보는 외부 AI로 보내지 않도록 설정되어 있습니다. AI 설정에서 먼저 허용하세요.",
   "Ask YardMate": "도우미에게 묻기",
   "Which lots failed?": "불합격 로트 보여줘",
   "Eligible support notices in Geoje": "거제에서 신청 가능한 지원사업",

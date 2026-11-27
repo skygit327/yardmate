@@ -23,6 +23,7 @@ interface Notice {
 export interface Program {
   id: string; created_at: string; filename: string; source: string; notice: Notice; match: Match;
   url?: string | null; fit?: { score: number; reasons: Texts[] }; facets?: { categories: string[]; regions: string[] };
+  ai?: { model: string; at: string; conditions: Record<string, { status: 'pass' | 'fail' | 'unknown'; reason: Texts }> };
   tasks: { id: string; title: Texts; due: string }[];
 }
 interface Profile {
@@ -67,9 +68,9 @@ function plainTitle(title: string) {
   return title.replace(/^\s*\[[^\]]*\]\s*/, '');
 }
 
-export default function Programs({ busy, perform, initialProgram, onProgramUsed, onOpenTasks, initialView, initialRegion }: {
+export default function Programs({ busy, perform, initialProgram, onProgramUsed, onOpenTasks, initialView, initialRegion, aiReady = false }: {
   busy: boolean; perform: (task: () => Promise<void>) => Promise<void>;
-  initialProgram: string | null; onProgramUsed: () => void; onOpenTasks: () => void; initialView?: 'list' | 'profile'; initialRegion?: string;
+  initialProgram: string | null; onProgramUsed: () => void; onOpenTasks: () => void; initialView?: 'list' | 'profile'; initialRegion?: string; aiReady?: boolean;
 }) {
   const { t, language, locale } = useLanguage();
   const [programs, setPrograms] = useState<Program[]>([]);
@@ -206,6 +207,10 @@ export default function Programs({ busy, perform, initialProgram, onProgramUsed,
       <div className={`program-verdict ${overallTone[match.overall]}`}>
         <div><strong>{match.met}/{match.required}</strong><span>{t("required conditions met")}</span></div>
         {match.preferred > 0 && <div><strong>{match.bonus}/{match.preferred}</strong><span>{t("preferred conditions met")}</span></div>}
+        {match.conditions.some(c => c.status === 'unknown') && <button type="button" className="small ai-check" disabled={busy || !aiReady}
+          title={aiReady ? t("Ask the AI about the conditions the rules could not decide") : t("Connect an AI model in AI settings to use this")}
+          onClick={() => perform(async () => { setSelected(await api<Program>(`/programs/${selected.id}/ai-check`, {})); })}>
+          <Icon name="spark" size={14} />{selected.ai ? t("Ask AI again") : t("Check with AI")}</button>}
         <button type="button" className="ghost small wording-toggle" aria-pressed={showWording} onClick={() => setShowWording(value => !value)}>
           <Icon name="file" size={14} />{t(showWording ? "Hide notice wording" : "Show notice wording")}</button>
       </div>
@@ -221,7 +226,9 @@ export default function Programs({ busy, perform, initialProgram, onProgramUsed,
               <td><strong>{pick(row.label)}</strong></td>
               {showWording && <td className="original-text">“{row.source}”</td>}
               <td>{pick(row.actual)}</td>
-              <td><span className={`badge ${statusTone[row.status]}`}>{t(statusLabel[row.status])}</span></td>
+              <td><span className={`badge ${statusTone[row.status]}`}>{t(statusLabel[row.status])}</span>
+                {row.status === 'unknown' && selected.ai?.conditions[row.id] && <span className={`ai-opinion ${selected.ai.conditions[row.id].status}`} title={pick(selected.ai.conditions[row.id].reason)}>
+                  <Icon name="spark" size={12} />AI: {t(statusLabel[selected.ai.conditions[row.id].status])}<small>{pick(selected.ai.conditions[row.id].reason)}</small></span>}</td>
             </tr>)}</tbody>
           </table></div>
         </div>;

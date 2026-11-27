@@ -1,6 +1,9 @@
 """Support-programme matching for Dongnam shipbuilding suppliers: notice -> conditions -> verdict."""
 
+import json
 from datetime import date
+
+import pytest
 
 from spec_agent.services.support_programs import (
     DEMO_PROFILE,
@@ -131,3 +134,79 @@ def test_api_paste_and_reject(client):
     assert response.status_code == 422
     assert client.delete(f"/api/programs/{program['id']}").status_code == 200
     assert client.get(f"/api/programs/{program['id']}").status_code == 404
+
+
+class FakeModel:
+    label = "llm:fake/model"
+
+    def __init__(self):
+        self.prompts = []
+
+    def complete(self, system, user, json_mode=True):
+        self.prompts.append(user)
+        ids = [c["id"] for c in json.loads(user)["conditions"]]
+        return json.dumps(
+            {
+                "conditions": [
+                    {
+                        "id": ids[0],
+                        "status": "pass",
+                        "reason": {
+                            "en": "Has KR approval.",
+                            "ko": "KR 승인 보유.",
+                            "zh": "持有 KR 认可。",
+                        },
+                    },
+                    {"id": "made-up", "status": "pass", "reason": {}},
+                ]
+            }
+        )
+
+
+@pytest.mark.parametrize(
+    ("base_url", "allow", "expected"),
+    [
+        ("http://127.0.0.1:9/v1", False, 200),
+        ("https://api.example.com/v1", False, 409),
+        ("https://api.example.com/v1", True, 200),
+    ],
+)
+def test_ai_check_adds_an_opinion_without_changing_the_rule_verdict(
+    tmp_path, base_url, allow, expected
+):
+    from conftest import sign_in
+    from fastapi.testclient import TestClient
+
+    from spec_agent.config import LLMSettings, Settings
+    from spec_agent.main import create_app
+
+    model = FakeModel()
+    llm = LLMSettings(
+        provider="openai", model="m", base_url=base_url, api_key="k", allow_internal=allow
+    )
+    with TestClient(create_app(Settings(tmp_path, llm=llm), model)) as client:
+        client.app.state.auth.create_user("tester", "Tester", "testing-password-1234")
+        sign_in(client)
+        client.post("/api/programs/samples")
+        target = next(
+            p for p in client.get("/api/programs").json() if p["filename"].startswith("03")
+        )
+        response = client.post(f"/api/programs/{target['id']}/ai-check")
+        assert response.status_code == expected
+        if expected != 200:
+            assert model.prompts == []  # nothing left the company
+            return
+        checked = response.json()
+        assert checked["match"]["overall"] == target["match"]["overall"]  # rules stay official
+        opinion = list(checked["ai"]["conditions"].values())
+        assert len(opinion) == 1 and opinion[0]["status"] == "pass"
+        assert opinion[0]["reason"]["zh"] == "持有 KR 认可。"
+        assert checked["ai"]["model"] == "llm:fake/model"
+        assert "거제" in model.prompts[0]  # the company profile was the context
+
+
+def test_ai_check_needs_a_model(client):
+    client.post("/api/programs/samples")
+    program = client.get("/api/programs").json()[0]
+    response = client.post(f"/api/programs/{program['id']}/ai-check")
+    assert response.status_code == 409

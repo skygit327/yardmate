@@ -370,6 +370,21 @@ def create_app(settings: Settings | None = None, llm_client=None) -> FastAPI:
 
         return resource()["glossary"]
 
+    @app.post("/api/programs/{program_id}/ai-check")
+    def program_ai_check(program_id: str):
+        settings = app.state.workflow.settings.llm
+        if settings.provider == "none":
+            raise HTTPException(409, "No AI model is connected. Add one in AI settings.")
+        if settings.external and not settings.allow_internal:
+            raise HTTPException(
+                409, "Company data is kept from external AI. Allow it in AI settings first."
+            )
+        client = app.state.assistant.client or LLMClient(settings)
+        try:
+            return app.state.programs.ai_check(program_id, client, client.label)
+        except LLMError as error:
+            raise HTTPException(502, f"The AI check failed: {error}") from None
+
     @app.get("/api/programs/feed")
     def notice_feed_status():
         return app.state.feed.status()

@@ -444,6 +444,14 @@ def _judge_one(condition: dict, profile: CompanyProfile, today: date) -> tuple[s
 # --- the desk the API talks to --------------------------------------------------------------
 
 
+AI_CHECK_PROMPT = """You help a small shipbuilding supplier in Busan, Ulsan or Gyeongnam read
+support-programme notices. For each condition sentence the rules could not decide, judge it
+against the company profile. Use "pass" or "fail" only when the profile clearly settles it;
+otherwise "unknown". Never invent facts about the company. Answer ONLY with JSON:
+{"conditions": [{"id": "...", "status": "pass|fail|unknown",
+  "reason": {"en": "one short sentence", "ko": "...", "zh": "..."}}]}"""
+
+
 class SupportPrograms:
     def __init__(self, workflow):
         self.workflow = workflow
@@ -595,6 +603,49 @@ class SupportPrograms:
         with self.workflow.lock:
             self.store.save_task(task)
         return task
+
+    def ai_check(self, program_id: str, client, label: str) -> dict:
+        """Ask the model about the conditions the rules left as "check".
+
+        The rule verdict stays the official one; the model's view is stored beside it with a
+        reason in every language, and shown as an AI opinion. Only the notice wording and the
+        company profile are sent.
+        """
+        from spec_agent.services.revision_agent import parse_json_object
+
+        program = self.get(program_id)
+        open_conditions = [c for c in program["match"]["conditions"] if c["status"] == "unknown"]
+        if not open_conditions:
+            return program
+        profile = self._profile_model().model_dump()
+        prompt = json.dumps(
+            {
+                "notice_title": program["notice"]["title"],
+                "company": profile,
+                "conditions": [
+                    {"id": c["id"], "group": c["group"], "sentence": c["source"]}
+                    for c in open_conditions
+                ],
+            },
+            ensure_ascii=False,
+        )
+        answer = parse_json_object(client.complete(AI_CHECK_PROMPT, prompt))
+        known = {c["id"] for c in open_conditions}
+        reviewed = {}
+        for item in answer.get("conditions", []):
+            if not isinstance(item, dict) or item.get("id") not in known:
+                continue
+            status = item.get("status") if item.get("status") in {"pass", "fail", "unknown"} else "unknown"
+            reason = item.get("reason") if isinstance(item.get("reason"), dict) else {}
+            reviewed[item["id"]] = {
+                "status": status,
+                "reason": {lang: str(reason.get(lang) or reason.get("en") or "")[:300] for lang in LANGUAGES},
+            }
+        stored = {k: v for k, v in program.items() if k not in {"match", "facets"}}
+        stored["ai"] = {"model": label, "at": timestamp(), "conditions": reviewed}
+        with self.workflow.lock:
+            self.store.save_support_program(stored)
+        return self.get(program_id)
 
     def summary(self) -> dict:
         programs = [p for p in self.list() if p["match"]["overall"] != "CLOSED"]

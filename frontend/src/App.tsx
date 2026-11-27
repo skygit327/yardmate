@@ -444,7 +444,7 @@ export default function App({ user, onLogout, loggingOut }: {
       {tab === 'tasks' && <Tasks key={tasksView} initialView={tasksView} busy={busy} perform={perform} onOpen={openLink} />}
       {tab === 'forms' && <FormIntake initialReading={formReading} onReadingUsed={() => setFormReading(null)} busy={busy} perform={perform} onOpenStandard={lineage => { void refresh(); openStandard(lineage); }} />}
       {tab === 'trace' && <Traceback busy={busy} perform={perform} seed={traceSeed} onSeedUsed={() => setTraceSeed(null)} initialCase={traceCase} onCaseUsed={() => setTraceCase(null)} />}
-      {tab === 'programs' && <Programs key={programsKey} initialView={programsView} initialRegion={programsRegion} busy={busy} perform={perform}
+      {tab === 'programs' && <Programs key={programsKey} initialView={programsView} initialRegion={programsRegion} aiReady={Boolean(llm && llm.provider !== 'none' && (!llm.external || llm.allow_internal))} busy={busy} perform={perform}
         initialProgram={programSelected} onProgramUsed={() => setProgramSelected(null)} onOpenTasks={() => go('tasks')} />}
       {tab === 'ai' && <AISettings busy={busy} perform={perform} onChanged={loadHealth} />}
       {tab === 'customers' && <CustomersView selected={customerName} busy={busy} perform={perform} onSelect={setCustomerName}

@@ -1,5 +1,11 @@
 // Simplified Chinese UI catalogue. Keys are the English source strings.
 export const chinese: Record<string, string> = {
+  "Ask the AI about the conditions the rules could not decide": "向 AI 询问规则无法判定的条件",
+  "Connect an AI model in AI settings to use this": "在 AI 设置中连接模型后即可使用",
+  "Ask AI again": "再次询问 AI",
+  "Check with AI": "用 AI 确认",
+  "No AI model is connected. Add one in AI settings.": "未连接 AI 模型。请在 AI 设置中连接。",
+  "Company data is kept from external AI. Allow it in AI settings first.": "公司信息设置为不发送给外部 AI。请先在 AI 设置中允许。",
   "Understood by AI": "由 AI 理解",
   "Ask the assistant": "询问助手",
   "Understood with rules": "按规则理解",
