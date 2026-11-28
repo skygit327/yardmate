@@ -196,7 +196,7 @@ export default function FormIntake({ busy, perform, onOpenStandard, initialReadi
         </section>
         {samples.length > 0 && <section className="panel intake-card">
           <h2>{t("Try a sample form")}</h2>
-          <div className="sample-list">{samples.map(sample => <button key={sample.id} type="button" className="sample-item" disabled={busy} onClick={() => void readSample(sample.id)}>
+          <div className="sample-list">{samples.map(sample => <button key={sample.id} type="button" className="sample-item" data-sample-en={sample.label.en} disabled={busy} onClick={() => void readSample(sample.id)}>
             <span className="sample-lang">{sample.language}</span><span className="sample-label">{sample.label[language] || sample.label.en}</span><Icon name="next" size={15} /></button>)}</div>
         </section>}
       </aside>
@@ -307,7 +307,7 @@ export default function FormIntake({ busy, perform, onOpenStandard, initialReadi
             <button type="button" className={!asVersion ? 'selected' : ''} onClick={() => setAsVersion(false)}>{t("New standard")}</button></div>}
           {reviewCount > 0 && <p className="warning-text">{fill(t("{count} criteria have not been checked yet."), { count: reviewCount })}</p>}
           <div className="action-bar"><span className="muted">{t("It is saved as a draft and does not apply to inspections until activated.")}</span>
-            <button className="primary big" disabled={busy || !rules.length || headerFields.some(([key]) => !header[key].trim())} onClick={() => void saveStandard()}>
+            <button className="primary big" data-tour="save-draft" disabled={busy || !rules.length || headerFields.some(([key]) => !header[key].trim())} onClick={() => void saveStandard()}>
               <Icon name="check" />{t("Save as draft standard")}</button></div></>}
       </section>
     </>}

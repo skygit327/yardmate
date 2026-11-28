@@ -1377,3 +1377,21 @@ h1.plate-title { font-family: inherit; }
 .account-links button:hover { background: var(--surface); border-color: var(--line-strong); }
 .success-banner { display: flex; align-items: center; gap: 8px; margin: 0; padding: 10px 14px; border-radius: 14px; background: var(--good-soft); color: var(--good); font-weight: 600; }
 @media (max-width: 900px) { .account-grid { grid-template-columns: 1fr; } }
+
+/* Auto demo: pointer, click ring, highlight and the report preview drawn over the live page */
+.account-links .tour-start span small { display: block; margin-top: 2px; font-size: 12px; font-weight: 500; color: var(--muted, #6b7280); }
+.tour-layer { position: fixed; inset: 0; z-index: 2147483000; pointer-events: none; }
+.tour-cursor { position: fixed; left: 0; top: 0; width: 30px; height: 30px; transition: transform .55s cubic-bezier(.3, .7, .2, 1); filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .4)); }
+.tour-cursor path { fill: #fff; stroke: #111; stroke-width: 1.6; stroke-linejoin: round; }
+.tour-ring { position: fixed; width: 54px; height: 54px; margin: -27px 0 0 -27px; border-radius: 50%; border: 4px solid #f5b82e; opacity: 0; }
+.tour-ring.go { animation: tour-ring .5s ease-out; }
+@keyframes tour-ring { 0% { opacity: 1; transform: scale(.4); } 100% { opacity: 0; transform: scale(1.6); } }
+.tour-highlight { position: fixed; border: 4px solid #f5b82e; border-radius: 18px; opacity: 0; box-shadow: 0 0 0 8px rgba(245, 184, 46, .25);
+  transition: opacity .25s, left .4s, top .4s, width .4s, height .4s; }
+.tour-pdf { position: fixed; inset: 0; display: flex; align-items: flex-start; justify-content: center; gap: 32px; padding-top: 48px;
+  background: rgba(10, 14, 20, .72); opacity: 0; transition: opacity .3s; }
+.tour-pdf.on { opacity: 1; }
+.tour-pdf figure { margin: 0; text-align: center; color: #fff; font-weight: 700; font-size: 16px; }
+.tour-pdf iframe { width: min(42vw, 600px); height: min(78vh, 760px); border: 0; border-radius: 10px; background: #fff; display: block; margin-bottom: 10px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, .5); }
+@media (prefers-reduced-motion: reduce) { .tour-cursor, .tour-highlight { transition: none; } }

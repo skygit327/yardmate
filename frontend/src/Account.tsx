@@ -6,9 +6,9 @@ import { ThemeToggle } from './theme';
 import type { User } from './types';
 
 /** My page: name, password, display preferences and shortcuts. */
-export default function Account({ user, busy, perform, onRenamed, onGo, onLogout }: {
+export default function Account({ user, busy, perform, onRenamed, onGo, onLogout, onTour }: {
   user: User; busy: boolean; perform: (task: () => Promise<void>) => Promise<void>;
-  onRenamed: (user: User) => void; onGo: (page: string) => void; onLogout: () => void;
+  onRenamed: (user: User) => void; onGo: (page: string) => void; onLogout: () => void; onTour: () => void;
 }) {
   const { t } = useLanguage();
   const [name, setName] = useState(user.display_name);
@@ -81,6 +81,7 @@ export default function Account({ user, busy, perform, onRenamed, onGo, onLogout
           <button onClick={() => onGo('profile')}><Icon name="building" size={18} /><span>{t("Company profile")}</span><Icon name="next" size={16} /></button>
           <button onClick={() => onGo('ai')}><Icon name="gear" size={18} /><span>{t("AI settings")}</span><Icon name="next" size={16} /></button>
           <button onClick={() => onGo('tasks')}><Icon name="calendar" size={18} /><span>{t("Tasks")}</span><Icon name="next" size={16} /></button>
+          <button className="tour-start" disabled={busy} onClick={onTour} title={t("Plays the whole demo with real data. Press Esc to stop.")}><Icon name="play" size={18} /><span>{t("Auto demo")}<small>{t("Plays the whole demo with real data. Press Esc to stop.")}</small></span><Icon name="next" size={16} /></button>
         </div>
       </section>
     </div>

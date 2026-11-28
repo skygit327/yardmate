@@ -9,6 +9,7 @@ import { displayInspection, displayStandard, setGlossary } from './legacyDisplay
 import { LanguageToggle, useLanguage } from './language';
 import { useMotion } from './motion';
 import { ThemeToggle } from './theme';
+import { startTour } from './tour';
 import Account from './Account';
 import AISettings from './AISettings';
 import CustomersView from './Customers';
@@ -308,6 +309,15 @@ export default function App({ user: initialUser, onLogout, loggingOut }: {
 
   useMotion([]);
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('tour') !== '1') return;
+    params.delete('tour');
+    window.history.replaceState(null, '', `${window.location.pathname}${params.size ? `?${params}` : ''}`);
+    const timer = window.setTimeout(() => void startTour(), 1500);
+    return () => window.clearTimeout(timer);
+  }, []);
+
   const navItems: { tab: string; icon: string; label: string; hint?: string }[] = [
     { tab: 'home', icon: 'home', label: 'Home' },
     { tab: 'forms', icon: 'scan', label: 'Read specs', hint: 'Shipyard, coating and owner forms in Korean, English or Chinese → one standard' },
@@ -323,7 +333,7 @@ export default function App({ user: initialUser, onLogout, loggingOut }: {
       <nav aria-label={t("Main")}>
         {navItems.map((item, index) => <Fragment key={item.tab}>
           {index === 1 || index === 4 ? <span className="nav-divider" aria-hidden="true" /> : null}
-          <button className={tab === item.tab ? 'active' : ''} aria-current={tab === item.tab ? 'page' : undefined} aria-label={t(item.label)} onClick={() => go(item.tab)} title={item.hint ? t(item.hint) : undefined}>
+          <button data-tour={`nav-${item.tab}`} className={tab === item.tab ? 'active' : ''} aria-current={tab === item.tab ? 'page' : undefined} aria-label={t(item.label)} onClick={() => go(item.tab)} title={item.hint ? t(item.hint) : undefined}>
             <Icon name={item.icon} /><span>{t(item.label)}</span></button></Fragment>)}</nav>
       <div className="top-actions">
   <button className="sidebar-cta primary" data-magnetic disabled={busy} onClick={startInspection}><Icon name="plus" />{t("New inspection")}</button>
@@ -367,7 +377,7 @@ export default function App({ user: initialUser, onLogout, loggingOut }: {
         <div className="panel-top"><button className="ghost" onClick={() => setCreating(false)}><Icon name="back" />{t("Back")}</button><h1>{t("New inspection")}</h1></div>
         <form onSubmit={create}><fieldset disabled={busy}>
           <h2 className="step-title"><span>1</span>{t("Choose a standard")}</h2>
-          <div className="choice-grid">{activeStandards.map(standard => <button type="button" key={standard.id} aria-pressed={standardId === standard.id}
+          <div className="choice-grid">{activeStandards.map(standard => <button type="button" key={standard.id} data-doc={standard.document_number} aria-pressed={standardId === standard.id}
             className={`choice ${standardId === standard.id ? 'selected' : ''}`} onClick={() => { setStandardId(standard.id); setValues({}); }}>
             <strong>{standard.product_name}</strong><small>{standard.customer} · {standard.part_number}</small><span className="chip">{t('Rev')} {standard.revision}</span></button>)}</div>
           <h2 className="step-title"><span>2</span>{t("Lot and inspector")}</h2>
@@ -455,7 +465,7 @@ export default function App({ user: initialUser, onLogout, loggingOut }: {
       {tab === 'trace' && <Traceback busy={busy} perform={perform} seed={traceSeed} onSeedUsed={() => setTraceSeed(null)} initialCase={traceCase} onCaseUsed={() => setTraceCase(null)} />}
       {tab === 'programs' && <Programs key={programsKey} initialView={programsView} initialRegion={programsRegion} aiReady={Boolean(llm && llm.provider !== 'none' && (!llm.external || llm.allow_internal))} busy={busy} perform={perform}
         initialProgram={programSelected} onProgramUsed={() => setProgramSelected(null)} onOpenTasks={() => go('tasks')} />}
-      {tab === 'account' && <Account user={user} busy={busy} perform={perform} onRenamed={next => { setUser(next); setInspector(next.display_name); }} onGo={page => go(page)} onLogout={() => void onLogout()} />}
+      {tab === 'account' && <Account user={user} busy={busy} perform={perform} onRenamed={next => { setUser(next); setInspector(next.display_name); }} onGo={page => go(page)} onLogout={() => void onLogout()} onTour={() => void startTour()} />}
       {tab === 'ai' && <AISettings busy={busy} perform={perform} onChanged={loadHealth} />}
       {tab === 'customers' && <CustomersView selected={customerName} busy={busy} perform={perform} onSelect={setCustomerName}
         onOpenRequest={openRequest} onNewRequest={newRequest} onOpenInspection={openInspection} onOpenStandard={lineage => openStandard(lineage)} />}
